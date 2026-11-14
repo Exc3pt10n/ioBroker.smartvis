@@ -777,6 +777,7 @@ const server = new SmartVisServer(
                 states[id] = { val, ack: true, ts: Date.now() };
                 server.queueState(id, states[id]);
                 simulateShutterControl(id, val);
+                simulateLivestream(id);
                 // Hue-Raumgruppe schaltet wie die Bridge ihre Lampen mit
                 simulateHueScene(id, val);
                 const groupLamps: Record<string, string[]> = {
@@ -795,6 +796,26 @@ const server = new SmartVisServer(
         log: console as unknown as ioBroker.Logger,
     },
 );
+
+/** Kamera-Livestream wie eusec: Adresse setzen, nach 20 s (statt 120 s) Höchstdauer wieder löschen */
+function simulateLivestream(id: string): void {
+    const m = /^(eusec\.0\..+\.cameras\.[^.]+)\.(start_stream|stop_stream)$/.exec(id);
+    if (!m) {
+        return;
+    }
+    const urlId = `${m[1]}.livestream`;
+    console.log(`Demo: ${m[2]} ${m[1]}`);
+    const set = (val: string): void => {
+        states[urlId] = { val, ack: true, ts: Date.now() };
+        server.queueState(urlId, states[urlId]);
+    };
+    if (m[2] === 'start_stream') {
+        set('http://localhost:8123/demo-livestream/stream.html?src=demo');
+        setTimeout(() => set(''), 20_000);
+    } else {
+        set('');
+    }
+}
 
 /** Szene ausgelöst: wie die Bridge die aktive Szene der Gruppe melden (Smart Scenes laufen bis zum Ausschalten) */
 function simulateHueScene(id: string, val: unknown): void {

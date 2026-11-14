@@ -184,19 +184,29 @@ export function CameraSheet({
         liveRef.current = live;
     }, [live]);
 
+    // Beim Schließen: laufenden Stream beenden. Abhängig nur von der State-ID – das Kamera-Objekt ist nach
+    // jedem neuen Model (z. B. nach einer Neu-Erkennung) ein anderes, das darf den Stream nicht beenden.
+    const stopId = camera.liveStop?.id;
     useEffect(
         () => () => {
-            // Beim Schließen: laufenden Stream beenden
-            if (liveRef.current && camera.liveStop) {
-                connection.setState(camera.liveStop.id, true);
+            if (liveRef.current && stopId) {
+                connection.setState(stopId, true);
             }
         },
-        [camera.liveStop],
+        [stopId],
     );
+
+    // eusec beendet den Stream nach der eingestellten Höchstdauer (Standard 120 s) und löscht die Adresse
+    const [sawUrl, setSawUrl] = useState(false);
+    if (live && info.liveUrl && !sawUrl) {
+        setSawUrl(true);
+    }
+    const ended = live && sawUrl && !info.liveUrl;
 
     const startLive = (): void => {
         if (camera.liveStart) {
             connection.setState(camera.liveStart.id, true);
+            setSawUrl(false);
             setLive(true);
         }
     };
@@ -244,7 +254,19 @@ export function CameraSheet({
                             </a>
                         </div>
                     ) : (
-                        <div className="camera__big camera__placeholder camera__waiting">Stream wird gestartet …</div>
+                        <div className="camera__big camera__placeholder camera__waiting">
+                            {ended ? (
+                                <span>
+                                    Livestream beendet
+                                    <small>
+                                        eusec begrenzt die Dauer (Einstellung „Max camera livestream duration“, Standard
+                                        120 s)
+                                    </small>
+                                </span>
+                            ) : (
+                                'Stream wird gestartet …'
+                            )}
+                        </div>
                     )
                 ) : selected ? (
                     <CameraImage
@@ -286,9 +308,9 @@ export function CameraSheet({
                         <button
                             type="button"
                             className="action action--primary"
-                            onClick={live ? stopLive : startLive}
+                            onClick={live && !ended ? stopLive : startLive}
                         >
-                            {live ? '⏹ Livestream beenden' : '▶ Livestream'}
+                            {ended ? '▶ Weiter ansehen' : live ? '⏹ Livestream beenden' : '▶ Livestream'}
                         </button>
                     )}
                     {ptz && !info.disabled && (

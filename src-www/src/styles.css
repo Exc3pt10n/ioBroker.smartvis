@@ -4332,7 +4332,16 @@ button.battery__row {
 }
 
 .camera__waiting {
+    padding: 16px;
+    color: #e6e8ec;
     font-size: 15px;
+    text-align: center;
+}
+
+.camera__waiting small {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
 }
 
 .camera__alarm {
