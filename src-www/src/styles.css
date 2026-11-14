@@ -4218,3 +4218,169 @@ button.battery__row {
 .wwarn__instruction {
     color: var(--text-muted);
 }
+
+/* ===== Kameras ===== */
+.cameras {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+    gap: 8px;
+}
+
+@media (min-width: 700px) {
+    .cameras {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: var(--gap);
+    }
+}
+
+.camera__detail > .detail__note {
+    margin: 8px 0 12px;
+}
+
+.camera {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    padding: 0;
+    border: 0;
+    border-radius: 14px;
+    background: var(--surface-2);
+    color: #fff;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.camera--event {
+    outline: 3px solid var(--active);
+    outline-offset: -3px;
+}
+
+.camera__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camera__placeholder {
+    display: grid;
+    place-items: center;
+    color: var(--text-muted);
+    font-size: 32px;
+    background: var(--surface-2);
+}
+
+.camera--off .camera__img {
+    filter: grayscale(1) brightness(0.6);
+}
+
+.camera__bar {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 18px 10px 8px;
+    background: linear-gradient(transparent, rgb(0 0 0 / 65%));
+    font-size: 14px;
+}
+
+.camera__name {
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.camera__time,
+.camera__badge {
+    flex: none;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.camera__badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: rgb(0 0 0 / 45%);
+}
+
+.camera__badge--event {
+    background: var(--active);
+    color: #000;
+    opacity: 1;
+}
+
+.camera__big,
+.camera__frame {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    border: 0;
+    border-radius: 14px;
+    object-fit: contain;
+    background: #000;
+}
+
+.camera__waiting {
+    font-size: 15px;
+}
+
+.camera__alarm {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--warn) 18%, var(--surface));
+    color: var(--warn);
+    font-weight: 600;
+}
+
+.camera__station {
+    margin-top: 8px;
+}
+
+.camera__station--alarm {
+    color: var(--warn);
+}
+
+.camera__ptz {
+    display: grid;
+    grid-template-areas:
+        '. up .'
+        'left . right'
+        '. down .';
+    grid-template-columns: repeat(3, 48px);
+    gap: 6px;
+    justify-content: center;
+    margin: 4px 0;
+}
+
+.camera__ptz .csec__btn {
+    width: 48px;
+    height: 44px;
+}
+
+.camera__ptz-up {
+    grid-area: up;
+}
+
+.camera__ptz-left {
+    grid-area: left;
+}
+
+.camera__ptz-right {
+    grid-area: right;
+}
+
+.camera__ptz-down {
+    grid-area: down;
+}

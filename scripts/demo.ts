@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildDiagnosis } from '../src/lib/diagnosis';
 import { dwdTree, openweathermapTree } from '../src/lib/fixtures/weather';
+import { eusecTree } from '../src/lib/fixtures/eusec';
 import { discover } from '../src/lib/discovery';
 import { applyEdit, applyOverrides } from '../src/lib/overrides';
 import { historyOptions, holdGaps } from '../src/lib/history';
@@ -662,6 +663,48 @@ dwdNow(
 );
 dwdNow('instruction', 'ACHTUNG! Hinweis auf mögliche Gefahren: Es können zum Beispiel einzelne Äste herabstürzen.');
 
+// eufy-Kameras (eusec): HomeBase mit drei Außenkameras, eine Innenkamera (im Privatmodus)
+Object.assign(objects, eusecTree().objects);
+const eusec = (id: string, val: SvStateValue['val'], ago = 0): void => {
+    states[`eusec.0.${id}`] = { val, ack: true, ts: Date.now() - ago };
+};
+const homeBase = 'T8010N0000000001';
+[
+    ['T8142N0000000011', 'Eingangstür', 25 * 60_000, 92],
+    ['T8142N0000000012', 'Garten', 3 * 3600_000, 64],
+    ['T8142T0000000013', 'Einfahrt', 26 * 3600_000, 15],
+].forEach(([serial, , ago, battery]) => {
+    const c = `${homeBase}.cameras.${String(serial)}`;
+    eusec(`${c}.picture_url`, `/files/eusec.0/${homeBase}/last_event/${String(serial)}.jpg`, Number(ago));
+    eusec(`${c}.enabled`, true);
+    eusec(`${c}.state`, 1);
+    eusec(`${c}.battery`, Number(battery));
+    eusec(`${c}.light`, false);
+    eusec(`${c}.motion_detected`, false);
+    eusec(`${c}.person_detected`, serial === 'T8142N0000000011');
+});
+const indoorCam = 'T8410P0000000021.cameras.T8410P0000000021';
+eusec(`${indoorCam}.picture_url`, '/files/eusec.0/T8410P0000000021/last_event/T8410P0000000021.jpg', 2 * 86_400_000);
+eusec(`${indoorCam}.enabled`, false);
+eusec(`${indoorCam}.state`, 2);
+eusec(`${homeBase}.station.guard_mode`, 1);
+eusec(`${homeBase}.station.current_mode`, 1);
+eusec(`${homeBase}.station.alarm`, false);
+eusec('T8410P0000000021.station.guard_mode', 63);
+
+/** Demo-Ereignisbild: Farbverlauf mit Kameraname (statt echter Aufnahmen) */
+function demoPicture(path: string): { data: Buffer; mimeType: string } | null {
+    const serial = /\/([^/]+)\.jpg$/.exec(path)?.[1];
+    const id = Object.keys(objects).find(k => objects[k].type === 'device' && k.endsWith(`.cameras.${serial}`));
+    if (!id) {
+        return null;
+    }
+    const camera = { name: typeof objects[id].common.name === 'string' ? objects[id].common.name : serial };
+    const hue = [...camera.name].reduce((h, ch) => h + ch.charCodeAt(0), 0) % 360;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl(${hue},45%,55%)"/><stop offset="1" stop-color="hsl(${(hue + 60) % 360},40%,25%)"/></linearGradient></defs><rect width="320" height="180" fill="url(#g)"/><text x="160" y="96" fill="rgba(255,255,255,.55)" font-family="sans-serif" font-size="22" text-anchor="middle">Demo-Bild ${camera.name}</text></svg>`;
+    return { data: Buffer.from(svg), mimeType: 'image/svg+xml' };
+}
+
 const result = discover(objects, { language: 'de', ignoreAdapters: [] });
 // Anpassungen aus dem Bearbeiten-Modus (in der Demo nur im Speicher)
 // Anpassungen je Endgerät, nur im Speicher (wie overrides.json im Adapter)
@@ -697,6 +740,7 @@ const server = new SmartVisServer(
             return new Promise(resolve => setTimeout(() => resolve(holdGaps(demoHistory(id, range), step, end)), 250));
         },
         diagnose: () => buildDiagnosis(result, 'de'),
+        file: path => Promise.resolve(demoPicture(path)),
         edit: (clientId, edit) => {
             store = withOverrides(store, clientId, applyEdit(overridesFor(store, clientId), edit));
             server.publishModels(false, clientId);

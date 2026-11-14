@@ -51,6 +51,7 @@ SmartVis erkennt Geräte und Räume automatisch und zeigt sie ohne manuelles Anl
   - Allgemein: Geräte mit technischem Namen (z. B. „DVES_4E55F6“) heißen wie ihr smartName aus iot/Alexa; Mehrfach-Schalter werden zu einem Gerät je Ausgang; Kontakte mit „Tür“ im Namen sind Türen; umgekehrt laufende Rollladen-Positionen (deCONZ, FRITZ!DECT: 0 = offen) rechnet SmartVis beim Lesen, Schreiben und im Verlauf um
 - **Wetterdienste** für die Wetterkarte: `openweathermap`, `weatherunderground` und `daswetter` (ab 4.x, Meteored) liefern Wetterlage mit Symbol und eine Vorhersage für heute und die nächsten vier Tage (Höchst-/Tiefstwert, Regen); ohne eigene Wetterstation zeigt die Karte auch die aktuellen Werte des Dienstes (Wind in km/h, °F in °C umgerechnet). Mit Station bleiben deren Messwerte maßgeblich, Regen und Sturm meldet weiterhin die Station
 - **Amtliche Warnungen** des Deutschen Wetterdienstes (`dwd`): aktive Warnungen oben in der Wetterkarte, farbig nach Stufe (gelb, orange, rot, violett), antippen zeigt Beschreibung und Verhaltenshinweise
+- **Kameras** (eufy Security über [`eusec`](https://github.com/bropat/ioBroker.eusec)): Kacheln mit dem letzten Ereignisbild auf der Startseite und im Raum; erkannte Bewegung/Person ist hervorgehoben, ausgeschaltete und Offline-Kameras sind gekennzeichnet. Die Detailansicht zeigt das Bild groß und bietet Livestream (go2rtc-Seite des eusec-Adapters; der Stream wird beim Schließen beendet), Kamera an/aus, Licht, Schwenken der Innenkameras und den Sicherheitsmodus der Station. Die Bilder liefert SmartVis aus dem ioBroker-Dateispeicher aus – nur die Dateien, auf die die Kameras gerade verweisen. Sirene und Neustart der Station sind bewusst nicht bedienbar
 - **Diagnose der Erkennung** unter Mehr → Erkennung: erkannte Geräte je Adapter, Kanäle ohne Kachel mit Grund und Datenpunkten, anonymer Bericht zum Teilen
 - Adapterspezifische Regeln gegen Kachel-Rauschen: Homematic IP nur den ersten virtuellen Kanal je Ausgang (keine Wartungs-, Tasten-, Wochenprofil- oder Schwellwert-Kanäle), Hue ohne Sensoren, Smart Scenes, Entertainment-Bereiche und Altlasten der alten Objektstruktur, Alexa nur Player
 - Eigener Webserver mit WebSocket-API; die App erhält nur erkannte States, Schreibzugriffe nur auf freigegebene States
@@ -158,6 +159,12 @@ scripts/demo.ts Demo-Server ohne ioBroker
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### 0.11.0 (2026-11-14)
+
+- (Exc3pt10n) Kameras (eufy Security über `eusec`): Kamera-Kacheln mit dem letzten Ereignisbild auf der Startseite (Karte „Kameras“) und in den Räumen; erkannte Bewegung oder Person ist hervorgehoben, ausgeschaltete (Privatmodus) und Offline-Kameras sind gekennzeichnet
+- (Exc3pt10n) Kamera-Detailansicht: großes Bild mit Zeitpunkt, Livestream über die go2rtc-Seite des eusec-Adapters (wird beim Schließen beendet), Kamera an/aus, Licht, Schwenken der Innenkameras und Sicherheitsmodus der Station (Zuhause, Abwesend, Deaktiviert …); ein Alarm erscheint auf der Kamerakarte
+- (Exc3pt10n) Die Ereignisbilder liefert SmartVis aus dem ioBroker-Dateispeicher aus (nur die Dateien, auf die eine erkannte Kamera verweist); Akkustände der Kameras erscheinen in der Batterieübersicht; aus den eusec-Objekten entstehen keine Störkacheln mehr
 
 ### 0.10.0 (2026-11-14)
 

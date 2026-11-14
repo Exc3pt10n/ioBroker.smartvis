@@ -69,6 +69,7 @@ class SmartVis extends utils.Adapter {
                 setState: (id, val) => this.writeState(id, val),
                 edit: (clientId, edit) => this.queue(() => this.applyAndSave(clientId, edit)),
                 history: (id, range) => this.readHistory(id, range),
+                file: path => this.readCameraFile(path),
                 diagnose: () => {
                     if (!this.discovery) {
                         throw new Error('Die Erkennung läuft noch');
@@ -283,6 +284,26 @@ class SmartVis extends utils.Adapter {
         const flip = this.inverted().get(id);
         const points = holdGaps(toPoints(response.result), options.step, options.end);
         return flip ? points.map(([t, v]) => [t, invertNumber(v, flip) as number]) : points;
+    }
+
+    /**
+     * Kamerabild aus dem ioBroker-Dateispeicher: nur Pfade, die gerade in einem erkannten picture_url-State
+     * stehen (z. B. "/files/eusec.0/<Station>/last_event/<Kamera>.jpg") – keine beliebigen Dateien.
+     */
+    private async readCameraFile(path: string): Promise<{ data: Buffer; mimeType?: string } | null> {
+        const allowed = (this.discovery?.model.cameras || []).some(
+            c => c.picture && this.states[c.picture.id]?.val === path,
+        );
+        const m = /^\/files\/([^/]+)\/(.+)$/.exec(path);
+        if (!allowed || !m || m[2].split('/').includes('..')) {
+            return null;
+        }
+        try {
+            const { file, mimeType } = await this.readFileAsync(m[1], m[2]);
+            return { data: Buffer.isBuffer(file) ? file : Buffer.from(file), mimeType };
+        } catch {
+            return null;
+        }
     }
 
     private async writeState(id: string, val: ioBrokerValue): Promise<void> {

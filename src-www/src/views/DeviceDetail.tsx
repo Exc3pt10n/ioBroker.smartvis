@@ -1063,7 +1063,7 @@ function AcControls({ refs, states }: { refs: AcRefs; states: States }): React.J
 }
 
 /** Auswahlfeld für States mit Werteliste (common.states) */
-function SelectState({ state, label }: { state: SvStateRef; label: string }): React.JSX.Element {
+export function SelectState({ state, label }: { state: SvStateRef; label: string }): React.JSX.Element {
     const { states } = useConnection();
     const value = states[state.id];
     const current = value?.val === null || value?.val === undefined ? '' : String(value.val);

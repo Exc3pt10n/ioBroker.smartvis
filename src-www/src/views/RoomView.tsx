@@ -2,6 +2,7 @@ import { DeviceTile } from '../components/DeviceTile';
 import { SortableGrid } from '../components/SortableGrid';
 import { CustomSections, type SectionDef } from '../components/CustomSections';
 import { ScenePanel } from '../components/ScenePanel';
+import { CameraGrid } from '../components/Cameras';
 import { EditBanner, EditButton } from '../components/EditButton';
 import { Icon } from '../components/Icon';
 import { useConnection } from '../connection';
@@ -44,8 +45,10 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
               ]
             : [];
 
+    const cameras = isNone ? [] : (model.cameras || []).filter(c => c.roomId === roomId);
+
     // Bereiche: je Gerätegruppe eine Karte, Szenen direkt nach dem Licht (Anordnung gilt für alle Räume)
-    const sections: SectionDef[] = groups.flatMap(({ group, devices: list }): SectionDef[] => [
+    const deviceSections: SectionDef[] = groups.flatMap(({ group, devices: list }): SectionDef[] => [
         {
             key: group.key,
             label: group.label,
@@ -105,6 +108,30 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
               ]
             : []),
     ]);
+    const sections: SectionDef[] = [
+        ...deviceSections,
+        {
+            key: 'cameras',
+            label: 'Kameras',
+            node: cameras.length ? (
+                <section
+                    className="group"
+                    aria-labelledby="group-cameras"
+                >
+                    <div className="group__head">
+                        <h2
+                            id="group-cameras"
+                            className="subtitle"
+                        >
+                            <span aria-hidden="true">📷</span> Kameras
+                            <span className="group__count">{cameras.length}</span>
+                        </h2>
+                    </div>
+                    <CameraGrid cameras={cameras} />
+                </section>
+            ) : null,
+        },
+    ];
 
     return (
         <>
@@ -135,7 +162,7 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
                 <EditButton />
             </div>
             <EditBanner text="Kachel antippen zum Umbenennen, Verschieben oder Ausblenden · Kacheln und Bereiche am Griff ⠿ ziehen · Bereichs-Anordnung gilt für alle Räume" />
-            {devices.length === 0 ? (
+            {devices.length === 0 && cameras.length === 0 ? (
                 <p className="empty">Keine Geräte in diesem Raum.</p>
             ) : (
                 <CustomSections

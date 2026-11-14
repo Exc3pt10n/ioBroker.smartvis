@@ -95,7 +95,16 @@ tests.integration(path.join(__dirname, '..'), {
                     },
                     'hm-rpc.0.DIM1.4.LEVEL': {
                         type: 'state',
-                        common: { name: 'LEVEL', role: 'level.dimmer', type: 'number', read: true, write: true, min: 0, max: 100, unit: '%' },
+                        common: {
+                            name: 'LEVEL',
+                            role: 'level.dimmer',
+                            type: 'number',
+                            read: true,
+                            write: true,
+                            min: 0,
+                            max: 100,
+                            unit: '%',
+                        },
                         native: {},
                     },
                     'enum.rooms.living': {
@@ -106,7 +115,13 @@ tests.integration(path.join(__dirname, '..'), {
                     // Zweite, in ioBroker deaktivierte Homematic-Instanz: ihre Geräte zeigt SmartVis nicht an
                     'system.adapter.hm-rpc.1': {
                         type: 'instance',
-                        common: { name: 'hm-rpc', title: 'Homematic', enabled: false, mode: 'daemon', host: 'anderer-host' },
+                        common: {
+                            name: 'hm-rpc',
+                            title: 'Homematic',
+                            enabled: false,
+                            mode: 'daemon',
+                            host: 'anderer-host',
+                        },
                         native: {},
                     },
                     'hm-rpc.1.DIM2': { type: 'device', common: { name: 'Stehlampe' }, native: { TYPE: 'HmIP-BDT' } },
@@ -117,16 +132,64 @@ tests.integration(path.join(__dirname, '..'), {
                     },
                     'hm-rpc.1.DIM2.4.LEVEL': {
                         type: 'state',
-                        common: { name: 'LEVEL', role: 'level.dimmer', type: 'number', read: true, write: true, min: 0, max: 100, unit: '%' },
+                        common: {
+                            name: 'LEVEL',
+                            role: 'level.dimmer',
+                            type: 'number',
+                            read: true,
+                            write: true,
+                            min: 0,
+                            max: 100,
+                            unit: '%',
+                        },
+                        native: {},
+                    },
+                });
+                // eufy-Kamera (eusec): Ereignisbild liegt im ioBroker-Dateispeicher, Pfad steht in picture_url
+                const cam = 'eusec.0.S1.cameras.C1';
+                Object.assign(objects, {
+                    'eusec.0': { type: 'meta', common: { name: 'Dateiablage', type: 'meta.user' }, native: {} },
+                    'eusec.0.S1': { type: 'device', common: { name: 'HomeBase' }, native: {} },
+                    [cam]: { type: 'device', common: { name: 'Garten' }, native: {} },
+                    [`${cam}.picture_url`]: {
+                        type: 'state',
+                        common: { name: 'Picture URL', role: 'url', type: 'string', read: true, write: false },
+                        native: {},
+                    },
+                    [`${cam}.motion_detected`]: {
+                        type: 'state',
+                        common: { name: 'Motion', role: 'sensor.motion', type: 'boolean', read: true, write: false },
                         native: {},
                     },
                 });
                 for (const [id, obj] of Object.entries(objects)) {
                     await harness.objects.setObjectAsync(id, { ...obj, _id: id });
                 }
+                const picture = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4]);
+                await new Promise((resolve, reject) =>
+                    harness.objects.writeFile('eusec.0', 'S1/last_event/C1.jpg', picture, err =>
+                        err ? reject(err) : resolve(),
+                    ),
+                );
+                await new Promise((resolve, reject) =>
+                    harness.states.setState(
+                        `${cam}.picture_url`,
+                        { val: '/files/eusec.0/S1/last_event/C1.jpg', ack: true },
+                        err => (err ? reject(err) : resolve()),
+                    ),
+                );
 
                 await harness.startAdapterAndWait();
                 const { ws, model } = await connect(port);
+
+                // Kamerabild: freigegeben nur der Pfad aus picture_url, alles andere 404
+                expect(model.cameras.map(c => c.name)).to.deep.equal(['Garten']);
+                const image = await fetch(`http://127.0.0.1:${port}/files/eusec.0/S1/last_event/C1.jpg?v=1`);
+                expect(image.status).to.equal(200);
+                expect(image.headers.get('content-type')).to.match(/image\/jpeg/);
+                expect(Buffer.from(await image.arrayBuffer())).to.deep.equal(picture);
+                const other = await fetch(`http://127.0.0.1:${port}/files/eusec.0/S1/geheim.jpg`);
+                expect(other.status).to.equal(404);
 
                 // Verlauf nur für aufgezeichnete States – sonst Fehler statt Datenbankabfrage
                 const answer = new Promise(resolve => {
@@ -186,7 +249,11 @@ tests.integration(path.join(__dirname, '..'), {
                     common: { name: 'SmartVis', type: 'meta.user' },
                     native: {},
                 });
-                const existing = { version: 1, devices: {}, rooms: { 'custom.vorhanden': { name: 'Vorhanden', custom: true } } };
+                const existing = {
+                    version: 1,
+                    devices: {},
+                    rooms: { 'custom.vorhanden': { name: 'Vorhanden', custom: true } },
+                };
                 await harness.objects.writeFileAsync('smartvis.0', 'overrides.json', JSON.stringify(existing));
 
                 await harness.startAdapterAndWait();
@@ -198,7 +265,12 @@ tests.integration(path.join(__dirname, '..'), {
                 // Zwei Änderungen direkt hintereinander – keine darf verloren gehen
                 const first = nextModel(ws);
                 ws.send(JSON.stringify({ t: 'edit', edit: { kind: 'createRoom', name: 'Werkstatt' } }));
-                ws.send(JSON.stringify({ t: 'edit', edit: { kind: 'room', id: 'custom.vorhanden', patch: { hidden: true } } }));
+                ws.send(
+                    JSON.stringify({
+                        t: 'edit',
+                        edit: { kind: 'room', id: 'custom.vorhanden', patch: { hidden: true } },
+                    }),
+                );
                 await first;
                 const second = await nextModel(ws);
                 expect(second.rooms.map(r => r.name)).to.include.members(['Vorhanden', 'Werkstatt']);
@@ -206,7 +278,9 @@ tests.integration(path.join(__dirname, '..'), {
                 ws.close();
 
                 // Ohne Geräte-Kennung landen Änderungen in der gemeinsamen Ausgangsbasis (Format 2)
-                let saved = JSON.parse((await harness.objects.readFile('smartvis.0', 'overrides.json')).file.toString());
+                let saved = JSON.parse(
+                    (await harness.objects.readFile('smartvis.0', 'overrides.json')).file.toString(),
+                );
                 expect(saved.version).to.equal(2);
                 expect(saved.shared.rooms).to.deep.equal({
                     'custom.vorhanden': { name: 'Vorhanden', custom: true, hidden: true },

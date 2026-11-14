@@ -6,6 +6,7 @@ import { getName } from './names';
 import { normalizeObjects } from './normalize';
 import { splitOutputs, type Unmatched } from './outputs';
 import { profileStateRefs, pvForecastRefs, runProfiles, shutterControlRefs, warningRefs } from './profiles';
+import { cameraRefs, stationRefs } from './profiles/eusec';
 import { ADAPTER_ALLOWED_TYPES, isCandidate } from './profiles/candidates';
 import { hueRoomHints } from './profiles/hueRooms';
 import { hueSceneGroups } from './profiles/hueScenes';
@@ -225,6 +226,14 @@ export function discover(objects: ObjectMap, options: DiscoveryOptions): Discove
     for (const w of profiles.weatherWarnings) {
         warningRefs(w).forEach(r => stateIds.add(r.id));
     }
+    // Kameras und Sicherheitsstationen: Anzeige plus freigegebene Bedienung (Kamera an/aus, Licht, Stream, Modus)
+    for (const refs of [...profiles.cameras.map(cameraRefs), ...profiles.securityStations.map(stationRefs)]) {
+        refs.read.forEach(r => stateIds.add(r.id));
+        refs.write.forEach(r => {
+            stateIds.add(r.id);
+            writableIds.add(r.id);
+        });
+    }
     const claimed = profiles.claimedInstances.map(i => `${i}.`);
     const isClaimed = (id: string): boolean => claimed.some(prefix => id.startsWith(prefix));
 
@@ -364,6 +373,20 @@ export function discover(objects: ObjectMap, options: DiscoveryOptions): Discove
         }
     }
     renameGenericChannels(devices);
+
+    // Kameras: Raum aus den Raum-Aufzählungen (Kamera, Station oder ein State), sonst aus dem Namen
+    for (const camera of profiles.cameras) {
+        const members = [camera.id, camera.stationId, ...cameraRefs(camera).read.map(r => r.id)];
+        const enumRoom = members.map(m => (m ? memberToRoom.get(m) : undefined)).find(Boolean);
+        if (enumRoom) {
+            camera.roomId = enumRoom;
+            continue;
+        }
+        const guess = guessRoom([camera.name], [...new Set([...rooms.names(), ...DEFAULT_ROOM_NAMES])]);
+        if (guess) {
+            camera.roomId = rooms.ensure(guess.name, 'name');
+        }
+    }
     devices.sort((a, b) => a.name.localeCompare(b.name, lang));
     const roomList = [...rooms.rooms.values()].sort((a, b) => a.name.localeCompare(b.name, lang));
 
@@ -422,6 +445,8 @@ export function discover(objects: ObjectMap, options: DiscoveryOptions): Discove
         // Eigene Wetterstationen zuerst (Messwerte haben Vorrang), dann Wetterdienste
         weather: [...profiles.weather].sort((a, b) => Number(a.source === 'service') - Number(b.source === 'service')),
         weatherWarnings: profiles.weatherWarnings,
+        cameras: profiles.cameras,
+        securityStations: profiles.securityStations,
         shutterControl: profiles.shutterControl,
         scenes,
         batteries,

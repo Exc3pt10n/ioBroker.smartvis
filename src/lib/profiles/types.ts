@@ -6,6 +6,8 @@ import type {
     SvWallbox,
     SvWeather,
     SvWeatherWarning,
+    SvCamera,
+    SvSecurityStation,
 } from '../../shared/protocol';
 
 export type ObjectMap = Record<string, ioBroker.Object>;
@@ -18,6 +20,8 @@ export interface ProfileResult {
     pvForecast?: SvPvForecast;
     /** Amtliche Wetterwarnungen (DWD) */
     warnings?: SvWeatherWarning[];
+    cameras?: SvCamera[];
+    securityStations?: SvSecurityStation[];
 }
 
 /**

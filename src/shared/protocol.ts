@@ -287,6 +287,53 @@ export interface SvForecastDay {
     windSpeed?: SvStateRef;
 }
 
+/** Kamera (z. B. eufy über ioBroker.eusec) */
+export interface SvCamera {
+    id: string;
+    name: string;
+    adapter: string;
+    roomId: string | null;
+    /** Gerätemodell, z. B. "T8142" */
+    model?: string;
+    /** Pfad des letzten Ereignisbilds im ioBroker-Dateispeicher ("/files/eusec.0/…") – SmartVis liefert es unter demselben Pfad aus */
+    picture?: SvStateRef;
+    motion?: SvStateRef;
+    person?: SvStateRef;
+    pet?: SvStateRef;
+    sound?: SvStateRef;
+    crying?: SvStateRef;
+    /** Kamera eingeschaltet (aus = Privatmodus) */
+    enabled?: SvStateRef;
+    /** Verbindungsstatus mit Werteliste (Online, Offline …) */
+    status?: SvStateRef;
+    battery?: SvStateRef;
+    /** Scheinwerfer/Licht der Kamera */
+    light?: SvStateRef;
+    liveStart?: SvStateRef;
+    liveStop?: SvStateRef;
+    /** Adresse der Livestream-Seite (nur gefüllt, solange der Stream läuft) */
+    liveUrl?: SvStateRef;
+    panLeft?: SvStateRef;
+    panRight?: SvStateRef;
+    tiltUp?: SvStateRef;
+    tiltDown?: SvStateRef;
+    /** Station mit Sicherheitsmodus, zu der die Kamera gehört */
+    stationId?: string;
+}
+
+/** Sicherheitsstation (z. B. eufy HomeBase oder eine Innenkamera als eigene Station) */
+export interface SvSecurityStation {
+    id: string;
+    name: string;
+    adapter: string;
+    /** Gewünschter Modus (schreibbar), Werteliste auf Deutsch */
+    guardMode?: SvStateRef;
+    /** Tatsächlicher Modus */
+    currentMode?: SvStateRef;
+    alarm?: SvStateRef;
+    connected?: SvStateRef;
+}
+
 /** Amtliche Warnung (DWD), ein Platz des Adapters; aktiv, solange headline gefüllt ist */
 export interface SvWeatherWarning {
     id: string;
@@ -578,6 +625,9 @@ export interface SvModel {
     batteries?: SvBattery[];
     /** Amtliche Wetterwarnungen (DWD) */
     weatherWarnings?: SvWeatherWarning[];
+    /** Kameras und ihre Sicherheitsstationen */
+    cameras?: SvCamera[];
+    securityStations?: SvSecurityStation[];
     /** Zustand von ioBroker (Hosts, Instanzen) */
     system?: SvSystemStatus;
     /** Zeitpunkt der letzten Erkennung (ms) */

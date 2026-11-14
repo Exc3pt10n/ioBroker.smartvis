@@ -24,7 +24,8 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
     const rooms = visibleRooms(model, editing)
         .filter(r => r.kind !== 'zone')
         .map(r => ({ room: r, devices: devices.filter(d => d.roomId === r.id) }))
-        .filter(r => editing || r.devices.length > 0);
+        // Räume nur mit Kamera (z. B. Einfahrt) zählen auch
+        .filter(r => editing || r.devices.length > 0 || (model.cameras || []).some(c => c.roomId === r.room.id));
     // Hue-Zonen über mehrere Räume: eigener Bereich unter den Räumen
     const zones = visibleRooms(model, editing)
         .filter(r => r.kind === 'zone')

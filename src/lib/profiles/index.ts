@@ -8,12 +8,15 @@ import type {
     SvWallbox,
     SvWeather,
     SvWeatherWarning,
+    SvCamera,
+    SvSecurityStation,
 } from '../../shared/protocol';
 import { pvforecastProfile } from './pvforecast';
 import { shuttercontrolProfile } from './shuttercontrol';
 import { hmWeatherProfile } from './hmWeather';
 import { kecontactProfile } from './kecontact';
 import { qhomeProfile } from './qhome';
+import { eusecProfile } from './eusec';
 import { daswetterProfile, dwdProfile, openweathermapProfile, weatherundergroundProfile } from './weatherServices';
 import { instancesOf, type AdapterProfile, type ObjectMap } from './types';
 
@@ -27,6 +30,7 @@ export const PROFILES: AdapterProfile[] = [
     weatherundergroundProfile,
     daswetterProfile,
     dwdProfile,
+    eusecProfile,
 ];
 
 export interface ProfilesResult {
@@ -36,6 +40,8 @@ export interface ProfilesResult {
     shutterControl: SvShutterControl[];
     pvForecast: SvPvForecast[];
     weatherWarnings: SvWeatherWarning[];
+    cameras: SvCamera[];
+    securityStations: SvSecurityStation[];
     /** Instanzen, die vollständig von einem Profil abgebildet werden */
     claimedInstances: string[];
 }
@@ -49,6 +55,8 @@ export function runProfiles(objects: ObjectMap, lang: string, isIgnored: (id: st
         shutterControl: [],
         pvForecast: [],
         weatherWarnings: [],
+        cameras: [],
+        securityStations: [],
         claimedInstances: [],
     };
     for (const profile of PROFILES) {
@@ -68,6 +76,12 @@ export function runProfiles(objects: ObjectMap, lang: string, isIgnored: (id: st
             }
             if (found.weather) {
                 result.weather.push(...found.weather);
+            }
+            if (found.cameras) {
+                result.cameras.push(...found.cameras);
+            }
+            if (found.securityStations) {
+                result.securityStations.push(...found.securityStations);
             }
             if (found.warnings) {
                 result.weatherWarnings.push(...found.warnings);

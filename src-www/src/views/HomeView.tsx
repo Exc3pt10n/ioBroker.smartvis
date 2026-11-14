@@ -10,6 +10,7 @@ import { CustomSections, type SectionDef } from '../components/CustomSections';
 import { EditBanner, EditButton } from '../components/EditButton';
 import { favorites, useEditing, visibleDevices } from '../editing';
 import { WarningsCard, WeatherCard } from '../components/WeatherCard';
+import { CamerasCard } from '../components/Cameras';
 import { activeWarnings } from '../weather';
 import { EnergyFlow, FlowStatus } from '../components/EnergyFlow';
 import { ForecastCard } from '../components/ForecastCard';
@@ -416,6 +417,11 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                 placeholder('Erscheint, sobald eine Batterie schwach ist (Anzeige des Geräts oder höchstens 20 %).')
             ),
         },
+        {
+            key: 'cameras',
+            label: 'Kameras',
+            node: model.cameras?.length ? <CamerasCard model={model} /> : null,
+        },
     ];
     // Standardbreiten im Desktop-Raster: Übersichtskarten und kurze Listen je ein Drittel
     const thirds = new Set(['weather', 'energy', 'playing', 'climate', 'open', 'problems', 'batteries']);
@@ -424,6 +430,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
         'energy',
         'forecast',
         'favorites',
+        'cameras',
         'playing',
         'climate',
         'open',
