@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import type { SvDevice, SvStateRef, SvStateValue } from '../../../src/shared/protocol';
 import { HistoryPanel } from '../components/HistoryPanel';
 import { ScenePanel } from '../components/ScenePanel';
+import { COLOR_SWATCHES, hsvToHex, parseHex, rgbToHs } from '../color';
 import { Icon } from '../components/Icon';
 import { Sheet } from '../components/Sheet';
 import { Slider } from '../components/Slider';
@@ -126,6 +128,14 @@ interface LightRefs {
     level?: SvStateRef;
     ct?: SvStateRef;
     hue?: SvStateRef;
+    sat?: SvStateRef;
+    /** Farbe als Hex-Wert "#RRGGBB" (z. B. hue-v2, zigbee) */
+    rgb?: SvStateRef;
+    red?: SvStateRef;
+    green?: SvStateRef;
+    blue?: SvStateRef;
+    /** Farbmodus der Lampe (ct = Weiß, hs/xy = Farbe) */
+    colorMode?: SvStateRef;
 }
 interface BlindRefs {
     set?: SvStateRef;
@@ -148,6 +158,12 @@ function lightRefs(device: SvDevice): LightRefs {
             (device.type === 'dimmer' ? find(device, ['SET'], { write: true, type: 'number' }) : undefined),
         ct: find(device, ['TEMPERATURE'], { write: true }),
         hue: find(device, ['HUE'], { write: true }),
+        sat: find(device, ['SATURATION'], { write: true }),
+        rgb: find(device, ['RGB'], { write: true, type: 'string' }),
+        red: find(device, ['RED'], { write: true }),
+        green: find(device, ['GREEN'], { write: true }),
+        blue: find(device, ['BLUE'], { write: true }),
+        colorMode: find(device, ['COLORMODE']),
     };
 }
 
@@ -503,7 +519,11 @@ export function DeviceDetail({
 }
 
 function LightControls({ refs, states }: { refs: LightRefs; states: States }): React.JSX.Element {
-    const { onOff, level, ct, hue } = refs;
+    const { onOff, level, ct } = refs;
+    const hasColor = !!(refs.hue || refs.rgb || (refs.red && refs.green && refs.blue));
+    // Weiß oder Farbe: nach dem aktuellen Farbmodus der Lampe, sonst Weiß
+    const modeVal = refs.colorMode ? String(states[refs.colorMode.id]?.val ?? '') : '';
+    const [mode, setMode] = useState<'white' | 'color'>(/^(hs|xy|color|rgb)$/i.test(modeVal) ? 'color' : 'white');
 
     // Farbtemperatur: Hue liefert Mired (153–500, hoch = warm), andere Kelvin (hoch = kalt),
     // Tuya einen relativen Wert (0 = warm … 1000 = kalt, Einheit "%")
@@ -538,7 +558,27 @@ function LightControls({ refs, states }: { refs: LightRefs; states: States }): R
                     variant="warm"
                 />
             )}
-            {ct && (
+            {hasColor && ct && (
+                <div
+                    className="segmented light__mode"
+                    role="radiogroup"
+                    aria-label="Lichtart"
+                >
+                    {(['white', 'color'] as const).map(m => (
+                        <button
+                            key={m}
+                            type="button"
+                            role="radio"
+                            aria-checked={mode === m}
+                            className={mode === m ? 'segmented--active' : ''}
+                            onClick={() => setMode(m)}
+                        >
+                            {m === 'white' ? 'Weiß' : 'Farbe'}
+                        </button>
+                    ))}
+                </div>
+            )}
+            {ct && (!hasColor || mode === 'white') && (
                 <Slider
                     label="Farbtemperatur"
                     value={num(states, ct)}
@@ -550,16 +590,10 @@ function LightControls({ refs, states }: { refs: LightRefs; states: States }): R
                     variant={isKelvin ? 'warm' : 'ct'}
                 />
             )}
-            {hue && (
-                <Slider
-                    label="Farbe"
-                    value={num(states, hue)}
-                    min={hue.min ?? 0}
-                    max={hue.max ?? 360}
-                    pending={pending(states, hue)}
-                    format={v => `${Math.round(v)}°`}
-                    onCommit={v => connection.setState(hue.id, v)}
-                    variant="hue"
+            {hasColor && (!ct || mode === 'color') && (
+                <LightColor
+                    refs={refs}
+                    states={states}
                 />
             )}
         </div>
@@ -1121,6 +1155,116 @@ export function SelectState({ state, label }: { state: SvStateRef; label: string
                     </option>
                 ))}
             </select>
+        </div>
+    );
+}
+
+/** Aktuelle Lichtfarbe (Farbton 0–360, Sättigung 0–1) aus Farbton/Sättigung, Hex-Wert oder R/G/B */
+function currentHs(refs: LightRefs, states: States): { h: number; s: number } | undefined {
+    const scaled = (ref: SvStateRef | undefined, fallbackMax: number): number | undefined => {
+        const v = num(states, ref);
+        if (v === undefined || !ref) {
+            return undefined;
+        }
+        const min = ref.min ?? 0;
+        const max = ref.max ?? fallbackMax;
+        return max > min ? (v - min) / (max - min) : undefined;
+    };
+    if (refs.hue) {
+        const h = scaled(refs.hue, 360);
+        return h === undefined ? undefined : { h: h * 360, s: scaled(refs.sat, 254) ?? 1 };
+    }
+    if (refs.rgb) {
+        const rgb = parseHex(String(states[refs.rgb.id]?.val ?? ''));
+        return rgb ? rgbToHs(...rgb) : undefined;
+    }
+    const r = num(states, refs.red);
+    const g = num(states, refs.green);
+    const b = num(states, refs.blue);
+    return r !== undefined && g !== undefined && b !== undefined ? rgbToHs(r, g, b) : undefined;
+}
+
+/**
+ * Farbe einstellen: Farbfelder für die schnelle Wahl, dazu Farbton und Sättigung.
+ * Schreibt Farbton/Sättigung (ioBroker.hue), den Hex-Wert (hue-v2, zigbee …) oder notfalls R/G/B;
+ * eine ausgeschaltete Lampe wird dabei eingeschaltet (die Hue-Bridge ändert sonst keine Farbe).
+ */
+function LightColor({ refs, states }: { refs: LightRefs; states: States }): React.JSX.Element {
+    const current = currentHs(refs, states);
+    const h = current?.h ?? 0;
+    const sat = current?.s ?? 1;
+    const apply = (hue: number, s: number): void => {
+        if (refs.onOff && states[refs.onOff.id]?.val !== true) {
+            connection.setState(refs.onOff.id, true);
+        }
+        if (refs.hue) {
+            const min = refs.hue.min ?? 0;
+            const max = refs.hue.max ?? 360;
+            connection.setState(refs.hue.id, Math.round(min + (hue / 360) * (max - min)));
+            if (refs.sat) {
+                const smin = refs.sat.min ?? 0;
+                const smax = refs.sat.max ?? 254;
+                connection.setState(refs.sat.id, Math.round(smin + s * (smax - smin)));
+            }
+            return;
+        }
+        const hex = hsvToHex(hue, s);
+        if (refs.rgb) {
+            connection.setState(refs.rgb.id, hex);
+            return;
+        }
+        const rgb = parseHex(hex)!;
+        [refs.red, refs.green, refs.blue].forEach((ref, i) => {
+            if (ref) {
+                connection.setState(ref.id, Math.round((rgb[i] / 255) * (ref.max ?? 255)));
+            }
+        });
+    };
+    const near = (a: number, b: number): boolean => Math.min(Math.abs(a - b), 360 - Math.abs(a - b)) < 12;
+    return (
+        <div className="light__color">
+            <div
+                className="swatches"
+                role="group"
+                aria-label="Farbe wählen"
+            >
+                {COLOR_SWATCHES.map(c => {
+                    const on = !!current && sat > 0.6 && near(h, c.h);
+                    return (
+                        <button
+                            key={c.name}
+                            type="button"
+                            className={`swatch${on ? ' swatch--on' : ''}`}
+                            style={{ background: hsvToHex(c.h, 1) }}
+                            aria-label={c.name}
+                            aria-pressed={on}
+                            title={c.name}
+                            onClick={() => apply(c.h, 1)}
+                        />
+                    );
+                })}
+            </div>
+            <Slider
+                label="Farbton"
+                value={current ? Math.round(h) : undefined}
+                min={0}
+                max={359}
+                format={v => `${Math.round(v)}°`}
+                onCommit={v => apply(v, sat)}
+                variant="hue"
+            />
+            {(refs.sat || refs.rgb || refs.red) && (
+                <Slider
+                    label="Sättigung"
+                    value={current ? Math.round(sat * 100) : undefined}
+                    min={0}
+                    max={100}
+                    format={v => `${Math.round(v)} %`}
+                    onCommit={v => apply(h, v / 100)}
+                    variant="sat"
+                    trackColor={hsvToHex(h, 1)}
+                />
+            )}
         </div>
     );
 }

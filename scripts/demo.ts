@@ -358,8 +358,15 @@ Object.assign(
     }
 }
 
-// Farbtemperatur für die Stehlampe (Hue: Mired 153–500)
-state('hue.0.Stehlampe.ct', 'level.color.temperature', 'number', true, 370, { min: 153, max: 500 });
+// Stehlampe als Hue Color Ambiance (wie ioBroker.hue: r/g/b, Farbton, Sättigung, Kelvin, Farbmodus)
+objects['hue.0.Stehlampe'].common.role = 'light.color';
+state('hue.0.Stehlampe.ct', 'level.color.temperature', 'number', true, 2700, { min: 2200, max: 6500, unit: '°K' });
+state('hue.0.Stehlampe.hue', 'level.color.hue', 'number', true, 28, { min: 0, max: 360, unit: '°' });
+state('hue.0.Stehlampe.sat', 'level.color.saturation', 'number', true, 230, { min: 0, max: 254 });
+state('hue.0.Stehlampe.r', 'level.color.red', 'number', true, 255, { min: 0, max: 255 });
+state('hue.0.Stehlampe.g', 'level.color.green', 'number', true, 140, { min: 0, max: 255 });
+state('hue.0.Stehlampe.b', 'level.color.blue', 'number', true, 30, { min: 0, max: 255 });
+state('hue.0.Stehlampe.colormode', 'colormode', 'string', false, 'hs');
 
 // Toshiba-Klimageräte (Adapter toshiba-ac, anonymisierter echter Objektbaum inkl. Werte)
 {

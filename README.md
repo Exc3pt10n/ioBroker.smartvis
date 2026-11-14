@@ -66,6 +66,7 @@ SmartVis erkennt Geräte und Räume automatisch und zeigt sie ohne manuelles Anl
   - Ist eine Wallbox vorhanden, wird ihre Leistung aus dem Hausverbrauch des Speichers herausgerechnet (der Speicher misst am Netzanschluss)
 - Neu-Erkennung bei Objektänderungen
 - **Verläufe** aus `sql`, `history` oder `influxdb`: automatisch für alle aufgezeichneten Werte (Einstellung „Aufzeichnung aktiviert“ am Datenpunkt) – in der Detailansicht der Geräte, im Wetter-Verlauf (Link in der Wetterkarte) und in der Energie-Sicht; Zeiträume 6 Std./24 Std./7 Tage als Mittelwerte, mit Min./Ø/Max., Tooltip und Tabelle. Für die Q.HOME werden auch die aufgezeichneten kW-Varianten (`GridPwPurchase`, `GridPwFeedIn`) erkannt
+- **Farbiges Licht** für Farblampen (Hue Color Ambiance über `hue` und `hue-v2`, Zigbee, Tasmota u. a.): „Weiß | Farbe“, Farbfelder, Farbton und Sättigung
 - **Hue-Szenen**: die Szenen der Hue-Räume und -Zonen lassen sich in der Detailansicht jeder Hue-Lampe und in der Raumansicht (unter „Licht“) auslösen; interne Bridge-Szenen und doppelte Gruppen werden ausgeblendet. Mit `hue-v2` auch Smart Scenes wie „Natürliches Licht“ (mit ✨ gekennzeichnet)
 - **Deaktivierte Instanzen**: Ist eine Adapter-Instanz in ioBroker deaktiviert, zeigt SmartVis ihre Geräte nicht an (ihre Werte aktualisieren sich ohnehin nicht mehr) – praktisch z. B. beim Umstieg von `hue` auf `hue-v2`
 - **Hue-Zonen**: Zonen innerhalb eines Raums erscheinen als Kachel im Raum, Zonen über mehrere Räume als eigener Eintrag unter „Zonen“; die gerade aktive Szene ist markiert (bei hue-v2 über `activeScene`, Smart Scenes über ihren Schalter)
@@ -165,6 +166,8 @@ scripts/demo.ts Demo-Server ohne ioBroker
 -->
 
 ### 0.12.0 (2026-11-14)
+
+- (Exc3pt10n) Farbiges Licht für Farblampen (z. B. Hue Color Ambiance mit `hue` oder `hue-v2`, Zigbee, Tasmota): in der Lampen-Ansicht Umschalter „Weiß | Farbe“ (startet im aktuellen Farbmodus der Lampe), Farbfelder für die schnelle Wahl sowie Farbton und Sättigung; eine ausgeschaltete Lampe wird dabei eingeschaltet. SmartVis nutzt Farbton/Sättigung, die Hex-Farbe oder notfalls R/G/B – je nachdem, was die Lampe anbietet
 
 - (Exc3pt10n) Kamera-Einstellungen (eusec) in der Kamera-Ansicht: Erkennung, Aufnahme, Bild & Ton und Benachrichtigungen – gruppiert, auf Deutsch und nur, was die Kamera anbietet; Untereinstellungen erscheinen nur, wenn sie wirken (z. B. Empfindlichkeit bei eingeschalteter Bewegungserkennung, Clip-Länge im Energiemodus „Benutzerdefiniert“)
 
