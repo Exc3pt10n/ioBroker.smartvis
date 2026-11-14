@@ -12,9 +12,9 @@ export type SecurityMode = 'home' | 'away' | 'off';
 const MODE_LABELS: Record<SecurityMode, string> = { home: 'Zuhause', away: 'Abwesend', off: 'Deaktiviert' };
 
 export const MODE_CHOICES: { mode: SecurityMode; label: string; icon: string }[] = [
-    { mode: 'home', label: 'Zuhause', icon: '🏠' },
-    { mode: 'away', label: 'Abwesend', icon: '🚶' },
-    { mode: 'off', label: 'Aus', icon: '⏻' },
+    { mode: 'home', label: 'Zuhause', icon: 'home' },
+    { mode: 'away', label: 'Abwesend', icon: 'walk' },
+    { mode: 'off', label: 'Aus', icon: 'power' },
 ];
 
 /** Stationen, deren Modus SmartVis setzen darf */

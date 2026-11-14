@@ -1,5 +1,6 @@
 import type { SvStateRef, SvSwitch } from '../../../src/shared/protocol';
 import { connection, useConnection } from '../connection';
+import { Icon } from './Icon';
 
 /** Schalter-Zeile; akzeptiert einen State oder einen Switch mit getrenntem Schreib-State */
 export function Toggle({
@@ -51,6 +52,7 @@ export function ActionButton({
 }: {
     state: SvStateRef | undefined;
     label: string;
+    /** Name aus dem Icon-Set (siehe Icon.tsx) */
     icon?: string;
     variant?: 'primary';
 }): React.JSX.Element | null {
@@ -63,7 +65,17 @@ export function ActionButton({
             className={`action${variant ? ` action--${variant}` : ''}`}
             onClick={() => connection.setState(state.id, true)}
         >
-            {icon && <span aria-hidden="true">{icon}</span>}
+            {icon && (
+                <span
+                    className="action__icon"
+                    aria-hidden="true"
+                >
+                    <Icon
+                        name={icon}
+                        size={18}
+                    />
+                </span>
+            )}
             <span>{label}</span>
         </button>
     );

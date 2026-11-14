@@ -2,6 +2,7 @@ import type { SvDevice } from '../../../src/shared/protocol';
 import { CameraGrid, EventTimeline, StationRow } from '../components/Cameras';
 import { CustomSections, type SectionDef } from '../components/CustomSections';
 import { DeviceTile } from '../components/DeviceTile';
+import { Icon } from '../components/Icon';
 import { EditBanner, EditButton } from '../components/EditButton';
 import { useConnection } from '../connection';
 import { isActive } from '../device';
@@ -91,7 +92,11 @@ export function SecurityView(): React.JSX.Element {
                                 className={mode.mode === c.mode ? 'segmented--active' : ''}
                                 onClick={() => setSecurityMode(stations, c.mode)}
                             >
-                                <span aria-hidden="true">{c.icon}</span> {c.label}
+                                <Icon
+                                    name={c.icon}
+                                    size={18}
+                                />{' '}
+                                {c.label}
                             </button>
                         ))}
                     </div>

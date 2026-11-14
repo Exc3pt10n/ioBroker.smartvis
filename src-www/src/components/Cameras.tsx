@@ -3,6 +3,7 @@ import type { SvCamera, SvCameraEvent, SvSecurityStation } from '../../../src/sh
 import { cameraInfo, eventLabel, eventTime, liveStreamUrl, shortEventTime, stationAlarm } from '../cameras';
 import { connection, useConnection } from '../connection';
 import { SelectState } from '../views/DeviceDetail';
+import { Icon } from './Icon';
 import { Sheet } from './Sheet';
 import { Toggle } from './Toggle';
 
@@ -272,7 +273,11 @@ export function CameraSheet({
                             className="action action--primary"
                             onClick={live && !ended ? stopLive : startLive}
                         >
-                            {ended ? '▶ Weiter ansehen' : live ? '⏹ Livestream beenden' : '▶ Livestream'}
+                            <Icon
+                                name={live && !ended ? 'stop' : 'play'}
+                                size={18}
+                            />{' '}
+                            {ended ? 'Weiter ansehen' : live ? 'Livestream beenden' : 'Livestream'}
                         </button>
                     )}
                     {ptz && !info.disabled && (

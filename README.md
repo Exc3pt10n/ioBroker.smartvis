@@ -165,6 +165,16 @@ scripts/demo.ts Demo-Server ohne ioBroker
 
 ### 0.11.0 (2026-11-14)
 
+- (Exc3pt10n) Startseite nach Dringlichkeit: frische Kamera-Erkennung vor dem Wetter, dann offene Fenster, Lichter, Klima, Medien, zuletzt Störungen und Batterien (eigene Anordnungen bleiben erhalten); der Hinweis „Geräte ohne Raum“ steht dezent am Seitenende
+- (Exc3pt10n) Kennzahlen: Warnungen zuerst und farbig hinterlegt, Nullwerte ausgeblendet, höchstens zwei Reihen mit „+N weitere“, Beschriftungen zweizeilig statt abgeschnitten, gezeichnete Symbole statt Emojis; die Sicherheits-Kennzahl heißt „Modus · …“
+- (Exc3pt10n) Raumkarten mit einheitlicher Fußzeile (Geräte und Kameras – statt „0 Geräte“ bei Räumen nur mit Kamera)
+- (Exc3pt10n) Eingeschaltete Lichter auch auf dem Handy kompakt (Raumzeile mit „Alle aus“, Lampen beim Aufklappen)
+- (Exc3pt10n) Rollladen-Detail mit Auf · Stopp · Zu; ohne eigenen Stopp-Datenpunkt hält der Rollladen an der aktuellen Position an
+- (Exc3pt10n) Desktop-Startseite als Mauerwerk: Karten rücken in Lücken nach, Lichter in einer Spalte
+- (Exc3pt10n) Energie auf dem Handy: Energiezähler und Verlauf zunächst eingeklappt (Antippen im Energiefluss öffnet den Verlauf)
+- (Exc3pt10n) Beschattung: Filter „Nur abweichende“ (nicht ganz offen oder Automatik aus)
+- (Exc3pt10n) Einmaliger Tipp zum Bearbeiten-Modus; Knöpfe mit gezeichneten Symbolen; Nebentexte größer und kontrastreicher
+
 - (Exc3pt10n) Neuer Bereich „Sicherheit“: Sicherheitsmodus aller Stationen auf einmal (Zuhause · Abwesend · Aus), Alarm-Banner, Kameras, Ereignis-Zeitleiste nach Tagen, Melder, Fenster & Türen und Bewegungsmelder; auf dem Handy in der Navigationsleiste, „Beschattung“ dann unter „Mehr“
 - (Exc3pt10n) Startseite: Kennzahl mit Sicherheitsmodus und jüngster Erkennung (Antippen öffnet Sicherheit), Karte „Gerade erkannt“ nur bei frischer Erkennung (bis 10 Minuten)
 - (Exc3pt10n) Kameras (eufy Security über `eusec`): Kamera-Kacheln mit dem letzten Ereignisbild im Bereich Sicherheit und in den Räumen; erkannte Bewegung oder Person ist hervorgehoben, ausgeschaltete (Privatmodus) und Offline-Kameras sind gekennzeichnet

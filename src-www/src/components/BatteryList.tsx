@@ -46,7 +46,7 @@ export function BatteryList({
                                             style={{ width: `${Math.min(100, Math.max(0, level))}%` }}
                                         />
                                     </span>
-                                    {Math.round(level)} %
+                                    {Math.round(level)} %{low && <span className="sr-only"> – schwach</span>}
                                 </>
                             ) : low ? (
                                 'schwach'

@@ -72,7 +72,11 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
                                 aria-label={`${roomLabel}: alle Lichter ${anyOn ? 'ausschalten' : 'einschalten'}`}
                                 onClick={() => switchLights(lamps, !anyOn, states, roomLabel)}
                             >
-                                💡 {anyOn ? 'Alle aus' : 'Alle an'}
+                                <Icon
+                                    name="light"
+                                    size={14}
+                                />{' '}
+                                {anyOn ? 'Alle aus' : 'Alle an'}
                             </button>
                         )}
                     </div>
