@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import type { SvCamera, SvCameraEvent, SvSecurityStation } from '../../../src/shared/protocol';
+import type { SvCamera, SvCameraEvent, SvCameraSetting, SvSecurityStation } from '../../../src/shared/protocol';
 import { cameraInfo, eventLabel, eventTime, liveStreamUrl, shortEventTime, stationAlarm } from '../cameras';
 import { connection, useConnection } from '../connection';
 import { SelectState } from '../views/DeviceDetail';
 import { Icon } from './Icon';
 import { Sheet } from './Sheet';
+import { Slider } from './Slider';
 import { Toggle } from './Toggle';
 
 /** Ereignisbild mit Platzhalter, falls (noch) keines vorhanden ist oder das Laden scheitert */
@@ -349,8 +350,103 @@ export function CameraSheet({
                         setSelected(e);
                     }}
                 />
+                {camera.settings && camera.settings.length > 0 && <CameraSettings settings={camera.settings} />}
             </div>
         </Sheet>
+    );
+}
+
+const SETTING_GROUPS: { key: SvCameraSetting['group']; label: string }[] = [
+    { key: 'detection', label: 'Erkennung' },
+    { key: 'recording', label: 'Aufnahme' },
+    { key: 'picture', label: 'Bild & Ton' },
+    { key: 'notifications', label: 'Benachrichtigungen' },
+];
+
+/** Einheiten der eusec-Datenpunkte lesbar ("sec" → "s") */
+function unitText(unit: string | undefined): string {
+    return unit === 'sec' ? 's' : (unit ?? '');
+}
+
+/**
+ * Einstellungen der Kamera, je Gruppe aufklappbar (selten gebraucht, daher eingeklappt).
+ * Untereinstellungen erscheinen nur, wenn sie gerade wirken (z. B. Empfindlichkeit bei eingeschalteter Erkennung).
+ */
+function CameraSettings({ settings }: { settings: SvCameraSetting[] }): React.JSX.Element {
+    const { states } = useConnection();
+    const active = (s: SvCameraSetting): boolean => {
+        if (!s.requires) {
+            return true;
+        }
+        const v = states[s.requires.id]?.val;
+        return typeof s.requires.value === 'boolean' ? v === s.requires.value : Number(v) === s.requires.value;
+    };
+    return (
+        <div className="camera__settings">
+            <h3 className="info__subtitle">Einstellungen</h3>
+            {SETTING_GROUPS.map(g => {
+                const list = settings.filter(s => s.group === g.key && active(s));
+                if (!list.length) {
+                    return null;
+                }
+                return (
+                    <details
+                        key={g.key}
+                        className="camera__setgroup"
+                    >
+                        <summary>
+                            {g.label}
+                            <span className="group__count">{list.length}</span>
+                        </summary>
+                        <div className="camera__setlist">
+                            {list.map(s => {
+                                const ref = s.state;
+                                if (ref.type === 'boolean') {
+                                    return (
+                                        <Toggle
+                                            key={ref.id}
+                                            state={ref}
+                                            label={s.label}
+                                            {...(s.hint && { hint: s.hint })}
+                                            compact
+                                        />
+                                    );
+                                }
+                                if (ref.states && Object.keys(ref.states).length) {
+                                    return (
+                                        <div key={ref.id}>
+                                            <SelectState
+                                                state={ref}
+                                                label={s.label}
+                                            />
+                                            {s.hint && <p className="camera__sethint">{s.hint}</p>}
+                                        </div>
+                                    );
+                                }
+                                const value = Number(states[ref.id]?.val);
+                                return (
+                                    <div key={ref.id}>
+                                        <Slider
+                                            label={s.label}
+                                            value={Number.isFinite(value) ? value : undefined}
+                                            min={ref.min ?? 0}
+                                            max={ref.max ?? 100}
+                                            step={ref.step ?? 1}
+                                            pending={states[ref.id]?.ack === false}
+                                            format={v =>
+                                                `${Math.round(v)}${unitText(ref.unit) ? ` ${unitText(ref.unit)}` : ''}`
+                                            }
+                                            onCommit={v => connection.setState(ref.id, v)}
+                                        />
+                                        {s.hint && <p className="camera__sethint">{s.hint}</p>}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </details>
+                );
+            })}
+        </div>
     );
 }
 

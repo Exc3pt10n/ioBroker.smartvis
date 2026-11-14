@@ -682,6 +682,16 @@ const homeBase = 'T8010N0000000001';
     eusec(`${c}.light`, false);
     eusec(`${c}.motion_detected`, false);
     eusec(`${c}.person_detected`, serial === 'T8142N0000000011');
+    // Einstellungen
+    eusec(`${c}.motion_detection`, true);
+    eusec(`${c}.motion_detection_type`, 2);
+    eusec(`${c}.motion_detection_sensitivity`, 4);
+    eusec(`${c}.speaker`, true);
+    eusec(`${c}.speaker_volume`, 92);
+    eusec(`${c}.nightvision`, 2);
+    eusec(`${c}.power_working_mode`, 2);
+    eusec(`${c}.recording_clip_length`, 30);
+    eusec(`${c}.status_led`, false);
 });
 const indoorCam = 'T8410P0000000021.cameras.T8410P0000000021';
 eusec(`${indoorCam}.picture_url`, '/files/eusec.0/T8410P0000000021/last_event/T8410P0000000021.jpg', 2 * 86_400_000);

@@ -48,6 +48,44 @@ export function eusecTree(): Tree {
             .state(`${c}.motion_detection`, { type: 'boolean', role: 'switch.enable', write: true })
             .state(`${c}.status_led`, { type: 'boolean', role: 'switch.enable', write: true })
             .state(`${c}.trigger_alarm_sound`, { type: 'boolean', role: 'button.start', write: true });
+        // Einstellungen (Auszug, wie in eusec)
+        t.state(`${c}.motion_detection_type`, {
+            type: 'number',
+            role: 'value',
+            write: true,
+            states: indoor ? { 1: 'Person', 3: 'Person and Pet' } : { 0: 'Humans only', 2: 'All motions' },
+        })
+            .state(`${c}.motion_detection_sensitivity`, { type: 'number', role: 'value', write: true, min: 1, max: 7 })
+            .state(`${c}.speaker`, { type: 'boolean', role: 'switch.enable', write: true })
+            .state(`${c}.speaker_volume`, {
+                type: 'number',
+                role: 'value',
+                write: true,
+                states: { 90: 'Low', 92: 'Medium', 93: 'High' },
+            })
+            .state(`${c}.rtsp_stream`, { type: 'boolean', role: 'switch.enable', write: true });
+        if (!indoor) {
+            t.state(`${c}.nightvision`, {
+                type: 'number',
+                role: 'value',
+                write: true,
+                states: { 0: 'Off', 1: 'B&W Night Vision', 2: 'Color Night Vision' },
+            })
+                .state(`${c}.power_working_mode`, {
+                    type: 'number',
+                    role: 'value',
+                    write: true,
+                    states: { 0: 'Optimal Battery Life', 1: 'Optimal Surveillance', 2: 'Custom Recording' },
+                })
+                .state(`${c}.recording_clip_length`, {
+                    type: 'number',
+                    role: 'value',
+                    write: true,
+                    min: 5,
+                    max: 120,
+                    unit: 'sec',
+                });
+        }
         if (indoor) {
             t.state(`${c}.pan_left`, { type: 'boolean', role: 'button.start', write: true })
                 .state(`${c}.pan_right`, { type: 'boolean', role: 'button.start', write: true })

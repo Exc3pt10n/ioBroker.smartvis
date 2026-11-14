@@ -54,4 +54,22 @@ describe('profile: eusec (eufy Security)', () => {
             'Garten',
         ]);
     });
+
+    it('bietet Einstellungen auf Deutsch, gruppiert und mit Abhängigkeiten an – ohne RTSP', () => {
+        const garden = cam('Garten');
+        const setting = (key: string): NonNullable<typeof garden.settings>[number] | undefined =>
+            garden.settings?.find(s => s.state.id.endsWith(`.${key}`));
+        expect(garden.settings?.map(s => s.group)).to.include.members(['detection', 'recording', 'picture']);
+        expect(setting('motion_detection_type')?.state.states).to.deep.equal({ 0: 'Nur Personen', 2: 'Jede Bewegung' });
+        expect(setting('nightvision')?.state.states?.['2']).to.equal('Farbe');
+        expect(setting('motion_detection_sensitivity')?.requires).to.deep.equal({
+            id: `${garden.id}.motion_detection`,
+            value: true,
+        });
+        expect(setting('recording_clip_length')?.requires?.value).to.equal(2);
+        expect(setting('speaker_volume')?.requires?.id).to.equal(`${garden.id}.speaker`);
+        expect(setting('rtsp_stream')).to.equal(undefined);
+        expect(r.writableIds.has(setting('nightvision')!.state.id)).to.equal(true);
+        expect(r.writableIds.has(`${garden.id}.rtsp_stream`)).to.equal(false);
+    });
 });
