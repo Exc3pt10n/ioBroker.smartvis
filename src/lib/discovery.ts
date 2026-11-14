@@ -514,6 +514,11 @@ function toDevice(
     if (!states.length) {
         return null;
     }
+    // Farblampen: Der type-detector nimmt je nach Muster nur RGB-Einzelwerte (Hue: r/g/b) oder nur den Hex-Wert
+    // (hue-v2) – Farbton, Sättigung, Hex-Farbe und Farbmodus aus demselben Kanal ergänzen (für die Farbauswahl)
+    if (LIGHT_TYPES.has(control.type)) {
+        states.push(...colorStates(id, objects, states));
+    }
 
     const obj = objects[id];
     const parent = objects[parentId(id)];
@@ -596,6 +601,78 @@ function toDevice(
         states,
         ...(genericName ? { [GENERIC]: parentId(id) } : {}),
     };
+}
+
+/** Zusätzliche Farb-States einer Lampe: Name in SmartVis → Rolle bzw. State-Name im Kanal */
+const COLOR_STATES: { name: string; match: (key: string, common: ioBroker.StateCommon) => boolean; write: boolean }[] =
+    [
+        { name: 'HUE', match: (_k, c) => c.role === 'level.color.hue' && c.type === 'number', write: true },
+        {
+            name: 'SATURATION',
+            match: (_k, c) => c.role === 'level.color.saturation' && c.type === 'number',
+            write: true,
+        },
+        { name: 'RGB', match: (_k, c) => c.role === 'level.color.rgb' && c.type === 'string', write: true },
+        { name: 'COLORMODE', match: k => /^colou?r_?mode$/i.test(k), write: false },
+    ];
+
+/** Direkte Kinder je Objekt-ID (einmal je Objekt-Map aufgebaut) */
+const childIndex = new WeakMap<ObjectMap, Map<string, string[]>>();
+
+function childrenOf(objects: ObjectMap, parent: string): string[] {
+    let index = childIndex.get(objects);
+    if (!index) {
+        index = new Map();
+        for (const id of Object.keys(objects)) {
+            const p = id.substring(0, id.lastIndexOf('.'));
+            const list = index.get(p);
+            if (list) {
+                list.push(id);
+            } else {
+                index.set(p, [id]);
+            }
+        }
+        childIndex.set(objects, index);
+    }
+    return index.get(parent) ?? [];
+}
+
+function colorStates(channelId: string, objects: ObjectMap, existing: SvStateRef[]): SvStateRef[] {
+    const prefix = `${channelId}.`;
+    const have = new Set(existing.map(s => s.id));
+    const children = childrenOf(objects, channelId);
+    const result: SvStateRef[] = [];
+    for (const def of COLOR_STATES) {
+        if (existing.some(s => s.name === def.name)) {
+            continue;
+        }
+        const id = children.find(k => {
+            if (have.has(k)) {
+                return false;
+            }
+            const obj = objects[k];
+            const common = obj?.common as ioBroker.StateCommon | undefined;
+            return obj?.type === 'state' && !!common && def.match(k.slice(prefix.length), common);
+        });
+        if (!id) {
+            continue;
+        }
+        const common = objects[id].common as ioBroker.StateCommon;
+        if (def.write && common.write !== true) {
+            continue;
+        }
+        result.push({
+            name: def.name,
+            id,
+            type: common.type,
+            role: common.role,
+            unit: common.unit,
+            min: common.min,
+            max: common.max,
+            write: common.write === true,
+        });
+    }
+    return result;
 }
 
 /**

@@ -319,6 +319,20 @@ export interface SvCamera {
     tiltDown?: SvStateRef;
     /** Station mit Sicherheitsmodus, zu der die Kamera gehört */
     stationId?: string;
+    /** Einstellungen der Kamera (nur, was das Gerät anbietet), Wertelisten auf Deutsch */
+    settings?: SvCameraSetting[];
+}
+
+/** Einstellung einer Kamera (Schalter, Auswahl oder Zahl) */
+export interface SvCameraSetting {
+    /** Gruppe in der Kamera-Ansicht */
+    group: 'detection' | 'recording' | 'picture' | 'notifications';
+    label: string;
+    /** Kurze Erklärung unter der Einstellung */
+    hint?: string;
+    state: SvStateRef;
+    /** Nur zeigen, wenn dieser State den Wert hat (z. B. Empfindlichkeit nur bei eingeschalteter Erkennung) */
+    requires?: { id: string; value: boolean | number };
 }
 
 /** Kamera-Ereignis aus dem Ereignisprotokoll von SmartVis */

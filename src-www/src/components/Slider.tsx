@@ -14,6 +14,7 @@ export function Slider({
     pending,
     onCommit,
     variant,
+    trackColor,
 }: {
     label: string;
     value: number | undefined;
@@ -23,7 +24,9 @@ export function Slider({
     format?: (v: number) => string;
     pending?: boolean;
     onCommit: (v: number) => void;
-    variant?: 'ct' | 'hue' | 'warm';
+    variant?: 'ct' | 'hue' | 'warm' | 'sat';
+    /** Zielfarbe des Verlaufs (variant "sat": von Weiß bis zu dieser Farbe) */
+    trackColor?: string;
 }): React.JSX.Element {
     const [draft, setDraft] = useState<number | undefined>(undefined);
     const [dragging, setDragging] = useState(false);
@@ -66,7 +69,12 @@ export function Slider({
                 max={max}
                 step={step}
                 value={shown}
-                style={{ '--percent': `${percent}%` } as React.CSSProperties}
+                style={
+                    {
+                        '--percent': `${percent}%`,
+                        ...(trackColor && { '--sat-color': trackColor }),
+                    } as React.CSSProperties
+                }
                 onChange={e => {
                     setDragging(true);
                     setDraft(Number(e.target.value));

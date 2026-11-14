@@ -1395,6 +1395,10 @@ details[open] > summary > .chevron {
     --track: linear-gradient(to right, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
 }
 
+.slider--sat input[type='range'] {
+    --track: linear-gradient(to right, #fff, var(--sat-color, #f00));
+}
+
 .slider input[type='range']::-webkit-slider-runnable-track {
     height: 12px;
     border-radius: 6px;
@@ -4662,4 +4666,72 @@ button.battery__row {
     width: 32px;
     height: 32px;
     margin-left: auto;
+}
+
+/* Kamera-Einstellungen (aufklappbare Gruppen) */
+.camera__settings {
+    margin-top: 16px;
+}
+
+.camera__setgroup {
+    margin-top: 8px;
+    padding: 0 14px;
+    border-radius: 14px;
+    background: var(--surface);
+}
+
+.camera__setgroup > summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 0;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.camera__setlist {
+    display: grid;
+    gap: 4px;
+    padding-bottom: 12px;
+}
+
+.camera__sethint {
+    margin: -2px 0 6px;
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+/* Lichtfarbe: Weiß/Farbe umschalten, Farbfelder */
+.light__mode {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    margin: 4px 0;
+}
+
+.light__color {
+    display: grid;
+    gap: 8px;
+}
+
+.swatches {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 8px;
+    padding: 4px 0;
+}
+
+.swatch {
+    aspect-ratio: 1;
+    min-width: 0;
+    max-width: 44px;
+    justify-self: center;
+    width: 100%;
+    border: 2px solid var(--surface);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--surface-2);
+    cursor: pointer;
+}
+
+.swatch--on {
+    box-shadow: 0 0 0 3px var(--accent);
 }
