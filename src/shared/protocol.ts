@@ -321,6 +321,19 @@ export interface SvCamera {
     stationId?: string;
 }
 
+/** Kamera-Ereignis aus dem Ereignisprotokoll von SmartVis */
+export interface SvCameraEvent {
+    /** Eindeutig: "<Kamera-ID>@<ts>" */
+    id: string;
+    cameraId: string;
+    /** Beginn (ms) */
+    ts: number;
+    /** Erkannt: person, pet, motion, sound, crying (leer = nur neues Ereignisbild) */
+    kinds: string[];
+    /** Gespeichertes Ereignisbild (unter /files/<smartvis-Instanz>/events/…) */
+    picture?: string;
+}
+
 /** Sicherheitsstation (z. B. eufy HomeBase oder eine Innenkamera als eigene Station) */
 export interface SvSecurityStation {
     id: string;
@@ -693,7 +706,8 @@ export type ServerMessage =
     | { t: 'states'; states: Record<string, SvStateValue | null> }
     | { t: 'error'; message: string }
     | { t: 'history'; reqId: number; points: [number, number][]; error?: string }
-    | { t: 'diagnose'; reqId: number; report?: SvDiagnosis; error?: string };
+    | { t: 'diagnose'; reqId: number; report?: SvDiagnosis; error?: string }
+    | { t: 'cameraEvents'; reqId: number; events?: SvCameraEvent[]; error?: string };
 
 /** Nachrichten Client → Server */
 export type ClientMessage =
@@ -705,4 +719,6 @@ export type ClientMessage =
     | { t: 'history'; reqId: number; id: string; range: SvHistoryRange }
     /** Diagnose der Erkennung anfordern (Mehr → Erkennung) */
     | { t: 'diagnose'; reqId: number }
+    /** Letzte Kamera-Ereignisse (ohne cameraId: aller Kameras) */
+    | { t: 'cameraEvents'; reqId: number; cameraId?: string }
     | { t: 'ping' };

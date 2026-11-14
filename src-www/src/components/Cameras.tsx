@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import type { SvCamera, SvModel, SvSecurityStation } from '../../../src/shared/protocol';
-import { cameraInfo, eventTime, shortEventTime, stationAlarm } from '../cameras';
+import type { SvCamera, SvCameraEvent, SvModel, SvSecurityStation } from '../../../src/shared/protocol';
+import { cameraInfo, eventLabel, eventTime, liveStreamUrl, shortEventTime, stationAlarm } from '../cameras';
 import { connection, useConnection } from '../connection';
 import { SelectState } from '../views/DeviceDetail';
 import { Sheet } from './Sheet';
@@ -145,6 +145,7 @@ export function CamerasCard({ model }: { model: SvModel }): React.JSX.Element | 
                 </p>
             )}
             <CameraGrid cameras={cameras} />
+            <RecentEvents cameras={cameras} />
             {stations.length > 0 && (
                 <details className="info__details">
                     <summary>Sicherheitsmodus</summary>
@@ -164,10 +165,20 @@ export function CamerasCard({ model }: { model: SvModel }): React.JSX.Element | 
  * Detailansicht einer Kamera: großes Ereignisbild, Status, Livestream (go2rtc-Seite des eusec-Adapters),
  * Kamera an/aus, Licht und Schwenken. Ein gestarteter Stream wird beim Schließen beendet (Akku schonen).
  */
-export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: () => void }): React.JSX.Element {
+export function CameraSheet({
+    camera,
+    onClose,
+    initialEvent,
+}: {
+    camera: SvCamera;
+    onClose: () => void;
+    /** Direkt ein Ereignis zeigen (aus der Liste der letzten Ereignisse) */
+    initialEvent?: SvCameraEvent;
+}): React.JSX.Element {
     const { states, model } = useConnection();
     const info = cameraInfo(camera, states);
     const [live, setLive] = useState(false);
+    const [selected, setSelected] = useState<SvCameraEvent | undefined>(initialEvent);
     const liveRef = useRef(false);
     useEffect(() => {
         liveRef.current = live;
@@ -216,13 +227,16 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                         <div className="camera__live">
                             <iframe
                                 className="camera__frame"
-                                src={info.liveUrl}
+                                src={liveStreamUrl(info.liveUrl)}
                                 title={`Livestream ${camera.name}`}
                                 allow="autoplay; fullscreen"
                             />
+                            <p className="detail__note">
+                                Kein Ton? Den Lautsprecher im Video antippen – der Browser startet Videos stumm.
+                            </p>
                             <a
                                 className="linkbtn"
-                                href={info.liveUrl}
+                                href={liveStreamUrl(info.liveUrl)}
                                 target="_blank"
                                 rel="noreferrer"
                             >
@@ -232,12 +246,30 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                     ) : (
                         <div className="camera__big camera__placeholder camera__waiting">Stream wird gestartet …</div>
                     )
+                ) : selected ? (
+                    <CameraImage
+                        className="camera__big"
+                        src={selected.picture}
+                        alt={`${eventLabel(selected.kinds)} ${eventTime(selected.ts)}`}
+                    />
                 ) : (
                     <CameraImage
                         className="camera__big"
                         src={info.disabled ? undefined : info.image}
                         alt={`Letztes Ereignis ${camera.name}`}
                     />
+                )}
+                {selected && !live && (
+                    <p className="detail__note camera__selected">
+                        {eventLabel(selected.kinds)} · {eventTime(selected.ts)}{' '}
+                        <button
+                            type="button"
+                            className="linkbtn camera__back"
+                            onClick={() => setSelected(undefined)}
+                        >
+                            Aktuelles Bild
+                        </button>
+                    </p>
                 )}
                 <p className="detail__note">
                     {info.status
@@ -318,7 +350,133 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                     )}
                     {station?.guardMode && <StationRow station={station} />}
                 </div>
+                <EventList
+                    cameras={[camera]}
+                    cameraId={camera.id}
+                    refreshKey={info.imageTs}
+                    selectedId={selected?.id}
+                    onSelect={e => {
+                        stopLive();
+                        setSelected(e);
+                    }}
+                />
             </div>
         </Sheet>
+    );
+}
+
+/** Ereignisse vom Adapter laden; neu laden, wenn sich refreshKey ändert (z. B. neues Ereignisbild) */
+function useCameraEvents(cameraId: string | undefined, refreshKey: unknown): SvCameraEvent[] | undefined {
+    const { status } = useConnection();
+    const [events, setEvents] = useState<SvCameraEvent[] | undefined>();
+    useEffect(() => {
+        if (status !== 'online') {
+            return;
+        }
+        let cancelled = false;
+        connection.cameraEvents(cameraId).then(
+            list => !cancelled && setEvents(list),
+            () => !cancelled && setEvents([]),
+        );
+        return () => {
+            cancelled = true;
+        };
+    }, [cameraId, refreshKey, status]);
+    return events;
+}
+
+/** Liste der letzten Ereignisse mit Vorschaubild; Antippen zeigt das Ereignisbild groß */
+function EventList({
+    cameras,
+    cameraId,
+    refreshKey,
+    selectedId,
+    onSelect,
+    limit = 20,
+    title = true,
+}: {
+    cameras: SvCamera[];
+    cameraId?: string;
+    refreshKey?: unknown;
+    selectedId?: string;
+    onSelect: (event: SvCameraEvent) => void;
+    limit?: number;
+    /** Überschrift (entfällt, wenn die Liste schon in einem "Letzte Ereignisse"-Bereich steht) */
+    title?: boolean;
+}): React.JSX.Element | null {
+    const events = useCameraEvents(cameraId, refreshKey);
+    if (!events) {
+        return null;
+    }
+    const names = new Map(cameras.map(c => [c.id, c.name]));
+    const shown = events.filter(e => names.has(e.cameraId)).slice(0, limit);
+    return (
+        <div className="camera__events">
+            {title && <h3 className="info__subtitle">Letzte Ereignisse</h3>}
+            {shown.length === 0 ? (
+                <p className="detail__note">
+                    Noch keine Ereignisse. SmartVis merkt sich ab jetzt jede Erkennung mit Bild (7 Tage).
+                </p>
+            ) : (
+                <ul className="camera__eventlist">
+                    {shown.map(e => (
+                        <li key={e.id}>
+                            <button
+                                type="button"
+                                className={`camera__event${e.id === selectedId ? ' camera__event--on' : ''}`}
+                                onClick={() => onSelect(e)}
+                            >
+                                <CameraImage
+                                    className="camera__thumb"
+                                    src={e.picture}
+                                    alt=""
+                                />
+                                <span className="camera__event-text">
+                                    <span className="camera__event-kind">{eventLabel(e.kinds)}</span>
+                                    <span className="camera__event-meta">
+                                        {cameraId ? '' : `${names.get(e.cameraId)} · `}
+                                        {eventTime(e.ts)}
+                                    </span>
+                                </span>
+                            </button>
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+}
+
+/** Startseite: letzte Ereignisse aller Kameras (aufklappbar); Antippen öffnet die Kamera mit dem Ereignis */
+function RecentEvents({ cameras }: { cameras: SvCamera[] }): React.JSX.Element {
+    const { states } = useConnection();
+    const [open, setOpen] = useState(false);
+    const [selected, setSelected] = useState<SvCameraEvent | undefined>();
+    // Neu laden, sobald eine Kamera ein neues Ereignisbild meldet
+    const latest = Math.max(0, ...cameras.map(c => (c.picture ? (states[c.picture.id]?.ts ?? 0) : 0)));
+    const camera = selected && cameras.find(c => c.id === selected.cameraId);
+    return (
+        <details
+            className="info__details"
+            onToggle={e => setOpen((e.target as HTMLDetailsElement).open)}
+        >
+            <summary>Letzte Ereignisse</summary>
+            {open && (
+                <EventList
+                    cameras={cameras}
+                    refreshKey={latest}
+                    onSelect={setSelected}
+                    limit={10}
+                    title={false}
+                />
+            )}
+            {camera && selected && (
+                <CameraSheet
+                    camera={camera}
+                    initialEvent={selected}
+                    onClose={() => setSelected(undefined)}
+                />
+            )}
+        </details>
     );
 }

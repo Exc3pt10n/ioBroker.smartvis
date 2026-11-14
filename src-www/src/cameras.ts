@@ -85,3 +85,27 @@ export function shortEventTime(ts: number, now = Date.now()): string {
     }
     return d.toLocaleDateString('de-DE', { weekday: 'short' });
 }
+
+/**
+ * Livestream-Seite von go2rtc mit Ton: WebRTC (Standard) überträgt den AAC-Ton der eufy-Kameras nicht,
+ * MSE und HLS schon – daher diese zuerst, WebRTC als Rückfall.
+ */
+export function liveStreamUrl(url: string): string {
+    if (!/\/stream\.html/.test(url) || /[?&]mode=/.test(url)) {
+        return url;
+    }
+    return `${url}${url.includes('?') ? '&' : '?'}mode=mse,hls,webrtc`;
+}
+
+const KIND_LABELS: Record<string, string> = {
+    person: 'Person',
+    pet: 'Haustier',
+    motion: 'Bewegung',
+    sound: 'Geräusch',
+    crying: 'Weinen',
+};
+
+/** "Person · Bewegung" bzw. "Ereignis" */
+export function eventLabel(kinds: string[]): string {
+    return kinds.length ? kinds.map(k => KIND_LABELS[k] ?? k).join(' · ') : 'Ereignis';
+}

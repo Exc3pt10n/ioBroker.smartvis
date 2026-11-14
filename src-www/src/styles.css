@@ -4384,3 +4384,74 @@ button.battery__row {
 .camera__ptz-down {
     grid-area: down;
 }
+
+/* Kamera-Ereignisse */
+.camera__events {
+    margin-top: 16px;
+}
+
+.camera__eventlist {
+    display: grid;
+    gap: 6px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.camera__event {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+    padding: 6px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.camera__event--on {
+    outline: 2px solid var(--accent);
+}
+
+.camera__thumb {
+    display: block;
+    width: 96px;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    object-fit: cover;
+    font-size: 18px;
+}
+
+.camera__event-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.camera__event-kind {
+    font-weight: 600;
+}
+
+.camera__event-meta {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.camera__selected {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+}
+
+.camera__back {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
