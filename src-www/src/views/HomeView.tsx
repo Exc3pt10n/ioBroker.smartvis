@@ -10,7 +10,9 @@ import { CustomSections, type SectionDef } from '../components/CustomSections';
 import { EditBanner, EditButton } from '../components/EditButton';
 import { favorites, useEditing, visibleDevices } from '../editing';
 import { WarningsCard, WeatherCard } from '../components/WeatherCard';
-import { CamerasCard } from '../components/Cameras';
+import { RecentDetectionsCard } from '../components/Cameras';
+import { eventLabel } from '../cameras';
+import { activeAlarms, primaryStation, recentDetections, securityMode, useNow } from '../security';
 import { activeWarnings } from '../weather';
 import { EnergyFlow, FlowStatus } from '../components/EnergyFlow';
 import { ForecastCard } from '../components/ForecastCard';
@@ -22,12 +24,21 @@ import { BatteryList } from '../components/BatteryList';
 
 const LIGHT_TYPES = ['light', 'dimmer', 'ct', 'hue', 'rgb', 'rgbSingle', 'rgbwSingle', 'cie'];
 const OPENING_TYPES = ['window', 'windowTilt', 'door'];
+/** Erkennungen (Anzeige "Person", "Bewegung" …) → Schlüssel für eventLabel */
+const KIND_KEYS: Record<string, string> = {
+    Person: 'person',
+    Haustier: 'pet',
+    Bewegung: 'motion',
+    Geräusch: 'sound',
+    Weinen: 'crying',
+};
 
 export function HomeView({ onNavigate }: { onNavigate: (path: string) => void }): React.JSX.Element {
     const { model, states } = useConnection();
     const { editing } = useEditing();
     const dashboard = useMediaQuery(DASHBOARD_QUERY);
     const phone = useMediaQuery('(max-width: 899px)');
+    const now = useNow(30_000);
     if (!model) {
         return <p className="empty">Lade Geräte …</p>;
     }
@@ -100,6 +111,17 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             document
                 .getElementById(`home-${section}`)
                 ?.scrollIntoView({ behavior: motionAllowed() ? 'smooth' : 'auto', block: 'start' });
+    // Sicherheit: Modus der Stationen, Alarme, jüngste Kamera-Erkennung
+    const hasSecurity = !!model.cameras?.length || !!model.securityStations?.length;
+    const alarms = hasSecurity ? activeAlarms(model, states, devices) : [];
+    // Kennzahl: Modus der Hauptstation (z. B. HomeBase) – Innenkameras mit eigener Station weichen oft ab
+    const primary = primaryStation(model);
+    const mode = securityMode(primary ? [primary] : [], states);
+    const detections = recentDetections(model, states, now);
+    const latestDetection = detections[0] && {
+        kinds: detections[0].events.length ? detections[0].events.map(e => KIND_KEYS[e] ?? e) : [],
+        camera: model.cameras?.find(c => c.id === detections[0].cameraId)?.name ?? '',
+    };
     const kpiCandidates: (Kpi | false)[] = [
         energy?.pv !== undefined && {
             key: 'pv',
@@ -194,6 +216,18 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             label: weakBatteries.length === 1 ? 'Batterie schwach' : 'Batterien schwach',
             onClick: jump('batteries'),
             warn: true,
+        },
+        hasSecurity && {
+            key: 'security',
+            icon: alarms.length ? '🚨' : '🛡️',
+            value: alarms.length ? 'Alarm' : mode.mode || mode.label !== '–' ? mode.label : 'Sicherheit',
+            label: alarms.length
+                ? alarms[0]
+                : latestDetection
+                  ? `${eventLabel(latestDetection.kinds)} · ${latestDetection.camera}`
+                  : 'Sicherheit',
+            onClick: () => onNavigate('security'),
+            warn: alarms.length > 0,
         },
         problems.length > 0 && {
             key: 'problems',
@@ -418,19 +452,26 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             ),
         },
         {
-            key: 'cameras',
-            label: 'Kameras',
-            node: model.cameras?.length ? <CamerasCard model={model} /> : null,
+            key: 'detections',
+            label: 'Gerade erkannt (Kameras)',
+            node: detections.length ? (
+                <RecentDetectionsCard
+                    detections={detections}
+                    cameras={model.cameras || []}
+                />
+            ) : (
+                placeholder('Erscheint, wenn eine Kamera gerade etwas erkennt (Ereignisbild bis 10 Minuten alt).')
+            ),
         },
     ];
     // Standardbreiten im Desktop-Raster: Übersichtskarten und kurze Listen je ein Drittel
-    const thirds = new Set(['weather', 'energy', 'playing', 'climate', 'open', 'problems', 'batteries']);
+    const thirds = new Set(['weather', 'energy', 'playing', 'climate', 'open', 'problems', 'batteries', 'detections']);
     const deskOrder = [
         'weather',
         'energy',
         'forecast',
         'favorites',
-        'cameras',
+        'detections',
         'playing',
         'climate',
         'open',

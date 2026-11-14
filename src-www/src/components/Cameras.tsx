@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { SvCamera, SvCameraEvent, SvModel, SvSecurityStation } from '../../../src/shared/protocol';
+import type { SvCamera, SvCameraEvent, SvSecurityStation } from '../../../src/shared/protocol';
 import { cameraInfo, eventLabel, eventTime, liveStreamUrl, shortEventTime, stationAlarm } from '../cameras';
 import { connection, useConnection } from '../connection';
 import { SelectState } from '../views/DeviceDetail';
@@ -7,7 +7,15 @@ import { Sheet } from './Sheet';
 import { Toggle } from './Toggle';
 
 /** Ereignisbild mit Platzhalter, falls (noch) keines vorhanden ist oder das Laden scheitert */
-function CameraImage({ src, alt, className }: { src?: string; alt: string; className: string }): React.JSX.Element {
+export function CameraImage({
+    src,
+    alt,
+    className,
+}: {
+    src?: string;
+    alt: string;
+    className: string;
+}): React.JSX.Element {
     const [failed, setFailed] = useState<string | undefined>();
     if (!src || failed === src) {
         return (
@@ -94,7 +102,7 @@ export function CameraGrid({ cameras }: { cameras: SvCamera[] }): React.JSX.Elem
 }
 
 /** Sicherheitsmodus einer Station (Zuhause, Abwesend …) und Alarm */
-function StationRow({ station }: { station: SvSecurityStation }): React.JSX.Element | null {
+export function StationRow({ station }: { station: SvSecurityStation }): React.JSX.Element | null {
     const { states } = useConnection();
     if (!station.guardMode) {
         return null;
@@ -112,52 +120,6 @@ function StationRow({ station }: { station: SvSecurityStation }): React.JSX.Elem
                 </span>
             )}
         </div>
-    );
-}
-
-/** Kamera-Karte der Startseite: Alarm, Sicherheitsmodus der Stationen und alle Kameras */
-export function CamerasCard({ model }: { model: SvModel }): React.JSX.Element | null {
-    const { states } = useConnection();
-    const cameras = model.cameras || [];
-    if (!cameras.length) {
-        return null;
-    }
-    // Stationen mit Kameras; die HomeBase (mehrere Kameras) zuerst
-    const stations = (model.securityStations || [])
-        .filter(s => cameras.some(c => c.stationId === s.id))
-        .sort(
-            (a, b) =>
-                cameras.filter(c => c.stationId === b.id).length - cameras.filter(c => c.stationId === a.id).length,
-        );
-    const alarms = stations.filter(s => stationAlarm(s, states));
-    return (
-        <section
-            className="card"
-            aria-label="Kameras"
-        >
-            <h2 className="subtitle">📷 Kameras</h2>
-            {alarms.length > 0 && (
-                <p
-                    className="camera__alarm"
-                    role="alert"
-                >
-                    🚨 Alarm: {alarms.map(s => s.name).join(', ')}
-                </p>
-            )}
-            <CameraGrid cameras={cameras} />
-            <RecentEvents cameras={cameras} />
-            {stations.length > 0 && (
-                <details className="info__details">
-                    <summary>Sicherheitsmodus</summary>
-                    {stations.map(s => (
-                        <StationRow
-                            key={s.id}
-                            station={s}
-                        />
-                    ))}
-                </details>
-            )}
-        </section>
     );
 }
 
@@ -407,8 +369,22 @@ function useCameraEvents(cameraId: string | undefined, refreshKey: unknown): SvC
     return events;
 }
 
+/** Tag als Überschrift der Zeitleiste: "Heute", "Gestern", "Montag, 12.11." */
+function dayLabel(ts: number, now = Date.now()): string {
+    const d = new Date(ts);
+    const today = new Date(now);
+    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    if (ts >= start) {
+        return 'Heute';
+    }
+    if (ts >= start - 86_400_000) {
+        return 'Gestern';
+    }
+    return d.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit' });
+}
+
 /** Liste der letzten Ereignisse mit Vorschaubild; Antippen zeigt das Ereignisbild groß */
-function EventList({
+export function EventList({
     cameras,
     cameraId,
     refreshKey,
@@ -416,6 +392,7 @@ function EventList({
     onSelect,
     limit = 20,
     title = true,
+    groupByDay = false,
 }: {
     cameras: SvCamera[];
     cameraId?: string;
@@ -425,6 +402,8 @@ function EventList({
     limit?: number;
     /** Überschrift (entfällt, wenn die Liste schon in einem "Letzte Ereignisse"-Bereich steht) */
     title?: boolean;
+    /** Zeitleiste mit Tagesüberschriften (Heute, Gestern …) */
+    groupByDay?: boolean;
 }): React.JSX.Element | null {
     const events = useCameraEvents(cameraId, refreshKey);
     if (!events) {
@@ -441,8 +420,11 @@ function EventList({
                 </p>
             ) : (
                 <ul className="camera__eventlist">
-                    {shown.map(e => (
+                    {shown.map((e, i) => (
                         <li key={e.id}>
+                            {groupByDay && (i === 0 || dayLabel(shown[i - 1].ts) !== dayLabel(e.ts)) && (
+                                <h3 className="camera__day">{dayLabel(e.ts)}</h3>
+                            )}
                             <button
                                 type="button"
                                 className={`camera__event${e.id === selectedId ? ' camera__event--on' : ''}`}
@@ -457,7 +439,12 @@ function EventList({
                                     <span className="camera__event-kind">{eventLabel(e.kinds)}</span>
                                     <span className="camera__event-meta">
                                         {cameraId ? '' : `${names.get(e.cameraId)} · `}
-                                        {eventTime(e.ts)}
+                                        {groupByDay
+                                            ? new Date(e.ts).toLocaleTimeString('de-DE', {
+                                                  hour: '2-digit',
+                                                  minute: '2-digit',
+                                              })
+                                            : eventTime(e.ts)}
                                     </span>
                                 </span>
                             </button>
@@ -469,29 +456,23 @@ function EventList({
     );
 }
 
-/** Startseite: letzte Ereignisse aller Kameras (aufklappbar); Antippen öffnet die Kamera mit dem Ereignis */
-function RecentEvents({ cameras }: { cameras: SvCamera[] }): React.JSX.Element {
+/** Ereignis-Zeitleiste aller Kameras (Bereich Sicherheit); Antippen öffnet die Kamera mit dem Ereignisbild */
+export function EventTimeline({ cameras, limit = 50 }: { cameras: SvCamera[]; limit?: number }): React.JSX.Element {
     const { states } = useConnection();
-    const [open, setOpen] = useState(false);
     const [selected, setSelected] = useState<SvCameraEvent | undefined>();
     // Neu laden, sobald eine Kamera ein neues Ereignisbild meldet
     const latest = Math.max(0, ...cameras.map(c => (c.picture ? (states[c.picture.id]?.ts ?? 0) : 0)));
     const camera = selected && cameras.find(c => c.id === selected.cameraId);
     return (
-        <details
-            className="info__details"
-            onToggle={e => setOpen((e.target as HTMLDetailsElement).open)}
-        >
-            <summary>Letzte Ereignisse</summary>
-            {open && (
-                <EventList
-                    cameras={cameras}
-                    refreshKey={latest}
-                    onSelect={setSelected}
-                    limit={10}
-                    title={false}
-                />
-            )}
+        <>
+            <EventList
+                cameras={cameras}
+                refreshKey={latest}
+                onSelect={setSelected}
+                limit={limit}
+                title={false}
+                groupByDay
+            />
             {camera && selected && (
                 <CameraSheet
                     camera={camera}
@@ -499,6 +480,50 @@ function RecentEvents({ cameras }: { cameras: SvCamera[] }): React.JSX.Element {
                     onClose={() => setSelected(undefined)}
                 />
             )}
-        </details>
+        </>
+    );
+}
+
+/**
+ * Startseite: Kameras mit laufender oder frischer Erkennung (Ereignisbild jünger als 10 Minuten).
+ * Ohne aktuelles Ereignis erscheint nichts – die Kameras stehen im Bereich Sicherheit.
+ */
+export function RecentDetectionsCard({
+    detections,
+    cameras,
+}: {
+    detections: { cameraId: string; ts: number; events: string[] }[];
+    cameras: SvCamera[];
+}): React.JSX.Element | null {
+    const [open, setOpen] = useState<string | undefined>();
+    const list = detections
+        .map(d => ({ ...d, camera: cameras.find(c => c.id === d.cameraId) }))
+        .filter((d): d is typeof d & { camera: SvCamera } => !!d.camera);
+    if (!list.length) {
+        return null;
+    }
+    const camera = cameras.find(c => c.id === open);
+    return (
+        <section
+            className="card"
+            aria-label="Gerade erkannt"
+        >
+            <h2 className="subtitle">📷 Gerade erkannt</h2>
+            <div className="cameras">
+                {list.map(d => (
+                    <CameraTile
+                        key={d.cameraId}
+                        camera={d.camera}
+                        onOpen={() => setOpen(d.cameraId)}
+                    />
+                ))}
+            </div>
+            {camera && (
+                <CameraSheet
+                    camera={camera}
+                    onClose={() => setOpen(undefined)}
+                />
+            )}
+        </section>
     );
 }

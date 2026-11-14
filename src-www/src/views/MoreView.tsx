@@ -9,7 +9,7 @@ import { setMotion, useMotion, type MotionSetting } from '../motion';
 import { BatteryList } from '../components/BatteryList';
 import { batteryLevel, isBatteryLow } from '../battery';
 
-export function MoreView(): React.JSX.Element {
+export function MoreView({ onNavigate }: { onNavigate: (path: string) => void }): React.JSX.Element {
     const { status, version, model, lastError, states } = useConnection();
     const columns = useCardColumns();
     const byAdapter = new Map<string, number>();
@@ -71,6 +71,34 @@ export function MoreView(): React.JSX.Element {
                 columns={columns}
                 className="csecs csecs--cols"
                 sections={[
+                    {
+                        // Auf dem Handy ist "Beschattung" nicht in der Leiste, wenn es den Bereich Sicherheit gibt
+                        key: 'shortcuts',
+                        label: 'Weitere Bereiche',
+                        note: 'nur Handy',
+                        node:
+                            model?.shutterControl.length &&
+                            (model.cameras?.length || model.securityStations?.length) ? (
+                                <nav
+                                    className="card more__links"
+                                    aria-label="Weitere Bereiche"
+                                >
+                                    <button
+                                        type="button"
+                                        className="more__link"
+                                        onClick={() => onNavigate('shutters')}
+                                    >
+                                        <span aria-hidden="true">🪟</span> Beschattung
+                                        <span
+                                            className="chevron-right"
+                                            aria-hidden="true"
+                                        >
+                                            ›
+                                        </span>
+                                    </button>
+                                </nav>
+                            ) : null,
+                    },
                     {
                         key: 'iobroker',
                         label: 'ioBroker',

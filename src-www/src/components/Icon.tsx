@@ -18,6 +18,7 @@ const PATHS: Record<string, string> = {
     sensor: 'M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16zM12 8v4l2 2',
     edit: 'M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16zM13.5 6.5l4 4',
     warning: 'M12 3 2 21h20zM12 10v4M12 17h.01',
+    shield: 'M12 3 20 6v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
 };
 
 const TYPE_ICON: Record<string, string> = {
