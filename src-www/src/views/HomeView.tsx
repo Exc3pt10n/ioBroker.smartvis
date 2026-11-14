@@ -7,9 +7,13 @@ import { autoStateInfo } from '../shutters';
 import { DeviceTile } from '../components/DeviceTile';
 import { SortableGrid } from '../components/SortableGrid';
 import { CustomSections, type SectionDef } from '../components/CustomSections';
-import { EditBanner, EditButton } from '../components/EditButton';
+import { EditBanner, EditButton, EditTip } from '../components/EditButton';
 import { favorites, useEditing, visibleDevices } from '../editing';
 import { WarningsCard, WeatherCard } from '../components/WeatherCard';
+import { Icon } from '../components/Icon';
+import { RecentDetectionsCard } from '../components/Cameras';
+import { eventLabel } from '../cameras';
+import { activeAlarms, primaryStation, recentDetections, securityMode, useNow } from '../security';
 import { activeWarnings } from '../weather';
 import { EnergyFlow, FlowStatus } from '../components/EnergyFlow';
 import { ForecastCard } from '../components/ForecastCard';
@@ -21,12 +25,55 @@ import { BatteryList } from '../components/BatteryList';
 
 const LIGHT_TYPES = ['light', 'dimmer', 'ct', 'hue', 'rgb', 'rgbSingle', 'rgbwSingle', 'cie'];
 const OPENING_TYPES = ['window', 'windowTilt', 'door'];
+/** Erkennungen (Anzeige "Person", "Bewegung" …) → Schlüssel für eventLabel */
+const KIND_KEYS: Record<string, string> = {
+    Person: 'person',
+    Haustier: 'pet',
+    Bewegung: 'motion',
+    Geräusch: 'sound',
+    Weinen: 'crying',
+};
+
+/** Wichtigkeit der Kennzahlen (kleiner = weiter vorn) */
+const KPI_ORDER = [
+    'security',
+    'open',
+    'pv',
+    'soc',
+    'home',
+    'car',
+    'lights',
+    'climate',
+    'playing',
+    'sun',
+    'forecast',
+    'forecast2',
+    'holiday',
+];
+
+function kpiRank(key: string): number {
+    const k = key.startsWith('car') ? 'car' : key;
+    const i = KPI_ORDER.indexOf(k);
+    return i < 0 ? KPI_ORDER.length : i;
+}
+
+/** Sichtbare Kennzahlen, bevor "+N weitere" kommt (Handy zwei Reihen, Desktop zwei Reihen à sechs) */
+const KPI_LIMIT_PHONE = 6;
+const KPI_LIMIT_DESK = 12;
+/** "+N weitere" aufgeklappt (für die Sitzung gemerkt) */
+let kpisExpanded = false;
+
+/** Räume mit vielen Lichtern auf dem Desktop eingeklappt; aufgeklappte merkt sich die Sitzung */
+const COLLAPSE_FROM = 4;
+const expandedRooms = new Set<string>();
 
 export function HomeView({ onNavigate }: { onNavigate: (path: string) => void }): React.JSX.Element {
     const { model, states } = useConnection();
     const { editing } = useEditing();
     const dashboard = useMediaQuery(DASHBOARD_QUERY);
     const phone = useMediaQuery('(max-width: 899px)');
+    const now = useNow(30_000);
+    const [showAllKpis, setShowAllKpis] = useState(kpisExpanded);
     if (!model) {
         return <p className="empty">Lade Geräte …</p>;
     }
@@ -99,111 +146,138 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             document
                 .getElementById(`home-${section}`)
                 ?.scrollIntoView({ behavior: motionAllowed() ? 'smooth' : 'auto', block: 'start' });
+    // Sicherheit: Modus der Stationen, Alarme, jüngste Kamera-Erkennung
+    const hasSecurity = !!model.cameras?.length || !!model.securityStations?.length;
+    const alarms = hasSecurity ? activeAlarms(model, states, devices) : [];
+    // Kennzahl: Modus der Hauptstation (z. B. HomeBase) – Innenkameras mit eigener Station weichen oft ab
+    const primary = primaryStation(model);
+    const mode = securityMode(primary ? [primary] : [], states);
+    const detections = recentDetections(model, states, now);
+    const latestDetection = detections[0] && {
+        kinds: detections[0].events.length ? detections[0].events.map(e => KIND_KEYS[e] ?? e) : [],
+        camera: model.cameras?.find(c => c.id === detections[0].cameraId)?.name ?? '',
+    };
     const kpiCandidates: (Kpi | false)[] = [
         energy?.pv !== undefined && {
             key: 'pv',
-            icon: '☀️',
+            icon: 'sun',
             value: formatPower(energy.pv),
             label: 'PV jetzt',
             onClick: toEnergy,
         },
         energy?.soc !== undefined && {
             key: 'soc',
-            icon: '🔋',
+            icon: 'battery',
             value: `${Math.round(energy.soc)} %`,
             label: 'Batterie',
             onClick: toEnergy,
         },
         energy?.home !== undefined && {
             key: 'home',
-            icon: '🏠',
+            icon: 'home',
             value: formatPower(energy.home),
             label: 'Verbrauch',
             onClick: toEnergy,
         },
         ...charging.map((w, i) => ({
             key: `car${i}`,
-            icon: '🚗',
+            icon: 'car',
             value: formatPower(w.power),
             label: 'Wallbox lädt',
             onClick: toEnergy,
         })),
         forecastToday !== undefined && {
             key: 'forecast',
-            icon: '🔮',
+            icon: 'chart',
             value: fmtKwh(forecastToday),
             label: 'PV heute',
             onClick: toEnergy,
         },
         forecastTomorrow !== undefined && {
             key: 'forecast2',
-            icon: '🔮',
+            icon: 'chart',
             value: fmtKwh(forecastTomorrow),
             label: 'PV morgen',
             onClick: toEnergy,
         },
-        {
+        lightsOn.length > 0 && {
             key: 'lights',
-            icon: '💡',
+            icon: 'light',
             value: String(lightsOn.length),
             label: lightsOn.length === 1 ? 'Licht an' : 'Lichter an',
             onClick: lightsOn.length ? jump('lights') : undefined,
         },
         climateOn.length > 0 && {
             key: 'climate',
-            icon: climateIcon,
+            icon: climateIcon === '❄️' ? 'snow' : 'flame',
             value: String(climateOn.length),
             label: 'Klima an',
             onClick: jump('climate'),
         },
-        {
+        open.length > 0 && {
             key: 'open',
-            icon: '🪟',
+            icon: 'window',
             value: String(open.length),
             label: 'offen',
             onClick: open.length ? jump('open') : undefined,
         },
         playing.length > 0 && {
             key: 'playing',
-            icon: '🎵',
+            icon: 'media',
             value: String(playing.length),
             label: 'spielt',
             onClick: jump('playing'),
         },
         sunProtected > 0 && {
             key: 'sun',
-            icon: '🕶️',
+            icon: 'sunProtect',
             value: String(sunProtected),
             label: 'Sonnenschutz',
             onClick: toShutters,
         },
         !!shutterAlarm && {
             key: 'alarm',
-            icon: autoStateInfo(shutterAlarm)?.icon || '⚠️',
+            icon: 'warning',
             value: autoStateInfo(shutterAlarm)?.label || shutterAlarm,
             label: 'Rollläden',
             onClick: toShutters,
             warn: true,
         },
-        holiday && { key: 'holiday', icon: '🏖️', value: 'aktiv', label: 'Urlaubszeiten', onClick: toShutters },
+        holiday && { key: 'holiday', icon: 'calendar', value: 'aktiv', label: 'Urlaubszeiten', onClick: toShutters },
         weakBatteries.length > 0 && {
             key: 'batteries',
-            icon: '🪫',
+            icon: 'batteryLow',
             value: String(weakBatteries.length),
             label: weakBatteries.length === 1 ? 'Batterie schwach' : 'Batterien schwach',
             onClick: jump('batteries'),
             warn: true,
         },
+        hasSecurity && {
+            key: 'security',
+            icon: alarms.length ? 'warning' : 'shield',
+            // Beschriftung "Modus …" – "Zuhause" allein wäre mit dem Seitentitel zu verwechseln
+            value: alarms.length ? 'Alarm' : mode.label !== '–' ? mode.label : 'Sicherheit',
+            label: alarms.length
+                ? alarms[0]
+                : latestDetection
+                  ? `Modus · ${eventLabel(latestDetection.kinds)} ${latestDetection.camera}`
+                  : 'Sicherheitsmodus',
+            onClick: () => onNavigate('security'),
+            warn: alarms.length > 0,
+        },
         problems.length > 0 && {
             key: 'problems',
-            icon: '⚠️',
+            icon: 'warning',
             value: String(problems.length),
             label: problems.length === 1 ? 'Störung' : 'Störungen',
             onClick: jump('problems'),
             warn: true,
         },
     ];
-    const kpis = kpiCandidates.filter((k): k is Kpi => !!k);
+    // Warnungen zuerst, dann nach Wichtigkeit; Nullwerte (0 Lichter, 0 offen) entfallen oben schon
+    const kpis = kpiCandidates
+        .filter((k): k is Kpi => !!k)
+        .sort((a, b) => Number(!!b.warn) - Number(!!a.warn) || kpiRank(a.key) - kpiRank(b.key));
     const main = model.energy[0];
     // Bereiche ohne aktuellen Inhalt: im Bearbeiten-Modus mit Hinweis zeigen (zum Anordnen/Ausblenden)
     const placeholder = (text: string): React.ReactNode =>
@@ -211,6 +285,9 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
 
     // Kennzahlen, Wetter usw. – auf dem Handy eine gemeinsam sortierbare Liste,
     // auf dem Desktop Kennzahlen als Leiste oben und die Karten in der linken Spalte
+    // Mit "+N weitere" als letzter Kachel: eine Kachel weniger, damit die Reihen voll bleiben
+    const kpiMax = dashboard ? KPI_LIMIT_DESK : KPI_LIMIT_PHONE;
+    const kpiLimit = kpis.length > kpiMax ? kpiMax - 1 : kpiMax;
     const kpiSections: SectionDef[] = [
         {
             key: 'kpis',
@@ -221,12 +298,30 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                     role="list"
                     aria-label="Kennzahlen"
                 >
-                    {kpis.map(k => (
+                    {(showAllKpis ? kpis : kpis.slice(0, kpiLimit)).map(k => (
                         <KpiTile
                             key={k.key}
                             kpi={k}
                         />
                     ))}
+                    {kpis.length > kpiLimit && (
+                        <div role="listitem">
+                            <button
+                                type="button"
+                                className="kpi kpi--more"
+                                aria-expanded={showAllKpis}
+                                onClick={() => {
+                                    kpisExpanded = !showAllKpis;
+                                    setShowAllKpis(!showAllKpis);
+                                }}
+                            >
+                                <span className="kpi__value">
+                                    {showAllKpis ? 'Weniger' : `+${kpis.length - kpiLimit}`}
+                                </span>
+                                <span className="kpi__label">{showAllKpis ? 'einklappen' : 'weitere'}</span>
+                            </button>
+                        </div>
+                    )}
                 </div>
             ),
         },
@@ -346,7 +441,9 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             node: lightsOn.length ? (
                 <LightsSection
                     lights={lightsOn}
-                    compact={dashboard}
+                    compact
+                    // Handy: schon ab zwei Lampen je Raum nur die Namenszeile, Kacheln beim Aufklappen
+                    collapseFrom={dashboard ? COLLAPSE_FROM : 2}
                     onNavigate={onNavigate}
                 />
             ) : (
@@ -416,20 +513,58 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                 placeholder('Erscheint, sobald eine Batterie schwach ist (Anzeige des Geräts oder höchstens 20 %).')
             ),
         },
+        {
+            key: 'detections',
+            label: 'Gerade erkannt (Kameras)',
+            node: detections.length ? (
+                <RecentDetectionsCard
+                    detections={detections}
+                    cameras={model.cameras || []}
+                />
+            ) : (
+                placeholder('Erscheint, wenn eine Kamera gerade etwas erkennt (Ereignisbild bis 10 Minuten alt).')
+            ),
+        },
     ];
+    // Reihenfolge nach Dringlichkeit (gilt, solange keine eigene Anordnung gespeichert ist):
+    // Frische Kamera-Erkennung vor dem Wetter; dann Offenes und Laufendes; Batterien/Störungen zuletzt
+    const pick = (list: SectionDef[], keys: string[]): SectionDef[] =>
+        keys.flatMap(k => list.filter(x => x.key === k || (k === 'forecast' && x.key.startsWith('forecast-'))));
+    const allSections = [...overviewSections, ...mainSections];
+    const overviewOrdered = pick(allSections, ['detections', 'weather', 'energy', 'forecast']);
+    const mainOrdered = pick(allSections, [
+        'favorites',
+        'open',
+        'lights',
+        'climate',
+        'playing',
+        'problems',
+        'batteries',
+    ]);
     // Standardbreiten im Desktop-Raster: Übersichtskarten und kurze Listen je ein Drittel
-    const thirds = new Set(['weather', 'energy', 'playing', 'climate', 'open', 'problems', 'batteries']);
-    const deskOrder = [
+    const thirds = new Set([
         'weather',
         'energy',
-        'forecast',
-        'favorites',
         'playing',
         'climate',
         'open',
         'problems',
         'batteries',
+        'detections',
         'lights',
+    ]);
+    const deskOrder = [
+        'detections',
+        'weather',
+        'energy',
+        'forecast',
+        'favorites',
+        'open',
+        'lights',
+        'climate',
+        'playing',
+        'problems',
+        'batteries',
     ];
     const deskSections: SectionDef[] = [...overviewSections, ...mainSections]
         .map(sec => ({
@@ -447,7 +582,8 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
     const hint = (
         <>
             {withoutRoom > 0 && !hintHidden && (
-                <div className="hint-row">
+                // Verwaltungshinweis: dezent am Ende der Seite, nicht zwischen den Inhalten
+                <div className="hint-row hint-row--subtle">
                     <button
                         type="button"
                         className="hint"
@@ -487,6 +623,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                 <EditButton />
             </div>
             <EditBanner text="Bereiche und Favoriten am Griff ⠿ ziehen, Bereiche aus- oder einblenden, Kachel antippen zum Anpassen" />
+            <EditTip />
             {dashboard ? (
                 // Desktop: Kennzahlen als Leiste, darunter ein Raster mit frei wählbarer Breite je Karte
                 <div className="home home--dashboard">
@@ -495,7 +632,6 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                             view="home.top"
                             sections={kpiSections}
                         />
-                        {hint}
                     </div>
                     <CustomSections
                         view="home.desk"
@@ -504,6 +640,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                         sections={deskSections}
                     />
                     {allQuiet && <p className="empty">Alles ruhig – keine Lichter an, alles geschlossen.</p>}
+                    {hint}
                 </div>
             ) : (
                 <div className="home">
@@ -511,36 +648,34 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                         <CustomSections
                             view="home.overview"
                             className="csecs csecs--stack"
-                            sections={[...kpiSections, ...overviewSections]}
+                            sections={[...kpiSections, ...overviewOrdered]}
                         />
                     </div>
-                    <div className="home__kpis">{hint}</div>
                     <div className="home__main">
                         <CustomSections
                             view="home.main"
                             className="csecs home__sections"
-                            sections={mainSections}
+                            sections={mainOrdered}
                         />
                         {allQuiet && <p className="empty">Alles ruhig – keine Lichter an, alles geschlossen.</p>}
                     </div>
+                    <div className="home__hint">{hint}</div>
                 </div>
             )}
         </>
     );
 }
 
-/** Räume mit vielen Lichtern auf dem Desktop eingeklappt; aufgeklappte merkt sich die Sitzung */
-const COLLAPSE_FROM = 4;
-const expandedRooms = new Set<string>();
-
 /** "Eingeschaltete Lichter" je Raum, mit "Alle aus"; compact (Desktop): kleine Kacheln, große Räume einklappbar */
 function LightsSection({
     lights,
     compact,
+    collapseFrom = COLLAPSE_FROM,
     onNavigate,
 }: {
     lights: SvDevice[];
     compact: boolean;
+    collapseFrom?: number;
     onNavigate: (path: string) => void;
 }): React.JSX.Element {
     const { model, states } = useConnection();
@@ -550,7 +685,7 @@ function LightsSection({
             <h2 className="subtitle">💡 Eingeschaltete Lichter</h2>
             {groupByRoom(lights, model?.rooms || []).map(g => {
                 const key = g.roomId ?? '_none';
-                const collapsible = compact && g.devices.length >= COLLAPSE_FROM;
+                const collapsible = compact && g.devices.length >= collapseFrom;
                 const open = !collapsible || expandedRooms.has(key);
                 const toggle = (): void => {
                     if (expandedRooms.has(key)) {
@@ -582,7 +717,11 @@ function LightsSection({
                                 title="Alle Lichter ausschalten"
                                 onClick={() => switchLights(g.devices, false, states, g.name)}
                             >
-                                💡 Alle aus
+                                <Icon
+                                    name="light"
+                                    size={14}
+                                />{' '}
+                                Alle aus
                             </button>
                             {collapsible && (
                                 <button
@@ -661,7 +800,10 @@ function KpiTile({ kpi }: { kpi: Kpi }): React.JSX.Element {
                 className="kpi__icon"
                 aria-hidden="true"
             >
-                {kpi.icon}
+                <Icon
+                    name={kpi.icon}
+                    size={16}
+                />
             </span>
             <span className="kpi__value">{kpi.value}</span>
             <span className="kpi__label">{kpi.label}</span>

@@ -6,6 +6,7 @@ import {
     PROTOCOL_VERSION,
     type ClientMessage,
     type ServerMessage,
+    type SvCameraEvent,
     type SvClientAction,
     type SvDiagnosis,
     type SvEdit,
@@ -24,6 +25,8 @@ const MIME: Record<string, string> = {
     '.webmanifest': 'application/manifest+json',
     '.svg': 'image/svg+xml',
     '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
     '.ico': 'image/x-icon',
     '.woff2': 'font/woff2',
 };
@@ -52,6 +55,13 @@ export interface ServerHandlers {
     history?(id: string, range: SvHistoryRange): Promise<[number, number][]>;
     /** Diagnose der letzten Erkennung */
     diagnose?(): SvDiagnosis;
+    /**
+     * Datei aus dem ioBroker-Dateispeicher unter /files/… (z. B. Kamerabilder);
+     * null = nicht freigegeben oder nicht vorhanden
+     */
+    file?(path: string): Promise<{ data: Buffer; mimeType?: string } | null>;
+    /** Letzte Kamera-Ereignisse (ohne cameraId: aller Kameras) */
+    cameraEvents?(cameraId?: string): SvCameraEvent[];
     onClientCountChange?(count: number): void;
     log: ioBroker.Logger;
 }
@@ -171,6 +181,18 @@ export class SmartVisServer {
                 }
                 return;
             }
+            if (msg.t === 'cameraEvents') {
+                try {
+                    if (!this.handlers.cameraEvents) {
+                        throw new Error('Kamera-Ereignisse sind nicht verfügbar');
+                    }
+                    const cameraId = typeof msg.cameraId === 'string' ? msg.cameraId : undefined;
+                    send(ws, { t: 'cameraEvents', reqId: msg.reqId, events: this.handlers.cameraEvents(cameraId) });
+                } catch (e) {
+                    send(ws, { t: 'cameraEvents', reqId: msg.reqId, error: (e as Error).message });
+                }
+                return;
+            }
             if (msg.t === 'diagnose') {
                 try {
                     if (!this.handlers.diagnose) {
@@ -244,6 +266,11 @@ export class SmartVisServer {
             return;
         }
 
+        if (pathname.startsWith('/files/') && this.handlers.file) {
+            this.serveFile(pathname, req, res);
+            return;
+        }
+
         let file = resolve(this.root, `.${sep}${normalize(pathname)}`);
         if (file !== this.root && !file.startsWith(this.root + sep)) {
             res.writeHead(403).end();
@@ -272,6 +299,25 @@ export class SmartVisServer {
             return;
         }
         createReadStream(file).pipe(res);
+    }
+
+    /** Freigegebene Datei aus dem ioBroker-Dateispeicher (Kamerabilder); nie zwischenspeichern */
+    private serveFile(pathname: string, req: IncomingMessage, res: ServerResponse): void {
+        this.handlers.file!(pathname).then(
+            file => {
+                if (!file) {
+                    res.writeHead(404).end();
+                    return;
+                }
+                res.writeHead(200, {
+                    'Content-Type': file.mimeType || MIME[extname(pathname)] || 'application/octet-stream',
+                    'Cache-Control': 'no-store',
+                    'X-Content-Type-Options': 'nosniff',
+                });
+                res.end(req.method === 'HEAD' ? undefined : file.data);
+            },
+            () => res.writeHead(404).end(),
+        );
     }
 }
 

@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react';
 import type { SvCardWidth, SvViewLayout } from '../../../src/shared/protocol';
 import { connection, useConnection } from '../connection';
 import { useEditing } from '../editing';
@@ -27,6 +28,40 @@ const WIDTH_CHOICES: { width: SvCardWidth; label: string; title: string }[] = [
     { width: 'twothirds', label: '⅔', title: 'zwei Drittel' },
     { width: 'full', label: '▭', title: 'volle Breite' },
 ];
+
+/** Zeilenhöhe des Mauerwerk-Rasters und Abstand zwischen Karten (px) */
+const ROW = 4;
+const GAP = 16;
+
+/**
+ * Mauerwerk (Desktop-Raster): Jede Karte belegt so viele kleine Zeilen, wie sie hoch ist – kurze Karten
+ * rücken unter benachbarte nach, statt dass sich alle nach der höchsten Karte der Reihe richten.
+ */
+function useMasonry(enabled: boolean): React.RefObject<HTMLDivElement | null> {
+    const ref = useRef<HTMLDivElement>(null);
+    useLayoutEffect(() => {
+        const grid = ref.current;
+        if (!enabled || !grid) {
+            return;
+        }
+        const layout = (): void => {
+            for (const item of Array.from(grid.children) as HTMLElement[]) {
+                const inner = item.firstElementChild as HTMLElement | null;
+                const h = inner ? inner.getBoundingClientRect().height : 0;
+                item.style.gridRowEnd = `span ${Math.max(1, Math.ceil((h + GAP) / ROW))}`;
+            }
+        };
+        layout();
+        const ro = new ResizeObserver(layout);
+        for (const item of Array.from(grid.children)) {
+            if (item.firstElementChild) {
+                ro.observe(item.firstElementChild);
+            }
+        }
+        return () => ro.disconnect();
+    });
+    return ref;
+}
 
 /** Bereiche der Reihe nach jeweils in die bisher kürzeste Spalte (bei gleichen Gewichten wie zeilenweise) */
 export function distribute<T extends { weight?: number }>(items: T[], columns: number): T[][] {
@@ -94,6 +129,7 @@ export function CustomSections({
     const available = sections.filter(s => s.node !== null && s.node !== undefined && s.node !== false);
     const ordered = applyLayout(available, layout);
     const canEdit = editing && !!model?.editable;
+    const masonryRef = useMasonry(grid && !canEdit);
     const widthOf = (s: SectionDef): SvCardWidth => layout?.widths?.[s.key] ?? s.width ?? 'full';
 
     if (!canEdit) {
@@ -103,13 +139,16 @@ export function CustomSections({
         }
         if (grid) {
             return (
-                <div className={`${className} dgrid`}>
+                <div
+                    ref={masonryRef}
+                    className={`${className} dgrid dgrid--masonry`}
+                >
                     {visible.map(s => (
                         <div
                             key={s.key}
                             className={`csec dgrid__item dgrid__item--${widthOf(s)}`}
                         >
-                            {s.node}
+                            <div className="dgrid__inner">{s.node}</div>
                         </div>
                     ))}
                 </div>

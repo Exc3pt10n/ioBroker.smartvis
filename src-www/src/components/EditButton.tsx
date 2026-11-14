@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useConnection } from '../connection';
 import { useEditing } from '../editing';
 import { Icon } from './Icon';
@@ -28,6 +29,63 @@ export function EditButton(): React.JSX.Element | null {
                 />
             )}
         </button>
+    );
+}
+
+const TIP_KEY = 'smartvis.tip.edit';
+
+function tipSeen(): boolean {
+    try {
+        return localStorage.getItem(TIP_KEY) === '1';
+    } catch {
+        return true;
+    }
+}
+
+/**
+ * Einmaliger Tipp unter der Titelzeile (Startseite): Das Stift-Symbol ist leicht zu übersehen.
+ * Verschwindet mit ✕ oder sobald der Bearbeiten-Modus einmal geöffnet wurde (im Browser gemerkt).
+ */
+export function EditTip(): React.JSX.Element | null {
+    const { model } = useConnection();
+    const { editing } = useEditing();
+    const [seen, setSeen] = useState(tipSeen);
+    const dismiss = (): void => {
+        try {
+            localStorage.setItem(TIP_KEY, '1');
+        } catch {
+            // ohne Speicher: nur für diese Sitzung ausblenden
+        }
+        setSeen(true);
+    };
+    if (editing && !seen) {
+        dismiss();
+    }
+    if (seen || editing || !model?.editable) {
+        return null;
+    }
+    return (
+        <div
+            className="edittip"
+            role="note"
+        >
+            <span>
+                Tipp: Mit{' '}
+                <Icon
+                    name="edit"
+                    size={14}
+                />{' '}
+                oben rechts ordnest du Bereiche an, blendest sie aus und benennst Geräte und Räume um.
+            </span>
+            <button
+                type="button"
+                className="iconbtn edittip__close"
+                aria-label="Tipp ausblenden"
+                onClick={dismiss}
+            >
+                ✕
+            </button>
+        </div>
     );
 }
 

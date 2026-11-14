@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { SvRoom } from '../../../src/shared/protocol';
 import { EditBanner, EditButton, MoveButtons } from '../components/EditButton';
 import { DragHandle, SortableGrid, useSortable } from '../components/SortableGrid';
+import { Icon } from '../components/Icon';
 import { connection, useConnection } from '../connection';
 import { moved, useEditing, visibleDevices, visibleRooms } from '../editing';
 import { CreateRoomSheet, EditRoomSheet } from './EditSheets';
@@ -24,7 +25,8 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
     const rooms = visibleRooms(model, editing)
         .filter(r => r.kind !== 'zone')
         .map(r => ({ room: r, devices: devices.filter(d => d.roomId === r.id) }))
-        .filter(r => editing || r.devices.length > 0);
+        // Räume nur mit Kamera (z. B. Einfahrt) zählen auch
+        .filter(r => editing || r.devices.length > 0 || (model.cameras || []).some(c => c.roomId === r.room.id));
     // Hue-Zonen über mehrere Räume: eigener Bereich unter den Räumen
     const zones = visibleRooms(model, editing)
         .filter(r => r.kind === 'zone')
@@ -58,6 +60,7 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
                             scene={sceneOf(list)}
                             weakBatteries={weakIn(room.id)}
                             count={list.length}
+                            cameras={(model.cameras || []).filter(c => c.roomId === room.id).length}
                             editing={editing}
                             canBack={i > 0}
                             canForward={i < order.length - 1}
@@ -153,6 +156,7 @@ function RoomCard({
     scene,
     weakBatteries = 0,
     count,
+    cameras = 0,
     editing,
     canBack,
     canForward,
@@ -166,6 +170,8 @@ function RoomCard({
     /** Geräte mit schwacher Batterie in diesem Raum */
     weakBatteries?: number;
     count: number;
+    /** Kameras im Raum (zählen zu den Geräten, sonst stünde dort z. B. "0 Geräte") */
+    cameras?: number;
     editing: boolean;
     canBack: boolean;
     canForward: boolean;
@@ -233,7 +239,7 @@ function RoomCard({
                         {status.humidity !== undefined && <span>💧 {fmt(status.humidity, 0)} %</span>}
                     </span>
                 ) : null}
-                {badges.length > 0 && !editing ? (
+                {badges.length > 0 && !editing && (
                     <span className="room__badges">
                         {badges.map(b => (
                             <span
@@ -246,13 +252,18 @@ function RoomCard({
                             </span>
                         ))}
                     </span>
-                ) : (
-                    <span className="room__meta">
-                        {count} {count === 1 ? 'Gerät' : 'Geräte'}
-                        {editing && room.source === 'name' ? ' · aus Gerätenamen erkannt' : ''}
-                        {editing && room.source === 'custom' ? ' · selbst angelegt' : ''}
-                    </span>
                 )}
+                {/* Immer dieselbe Fußzeile: Anzahl Geräte (und Kameras) – einheitlich auf allen Karten */}
+                <span className="room__meta">
+                    {[
+                        count > 0 && `${count} ${count === 1 ? 'Gerät' : 'Geräte'}`,
+                        cameras > 0 && `${cameras} ${cameras === 1 ? 'Kamera' : 'Kameras'}`,
+                    ]
+                        .filter(Boolean)
+                        .join(' · ') || 'Keine Geräte'}
+                    {editing && room.source === 'name' ? ' · aus Gerätenamen erkannt' : ''}
+                    {editing && room.source === 'custom' ? ' · selbst angelegt' : ''}
+                </span>
             </button>
             {lit && !editing && (
                 <button
@@ -262,7 +273,11 @@ function RoomCard({
                     title="Alle Lichter ausschalten"
                     onClick={() => switchLights(status.lights, false, connection.getSnapshot().states, room.name)}
                 >
-                    💡 aus
+                    <Icon
+                        name="light"
+                        size={14}
+                    />{' '}
+                    aus
                 </button>
             )}
             {editing && (

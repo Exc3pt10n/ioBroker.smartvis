@@ -13,6 +13,7 @@ import { HomeView } from './views/HomeView';
 import { MoreView } from './views/MoreView';
 import { RoomView } from './views/RoomView';
 import { RoomsView } from './views/RoomsView';
+import { SecurityView } from './views/SecurityView';
 import { ShutterView } from './views/ShutterView';
 
 /** Einfaches Hash-Routing: #/home, #/rooms, #/rooms/<id>, #/more */
@@ -120,6 +121,7 @@ const TABS = [
     { id: 'home', label: 'Home', icon: 'home' },
     { id: 'rooms', label: 'Räume', icon: 'rooms' },
     { id: 'energy', label: 'Energie', icon: 'energy', needs: 'energy' },
+    { id: 'security', label: 'Sicherheit', icon: 'shield', needs: 'security' },
     { id: 'shutters', label: 'Beschattung', icon: 'blind', needs: 'shutters' },
     { id: 'more', label: 'Mehr', icon: 'more' },
 ];
@@ -128,12 +130,14 @@ export function App(): React.JSX.Element {
     const [route, navigate] = useRoute();
     useScrollMemory(route);
     const { status, model } = useConnection();
+    const hasSecurity = !!model?.cameras?.length || !!model?.securityStations?.length;
     const tabs = TABS.filter(
         t =>
             !t.needs ||
             (t.needs === 'energy' &&
                 (!!model?.energy.length || !!model?.wallboxes.length || !!model?.pvForecast.length)) ||
-            (t.needs === 'shutters' && !!model?.shutterControl.length),
+            (t.needs === 'shutters' && !!model?.shutterControl.length) ||
+            (t.needs === 'security' && hasSecurity),
     );
     const [tab = 'home', param] = route;
     const [detailId, setDetailId] = useState<string | null>(null);
@@ -154,10 +158,12 @@ export function App(): React.JSX.Element {
         view = <RoomsView onNavigate={navigate} />;
     } else if (tab === 'shutters') {
         view = <ShutterView />;
+    } else if (tab === 'security') {
+        view = <SecurityView />;
     } else if (tab === 'energy') {
         view = <EnergyView />;
     } else if (tab === 'more') {
-        view = <MoreView />;
+        view = <MoreView onNavigate={navigate} />;
     } else {
         view = <HomeView onNavigate={navigate} />;
     }
@@ -175,7 +181,10 @@ export function App(): React.JSX.Element {
                             <a
                                 key={t.id}
                                 href={`#/${t.id}`}
-                                className={`nav__item${tab === t.id ? ' nav__item--active' : ''}`}
+                                className={`nav__item${tab === t.id ? ' nav__item--active' : ''}${
+                                    // Handy: höchstens 5 Einträge – Beschattung ist dann über "Mehr" erreichbar
+                                    t.id === 'shutters' && hasSecurity ? ' nav__item--wide' : ''
+                                }`}
                                 aria-current={tab === t.id ? 'page' : undefined}
                                 onClick={e => {
                                     // Über navigate (statt reinem Hash-Link), damit der Wechsel überblendet wird

@@ -1,6 +1,7 @@
 import type { SvDevice, SvStateRef, SvStateValue } from '../../../src/shared/protocol';
 import { HistoryPanel } from '../components/HistoryPanel';
 import { ScenePanel } from '../components/ScenePanel';
+import { Icon } from '../components/Icon';
 import { Sheet } from '../components/Sheet';
 import { Slider } from '../components/Slider';
 import { Toggle } from '../components/Toggle';
@@ -601,29 +602,56 @@ function BlindControls({
                 <p className="detail__note">Aktuell: {formatValue(actual, states[actual.id])}</p>
             )}
             {set && (
-                <div className="actions actions--small">
+                // Immer Auf · Stopp · Zu: ohne eigenen Stopp-Datenpunkt hält der Rollladen an, indem die aktuelle
+                // Position als Ziel gesetzt wird (Homematic, Shelly u. a. bleiben dann stehen)
+                <div className="actions actions--small actions--three">
                     <button
                         type="button"
                         className="action"
                         onClick={() => connection.setState(set.id, max)}
                     >
-                        ⬆️ Auf
+                        <Icon
+                            name="up"
+                            size={18}
+                        />
+                        Auf
                     </button>
-                    {stop && (
-                        <button
-                            type="button"
-                            className="action"
-                            onClick={() => connection.setState(stop.id, true)}
-                        >
-                            ⏹ Stopp
-                        </button>
-                    )}
+                    <button
+                        type="button"
+                        className="action"
+                        disabled={!stop && !(actual && actual.id !== set.id)}
+                        title={
+                            !stop && !(actual && actual.id !== set.id)
+                                ? 'Dieser Rollladen kann nicht angehalten werden'
+                                : undefined
+                        }
+                        onClick={() => {
+                            if (stop) {
+                                connection.setState(stop.id, true);
+                            } else if (actual && actual.id !== set.id) {
+                                const pos = num(states, actual);
+                                if (pos !== undefined) {
+                                    connection.setState(set.id, pos);
+                                }
+                            }
+                        }}
+                    >
+                        <Icon
+                            name="stop"
+                            size={18}
+                        />
+                        Stopp
+                    </button>
                     <button
                         type="button"
                         className="action"
                         onClick={() => connection.setState(set.id, min)}
                     >
-                        ⬇️ Zu
+                        <Icon
+                            name="down"
+                            size={18}
+                        />
+                        Zu
                     </button>
                 </div>
             )}
@@ -1063,7 +1091,7 @@ function AcControls({ refs, states }: { refs: AcRefs; states: States }): React.J
 }
 
 /** Auswahlfeld für States mit Werteliste (common.states) */
-function SelectState({ state, label }: { state: SvStateRef; label: string }): React.JSX.Element {
+export function SelectState({ state, label }: { state: SvStateRef; label: string }): React.JSX.Element {
     const { states } = useConnection();
     const value = states[state.id];
     const current = value?.val === null || value?.val === undefined ? '' : String(value.val);

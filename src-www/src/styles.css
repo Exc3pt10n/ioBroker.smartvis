@@ -4,7 +4,7 @@
     --surface: #ffffff;
     --surface-2: #eceef2;
     --text: #15171c;
-    --text-muted: #646a76;
+    --text-muted: #5a606b;
     --accent: #2563eb;
     --accent-soft: #dbe6fd;
     --active: #f59e0b;
@@ -23,7 +23,7 @@
         --surface: #1a1d23;
         --surface-2: #252931;
         --text: #eef0f4;
-        --text-muted: #9aa1ad;
+        --text-muted: #a8afbb;
         --accent: #60a5fa;
         --accent-soft: #1e2a44;
         --active: #fbbf24;
@@ -325,8 +325,13 @@ button {
 }
 
 .room__meta {
+    margin-top: auto;
     font-size: 13px;
     color: var(--text-muted);
+}
+
+.room__badges + .room__meta {
+    margin-top: 2px;
 }
 
 .room__climate {
@@ -381,7 +386,7 @@ button {
     background: var(--surface);
     box-shadow: var(--shadow);
     font: inherit;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     cursor: pointer;
 }
@@ -664,7 +669,7 @@ button.chip {
 /* ===== Wallbox ===== */
 .wallbox__estimated {
     display: block;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 400;
     text-align: right;
     color: var(--text-muted);
@@ -1004,7 +1009,7 @@ details[open] > summary > .chevron {
 }
 
 .sun dt {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-muted);
 }
 
@@ -2088,7 +2093,7 @@ section + .chips {
     padding: 0 6px;
     border-radius: 999px;
     background: var(--surface-2);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     text-align: center;
     vertical-align: 1px;
@@ -2411,7 +2416,7 @@ section + .chips {
     display: flex;
     justify-content: space-between;
     margin-top: 4px;
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
 }
@@ -2532,7 +2537,7 @@ section + .chips {
     border-radius: 999px;
     background: var(--active-soft);
     color: var(--text);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -2604,6 +2609,26 @@ section + .chips {
     margin-top: 0;
 }
 
+/* Verwaltungshinweis am Seitenende: dezent statt auffälliger Box */
+.hint-row--subtle {
+    margin-top: 24px;
+}
+
+.hint-row--subtle .hint {
+    padding: 8px 0;
+    border: 0;
+    background: none;
+    color: var(--text-muted);
+    font-size: 14px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.hint-row--subtle .hint-row__close {
+    width: 36px;
+    height: 36px;
+}
+
 .hint-row__close {
     flex: none;
     align-self: center;
@@ -2659,7 +2684,7 @@ section + .chips {
 }
 
 .quota__diff {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-muted);
 }
 
@@ -2969,8 +2994,28 @@ button.kpi:hover {
 }
 
 .kpi__icon {
-    font-size: 14px;
+    display: flex;
+    color: var(--accent);
     line-height: 1;
+}
+
+.kpi--warn {
+    background: color-mix(in srgb, var(--warn) 10%, var(--surface));
+}
+
+.kpi--warn .kpi__icon {
+    color: var(--warn);
+}
+
+.kpi--more {
+    grid-template-columns: minmax(0, 1fr);
+    border: 1px dashed var(--surface-2);
+    background: transparent;
+    cursor: pointer;
+}
+
+.kpi--more .kpi__value {
+    color: var(--accent);
 }
 
 .kpi__value {
@@ -2983,12 +3028,16 @@ button.kpi:hover {
 }
 
 .kpi__label {
+    /* Zwei Zeilen statt abgeschnitten ("Batterien schwach", "Person · Eingangstür") */
+    display: -webkit-box;
     grid-column: 1 / -1;
     overflow: hidden;
-    text-overflow: ellipsis;
-    font-size: 12px;
+    font-size: 12.5px;
+    line-height: 1.25;
     color: var(--text-muted);
-    white-space: nowrap;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
 }
 
 .kpi--warn .kpi__value {
@@ -3063,6 +3112,10 @@ button.kpi:hover {
 /* Sprungziele der Kennzahlen */
 .home__sections section[id] {
     scroll-margin-top: 16px;
+}
+
+.home__hint {
+    order: 4;
 }
 
 .home__main {
@@ -3428,7 +3481,7 @@ button.kpi:hover {
 }
 
 .instance__id {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-muted);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -3478,7 +3531,7 @@ button.kpi:hover {
     min-width: 0;
     min-height: 52px;
     padding: 4px 2px;
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .ac__mode-icon {
@@ -3517,7 +3570,7 @@ button.kpi:hover {
     background: var(--surface-2);
     color: var(--text);
     font: inherit;
-    font-size: 12px;
+    font-size: 13px;
     text-align: center;
     cursor: pointer;
 }
@@ -3845,7 +3898,7 @@ button.kpi:hover {
 }
 
 .grid--compact .tile__value {
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .grid--compact .tile__auto {
@@ -3857,6 +3910,7 @@ button.kpi:hover {
 }
 
 .roomgroup__toggle {
+    white-space: nowrap;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -3886,7 +3940,7 @@ button.kpi:hover {
 
 .instance__paused {
     display: block;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 400;
     color: var(--text-muted);
     white-space: nowrap;
@@ -3990,7 +4044,7 @@ button.battery__row {
 }
 
 .battery__room {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-muted);
 }
 
@@ -4061,7 +4115,7 @@ button.battery__row {
 
 .diag__table thead th {
     color: var(--text-muted);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 500;
 }
 
@@ -4217,4 +4271,395 @@ button.battery__row {
 
 .wwarn__instruction {
     color: var(--text-muted);
+}
+
+/* ===== Kameras ===== */
+.cameras {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+    gap: 8px;
+}
+
+@media (min-width: 700px) {
+    .cameras {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: var(--gap);
+    }
+}
+
+.camera__detail > .detail__note {
+    margin: 8px 0 12px;
+}
+
+.camera {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    padding: 0;
+    border: 0;
+    border-radius: 14px;
+    background: var(--surface-2);
+    color: #fff;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.camera--event {
+    outline: 3px solid var(--active);
+    outline-offset: -3px;
+}
+
+.camera__img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.camera__placeholder {
+    display: grid;
+    place-items: center;
+    color: var(--text-muted);
+    font-size: 32px;
+    background: var(--surface-2);
+}
+
+.camera--off .camera__img {
+    filter: grayscale(1) brightness(0.6);
+}
+
+.camera__bar {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 18px 10px 8px;
+    background: linear-gradient(transparent, rgb(0 0 0 / 65%));
+    font-size: 14px;
+}
+
+.camera__name {
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.camera__time,
+.camera__badge {
+    flex: none;
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.camera__badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: rgb(0 0 0 / 45%);
+}
+
+.camera__badge--event {
+    background: var(--active);
+    color: #000;
+    opacity: 1;
+}
+
+.camera__big,
+.camera__frame {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    height: auto;
+    border: 0;
+    border-radius: 14px;
+    object-fit: contain;
+    background: #000;
+}
+
+.camera__waiting {
+    padding: 16px;
+    color: #e6e8ec;
+    font-size: 15px;
+    text-align: center;
+}
+
+.camera__waiting small {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+}
+
+.camera__alarm {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--warn) 18%, var(--surface));
+    color: var(--warn);
+    font-weight: 600;
+}
+
+.camera__station {
+    margin-top: 8px;
+}
+
+.camera__station--alarm {
+    color: var(--warn);
+}
+
+.camera__ptz {
+    display: grid;
+    grid-template-areas:
+        '. up .'
+        'left . right'
+        '. down .';
+    grid-template-columns: repeat(3, 48px);
+    gap: 6px;
+    justify-content: center;
+    margin: 4px 0;
+}
+
+.camera__ptz .csec__btn {
+    width: 48px;
+    height: 44px;
+}
+
+.camera__ptz-up {
+    grid-area: up;
+}
+
+.camera__ptz-left {
+    grid-area: left;
+}
+
+.camera__ptz-right {
+    grid-area: right;
+}
+
+.camera__ptz-down {
+    grid-area: down;
+}
+
+/* Kamera-Ereignisse */
+.camera__events {
+    margin-top: 16px;
+}
+
+.camera__eventlist {
+    display: grid;
+    gap: 6px;
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.camera__event {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+    padding: 6px;
+    border: 0;
+    border-radius: 12px;
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.camera__event--on {
+    outline: 2px solid var(--accent);
+}
+
+.camera__thumb {
+    display: block;
+    width: 96px;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    object-fit: cover;
+    font-size: 18px;
+}
+
+.camera__event-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.camera__event-kind {
+    font-weight: 600;
+}
+
+.camera__event-meta {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.camera__selected {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 12px;
+}
+
+.camera__back {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== Bereich Sicherheit ===== */
+.security__modes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 4px;
+}
+
+.security__modes button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px;
+    font-size: 15px;
+    white-space: nowrap;
+}
+
+@media (min-width: 600px) {
+    .security__modes button {
+        flex-direction: row;
+        justify-content: center;
+        gap: 6px;
+    }
+}
+
+.camera__day {
+    margin: 10px 0 2px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.camera__eventlist > li:first-child .camera__day {
+    margin-top: 0;
+}
+
+/* Handy: Beschattung über "Mehr", wenn es den Bereich Sicherheit gibt (Leiste höchstens 5 Einträge) */
+@media (max-width: 899px) {
+    .nav__item--wide {
+        display: none;
+    }
+}
+
+.more__links {
+    padding: 4px 0;
+}
+
+.more__link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px 16px;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font: inherit;
+    font-size: 16px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.more__link .chevron-right {
+    margin-left: auto;
+    color: var(--text-muted);
+    font-size: 20px;
+}
+
+@media (min-width: 900px) {
+    .more__links {
+        display: none;
+    }
+}
+
+.action:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+/* Handy: eingeklappter Bereich als eine Zeile (Energie: Zähler, Verlauf) */
+.collapse-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    border: 0;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.collapse-card .subtitle {
+    margin: 0;
+}
+
+.collapse-card__chevron {
+    color: var(--text-muted);
+    font-size: 22px;
+}
+
+/* Desktop-Raster als Mauerwerk: kleine Zeilen, Höhe je Karte per Skript (CustomSections) */
+.dgrid--masonry {
+    grid-auto-rows: 4px;
+    grid-auto-flow: row dense;
+    row-gap: 0;
+}
+
+.dgrid--masonry > .dgrid__item {
+    align-self: start;
+}
+
+.shutter-filter {
+    display: inline-grid;
+    grid-template-columns: repeat(2, auto);
+    margin: 4px 0 12px;
+}
+
+.shutter-list__empty {
+    margin: 8px 0 0;
+}
+
+/* Einmaliger Tipp zum Bearbeiten-Modus */
+.edittip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 12px;
+    padding: 8px 8px 8px 14px;
+    border-radius: 12px;
+    background: var(--accent-soft);
+    font-size: 14px;
+}
+
+.edittip svg {
+    vertical-align: -2px;
+}
+
+.edittip__close {
+    flex: none;
+    width: 32px;
+    height: 32px;
+    margin-left: auto;
 }

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import { useCardColumns } from '../media';
 import type { SvAutoShutter, SvShutterControl } from '../../../src/shared/protocol';
 import { ActionButton, Toggle } from '../components/Toggle';
@@ -10,9 +10,21 @@ import { autoStateInfo, text, timeText } from '../shutters';
 /** Eingeklappte Bereiche (für diese Sitzung) */
 const collapsedAreas = new Set<string>();
 
+/** Filter "Nur abweichende" (geschlossen, Sonnenschutz oder Automatik aus) – für die Sitzung gemerkt */
+let deviatingOnly = false;
+const DeviatingContext = createContext(false);
+
+/** Weicht der Rollladen vom Normalfall ab (nicht ganz offen oder eine Automatik ausgeschaltet)? */
+function isDeviating(s: SvAutoShutter, states: Record<string, { val: unknown } | null>): boolean {
+    const level = s.level ? Number(states[s.level.id]?.val) : NaN;
+    const autoOff = [s.autoUp, s.autoDown, s.autoSun].some(r => r && states[r.id]?.val === false);
+    return (Number.isFinite(level) && level < 95) || autoOff;
+}
+
 export function ShutterView(): React.JSX.Element {
     const { model } = useConnection();
     const columns = useCardColumns();
+    const [onlyDeviating, setOnlyDeviating] = useState(deviatingOnly);
     if (!model) {
         return <p className="empty">Lade …</p>;
     }
@@ -31,12 +43,38 @@ export function ShutterView(): React.JSX.Element {
                 <EditButton />
             </div>
             <EditBanner text="Bereiche am Griff ⠿ ziehen oder mit ↑ ↓ sortieren und aus- oder einblenden" />
-            <CustomSections
-                view="shutters"
-                columns={columns}
-                className="csecs csecs--cols"
-                sections={model.shutterControl.flatMap(sc => shutterSections(sc, model.shutterControl.length > 1))}
-            />
+            <div
+                className="segmented shutter-filter"
+                role="radiogroup"
+                aria-label="Rollläden anzeigen"
+            >
+                {[
+                    { value: false, label: 'Alle' },
+                    { value: true, label: 'Nur abweichende' },
+                ].map(o => (
+                    <button
+                        key={o.label}
+                        type="button"
+                        role="radio"
+                        aria-checked={onlyDeviating === o.value}
+                        className={onlyDeviating === o.value ? 'segmented--active' : ''}
+                        onClick={() => {
+                            deviatingOnly = o.value;
+                            setOnlyDeviating(o.value);
+                        }}
+                    >
+                        {o.label}
+                    </button>
+                ))}
+            </div>
+            <DeviatingContext.Provider value={onlyDeviating}>
+                <CustomSections
+                    view="shutters"
+                    columns={columns}
+                    className="csecs csecs--cols"
+                    sections={model.shutterControl.flatMap(sc => shutterSections(sc, model.shutterControl.length > 1))}
+                />
+            </DeviatingContext.Provider>
         </>
     );
 }
@@ -71,22 +109,22 @@ function ControlsCard({ sc }: { sc: SvShutterControl }): React.JSX.Element {
                 <ActionButton
                     state={sc.openAll}
                     label="Alle öffnen"
-                    icon="⬆️"
+                    icon="up"
                 />
                 <ActionButton
                     state={sc.closeAll}
                     label="Alle schließen"
-                    icon="⬇️"
+                    icon="down"
                 />
                 <ActionButton
                     state={sc.sunProtectAll}
                     label="Sonnenschutz"
-                    icon="🕶️"
+                    icon="sunProtect"
                 />
                 <ActionButton
                     state={sc.autoAll}
                     label="Alle auf Automatik"
-                    icon="🤖"
+                    icon="auto"
                     variant="primary"
                 />
             </div>
@@ -189,17 +227,17 @@ function AreaCard({ sc, area }: { sc: SvShutterControl; area: SvShutterControl['
                 <ActionButton
                     state={area.open}
                     label="Öffnen"
-                    icon="⬆️"
+                    icon="up"
                 />
                 <ActionButton
                     state={area.close}
                     label="Schließen"
-                    icon="⬇️"
+                    icon="down"
                 />
                 <ActionButton
                     state={area.sunProtect}
                     label="Sonnenschutz"
-                    icon="🕶️"
+                    icon="sunProtect"
                 />
             </div>
             {open && <ShutterList shutters={shutters} />}
@@ -211,9 +249,15 @@ function AreaCard({ sc, area }: { sc: SvShutterControl; area: SvShutterControl['
  * Rollläden mit Fahrtasten. Die Automatik-Schalter je Rollladen (Auf/Ab/Sonne) sind selten
  * nötig und deshalb eingeklappt; ausgeschaltete Automatiken stehen als Hinweis am Rollladen.
  */
-function ShutterList({ shutters }: { shutters: SvAutoShutter[] }): React.JSX.Element {
+function ShutterList({ shutters: all }: { shutters: SvAutoShutter[] }): React.JSX.Element {
+    const { states } = useConnection();
+    const onlyDeviating = useContext(DeviatingContext);
     const [flags, setFlags] = useState(false);
+    const shutters = onlyDeviating ? all.filter(s => isDeviating(s, states)) : all;
     const hasFlags = shutters.some(s => s.autoUp || s.autoDown || s.autoSun);
+    if (!shutters.length) {
+        return <p className="detail__note shutter-list__empty">Alle offen, Automatik überall an.</p>;
+    }
     return (
         <>
             <ul className="shutter-list">
@@ -232,7 +276,7 @@ function ShutterList({ shutters }: { shutters: SvAutoShutter[] }): React.JSX.Ele
                     aria-expanded={flags}
                     onClick={() => setFlags(!flags)}
                 >
-                    {flags ? 'Fertig' : '🤖 Automatik je Rollladen anpassen'}
+                    {flags ? 'Fertig' : 'Automatik je Rollladen anpassen'}
                 </button>
             )}
         </>

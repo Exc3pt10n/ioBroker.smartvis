@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useCardColumns } from '../media';
+import { useCardColumns, useMediaQuery } from '../media';
 import type { SvStateRef } from '../../../src/shared/protocol';
 import { EnergyFlow, FlowStatus } from '../components/EnergyFlow';
 import { EnergyTotals } from '../components/EnergyTotals';
@@ -11,10 +11,14 @@ import { EditBanner, EditButton } from '../components/EditButton';
 import { useConnection } from '../connection';
 import { kwh, num, snapshot } from '../energy';
 
+/** Auf dem Handy aufgeklappte Bereiche (für die Sitzung gemerkt) */
+const openedOnPhone = new Set<string>();
+
 export function EnergyView(): React.JSX.Element {
     const { model, states } = useConnection();
     const columns = useCardColumns();
     const [focus, setFocus] = useState<{ key: string; n: number }>();
+    const phone = useMediaQuery('(max-width: 899px)');
     if (!model) {
         return <p className="empty">Lade …</p>;
     }
@@ -108,6 +112,7 @@ export function EnergyView(): React.JSX.Element {
                     ? surplusKey
                     : 'power';
         setFocus({ key, n: Date.now() });
+        openedOnPhone.add('history');
     };
 
     const multi = model.energy.length > 1;
@@ -146,10 +151,16 @@ export function EnergyView(): React.JSX.Element {
                     label: `Energiezähler${suffix}`,
                     weight: 4,
                     node: (
-                        <EnergyTotals
-                            system={system}
-                            states={states}
-                        />
+                        <PhoneCollapse
+                            id={`totals-${system.id}`}
+                            phone={phone}
+                            title={`📊 Energiezähler${suffix}`}
+                        >
+                            <EnergyTotals
+                                system={system}
+                                states={states}
+                            />
+                        </PhoneCollapse>
                     ),
                 },
             ];
@@ -167,10 +178,16 @@ export function EnergyView(): React.JSX.Element {
             wide: true,
             node:
                 energyHistory.length > 0 ? (
-                    <HistoryPanel
-                        series={energyHistory}
-                        focus={focus}
-                    />
+                    <PhoneCollapse
+                        id="history"
+                        phone={phone}
+                        title="📈 Verlauf"
+                    >
+                        <HistoryPanel
+                            series={energyHistory}
+                            focus={focus}
+                        />
+                    </PhoneCollapse>
                 ) : null,
         },
         ...model.pvForecast.map(pv => ({
@@ -215,5 +232,45 @@ export function EnergyView(): React.JSX.Element {
                 className="csecs csecs--cols"
             />
         </>
+    );
+}
+
+/**
+ * Handy: Bereich zunächst als eine Zeile ("📈 Verlauf ›"), die Seite bleibt kurz;
+ * Antippen zeigt den vollen Inhalt. Desktop: immer offen.
+ */
+function PhoneCollapse({
+    id,
+    phone,
+    title,
+    children,
+}: {
+    id: string;
+    phone: boolean;
+    title: string;
+    children: React.ReactNode;
+}): React.JSX.Element {
+    const [, rerender] = useState(0);
+    if (!phone || openedOnPhone.has(id)) {
+        return <>{children}</>;
+    }
+    return (
+        <button
+            type="button"
+            className="card collapse-card"
+            aria-expanded={false}
+            onClick={() => {
+                openedOnPhone.add(id);
+                rerender(n => n + 1);
+            }}
+        >
+            <span className="subtitle">{title}</span>
+            <span
+                className="collapse-card__chevron"
+                aria-hidden="true"
+            >
+                ›
+            </span>
+        </button>
     );
 }
