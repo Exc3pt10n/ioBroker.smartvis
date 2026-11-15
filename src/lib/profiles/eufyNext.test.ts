@@ -24,7 +24,11 @@ describe('profile: eufy-next (eufy v6 cloud)', () => {
         expect(garden.status?.id).to.equal(`${garden.id}.info.available`);
         expect(garden.battery?.id).to.equal(`${garden.id}.battery.level`);
         expect(garden.light?.write).to.equal(true);
-        expect(garden.liveStart).to.equal(undefined);
+        expect(garden.liveStart?.id).to.equal(`${garden.id}.livestream.start`);
+        expect(garden.liveStop?.id).to.equal(`${garden.id}.livestream.stop`);
+        expect(garden.liveUrl?.id).to.equal(`${garden.id}.livestream.url`);
+        expect(r.writableIds.has(garden.liveStart!.id)).to.equal(true);
+        expect(r.writableIds.has(`${garden.id}.livestream.rtsp`)).to.equal(false);
         expect(garden.model).to.equal('T8142');
         const living = cam('Wohnzimmer');
         expect(living.tiltUp?.id).to.equal(`${living.id}.ptz.up`);

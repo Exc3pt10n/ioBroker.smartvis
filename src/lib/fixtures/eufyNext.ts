@@ -71,6 +71,13 @@ export function eufyNextTree(): Tree {
             .state(`${d}.snapshot.updated`, { type: 'number', role: 'value.time' })
             .state(`${d}.snapshot.refreshStored`, { type: 'boolean', role: 'button', read: false, write: true })
             .state(`${d}.snapshot.refreshLive`, { type: 'boolean', role: 'button', read: false, write: true });
+        // Livestream (eufy-next ab 0.2.0, go2rtc)
+        t.channel(`${d}.livestream`, 'Livestream')
+            .state(`${d}.livestream.start`, { type: 'boolean', role: 'button.start', read: false, write: true })
+            .state(`${d}.livestream.stop`, { type: 'boolean', role: 'button.stop', read: false, write: true })
+            .state(`${d}.livestream.url`, { type: 'string', role: 'url' })
+            .state(`${d}.livestream.rtsp`, { type: 'string', role: 'url' })
+            .state(`${d}.livestream.active`, { type: 'boolean', role: 'indicator' });
         event(d, 'motion', 'sensor.motion');
         event(d, 'personDetected', 'indicator');
         if (battery) {

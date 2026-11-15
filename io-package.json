@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "smartvis",
-        "version": "0.14.0",
+        "version": "0.15.0",
         "news": {
+            "0.15.0": {
+                "en": "eufy-next: livestream with sound in the camera view (from eufy-next 0.2.0, go2rtc), stopped when closing",
+                "de": "eufy-next: Livestream mit Ton in der Kamera-Ansicht (ab eufy-next 0.2.0, go2rtc), wird beim Schließen beendet",
+                "ru": "eufy-next: прямая трансляция со звуком в окне камеры (начиная с eufy-next 0.2.0, go2rtc), останавливается при закрытии",
+                "pt": "eufy-next: transmissão em direto com som na vista da câmara (a partir do eufy-next 0.2.0, go2rtc), termina ao fechar",
+                "nl": "eufy-next: livestream met geluid in de cameraweergave (vanaf eufy-next 0.2.0, go2rtc), stopt bij het sluiten",
+                "fr": "eufy-next : flux en direct avec son dans la vue caméra (à partir d'eufy-next 0.2.0, go2rtc), arrêté à la fermeture",
+                "it": "eufy-next: livestream con audio nella vista telecamera (da eufy-next 0.2.0, go2rtc), interrotto alla chiusura",
+                "es": "eufy-next: transmisión en directo con sonido en la vista de cámara (desde eufy-next 0.2.0, go2rtc), se detiene al cerrar",
+                "pl": "eufy-next: transmisja na żywo z dźwiękiem w widoku kamery (od eufy-next 0.2.0, go2rtc), zatrzymywana po zamknięciu",
+                "uk": "eufy-next: пряма трансляція зі звуком у вікні камери (з eufy-next 0.2.0, go2rtc), зупиняється під час закриття",
+                "zh-cn": "eufy-next：摄像头视图中提供带声音的直播（eufy-next 0.2.0 起，基于 go2rtc），关闭时停止"
+            },
             "0.14.0": {
                 "en": "Support for eufy-next (eufy v6 cloud): cameras with event picture, detection, reachability, battery, light, pan/tilt and settings; stations with security mode and alarm; \"Current picture\" button in the camera view",
                 "de": "Unterstützung für eufy-next (eufy v6 cloud): Kameras mit Ereignisbild, Erkennung, Erreichbarkeit, Akku, Licht, Schwenken und Einstellungen; Stationen mit Sicherheitsmodus und Alarm; Knopf „Aktuelles Bild“ in der Kamera-Ansicht",
@@ -249,19 +262,6 @@
                 "pl": "Dostosowania dla każdego urządzenia: nazwy, pokoje, ulubione, ukryte urządzenia i układ obowiązują osobno dla telefonu/tabletu/przeglądarki; nowe Więcej → Dostosowania: zmiana nazwy, kopiowanie z innego urządzenia, reset tego lub wszystkich urządzeń. Breaking: nowy format overrides.json (migrowany automatycznie)",
                 "uk": "Налаштування для кожного пристрою: назви, кімнати, обране, приховані пристрої та розташування тепер діють окремо для телефону/планшета/браузера; нове: Ще → Налаштування (перейменування, копіювання з іншого пристрою, скидання цього або всіх пристроїв). Breaking: новий формат overrides.json (переноситься автоматично)",
                 "zh-cn": "按设备保存自定义：名称、房间、收藏、隐藏的设备和布局现在按手机/平板/浏览器分别保存；新增“更多 → 自定义”：重命名、从其他设备复制、重置本设备或所有设备。Breaking：overrides.json 新格式（自动迁移）"
-            },
-            "0.1.1": {
-                "en": "New setting \"Animations\" (More → Display): animations such as the energy flow can now run even if the operating system requests reduced motion",
-                "de": "Neue Einstellung „Animationen“ (Mehr → Darstellung): Animationen wie der Energiefluss laufen auf Wunsch auch, wenn das Betriebssystem reduzierte Bewegung wünscht",
-                "ru": "Новая настройка «Анимации» (Ещё → Отображение): анимации, например поток энергии, могут работать, даже если система запрашивает уменьшение движения",
-                "pt": "Nova definição \"Animações\" (Mais → Apresentação): animações como o fluxo de energia podem funcionar mesmo quando o sistema pede movimento reduzido",
-                "nl": "Nieuwe instelling \"Animaties\" (Meer → Weergave): animaties zoals de energiestroom kunnen ook draaien als het besturingssysteem minder beweging vraagt",
-                "fr": "Nouveau réglage « Animations » (Plus → Affichage) : les animations comme le flux d'énergie peuvent fonctionner même si le système demande de réduire les mouvements",
-                "it": "Nuova impostazione \"Animazioni\" (Altro → Visualizzazione): animazioni come il flusso di energia possono funzionare anche se il sistema richiede movimento ridotto",
-                "es": "Nuevo ajuste \"Animaciones\" (Más → Visualización): las animaciones como el flujo de energía pueden funcionar aunque el sistema solicite movimiento reducido",
-                "pl": "Nowe ustawienie „Animacje” (Więcej → Wyświetlanie): animacje, np. przepływ energii, mogą działać, nawet gdy system prosi o ograniczenie ruchu",
-                "uk": "Нове налаштування «Анімації» (Ще → Відображення): анімації, як-от потік енергії, можуть працювати, навіть якщо система просить зменшити рух",
-                "zh-cn": "新增“动画”设置（更多 → 显示）：即使操作系统要求减少动态效果，能量流等动画也可继续运行"
             }
         },
         "titleLang": {

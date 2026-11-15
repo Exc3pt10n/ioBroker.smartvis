@@ -784,6 +784,7 @@ const server = new SmartVisServer(
                 server.queueState(id, states[id]);
                 simulateShutterControl(id, val);
                 simulateSnapshot(id);
+                simulateLivestream(id);
                 // Hue-Raumgruppe schaltet wie die Bridge ihre Lampen mit
                 simulateHueScene(id, val);
                 const groupLamps: Record<string, string[]> = {
@@ -814,6 +815,30 @@ function simulateSnapshot(id: string): void {
         states[urlId] = { val: states[urlId]?.val ?? null, ack: true, ts: Date.now() };
         server.queueState(urlId, states[urlId]);
     }, 2000);
+}
+
+/** Livestream wie eufy-next: Adresse und "aktiv" setzen, nach 20 s (statt 120 s) Höchstdauer wieder leeren */
+function simulateLivestream(id: string): void {
+    const m = /^(eufy-next\.0\.[^.]+)\.livestream\.(start|stop)$/.exec(id);
+    if (!m) {
+        return;
+    }
+    const set = (url: string): void => {
+        for (const [key, val] of [
+            ['url', url],
+            ['active', !!url],
+        ] as const) {
+            const sid = `${m[1]}.livestream.${key}`;
+            states[sid] = { val, ack: true, ts: Date.now() };
+            server.queueState(sid, states[sid]);
+        }
+    };
+    if (m[2] === 'start') {
+        set('http://localhost:8123/demo-livestream/stream.html?src=demo');
+        setTimeout(() => set(''), 20_000);
+    } else {
+        set('');
+    }
 }
 
 /** Szene ausgelöst: wie die Bridge die aktive Szene der Gruppe melden (Smart Scenes laufen bis zum Ausschalten) */
