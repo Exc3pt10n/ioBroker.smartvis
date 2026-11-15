@@ -3823,6 +3823,15 @@ button.kpi:hover {
 }
 
 /* Status-Karten der Startseite (Lichter, Klima, Offenes …): eine Zeile je Raum bzw. Gerät */
+.slist {
+    padding-top: 14px;
+}
+
+/* Handy: erste Karte unter Kennzahlen/Wetter braucht den Abstand, den sonst die Überschrift über der Karte gibt */
+.home__sections > .csec:first-child > .card {
+    margin-top: 16px;
+}
+
 .slist__head {
     display: flex;
     align-items: center;

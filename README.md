@@ -173,6 +173,7 @@ scripts/demo.ts Demo-Server ohne ioBroker
 - (Exc3pt10n) Startseite: Status-Karten statt Kachelreihen – je Thema eine Karte mit Anzahl in der Überschrift und einer Zeile je Raum bzw. Gerät:
   - „Lichter an“ ohne Namenslisten: eine Zeile je Raum („Wohnzimmer · 5 an“, bei einer Lampe deren Name) mit „Aus“, darüber „Alle aus“; Antippen öffnet den Raum
   - „Klimageräte an“ mit Betriebsart und Raum und „Aus“ (bei mehreren „Alle aus“), „offen“ (Fenster & Türen), „Player spielt“ mit Titel und „Pause“, „Störungen“ mit Art der Störung und „Batterien schwach“; Antippen öffnet die Detailansicht, Ausschalten lässt sich rückgängig machen
+- (Exc3pt10n) „Rückgängig“ nach dem Ausschalten von Lichtern ruft eine vorher aktive Hue-Szene wieder auf (bisher wurden die Lampen nur eingeschaltet, die Szene war danach nicht mehr aktiv)
 - (Exc3pt10n) Kamera-Ereignisse entfernt: Ereignisliste in der Kamera-Ansicht und Zeitleiste im Bereich Sicherheit gibt es nicht mehr (das gespeicherte Bild war wenig aussagekräftig, Clips lassen sich darüber nicht abspielen); bereits gespeicherte Ereignisbilder unter `smartvis.0/events` werden beim Start gelöscht
 - (Exc3pt10n) Energie auf dem Handy: Die aufgeklappten Karten „Energiezähler“ und „Verlauf“ lassen sich mit „… einklappen“ unter der Karte wieder einklappen; auf dem Tablet bleiben sie wie zuvor offen
 - (Exc3pt10n) Sensoren ohne Schalter (z. B. Temperatur- und Feuchtigkeitssensoren) zeigen in der Detailansicht ihren aktuellen Wert groß mit Zeitpunkt der letzten Änderung
