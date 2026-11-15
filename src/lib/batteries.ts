@@ -46,7 +46,7 @@ const MODEL_FIELDS = ['TYPE', 'model', 'modelId', 'modelid', 'modelID', 'product
 
 /**
  * Batterieart aus dem Gerätemodell (Tabelle aus der Battery-Notes-Bibliothek), z. B. HmIP-SWDO → "AAA".
- * eufy-Kameras haben einen fest eingebauten Akku.
+ * eufy-Kameras (eusec, eufy-next) haben einen fest eingebauten Akku.
  */
 export function batteryType(obj: ioBroker.Object | undefined, adapter: string): string | undefined {
     if (adapter === 'eusec') {
@@ -61,6 +61,10 @@ export function batteryType(obj: ioBroker.Object | undefined, adapter: string): 
         if (type) {
             return type;
         }
+    }
+    // eufy-next: Kameras (Gerätefamilie "camera") haben einen fest eingebauten Akku
+    if (adapter === 'eufy-next' && native.codec === 'camera') {
+        return 'fester Akku';
     }
     return undefined;
 }

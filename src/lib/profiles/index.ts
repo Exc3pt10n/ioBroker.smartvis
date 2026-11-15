@@ -17,6 +17,7 @@ import { hmWeatherProfile } from './hmWeather';
 import { kecontactProfile } from './kecontact';
 import { qhomeProfile } from './qhome';
 import { eusecProfile } from './eusec';
+import { eufyNextProfile } from './eufyNext';
 import { daswetterProfile, dwdProfile, openweathermapProfile, weatherundergroundProfile } from './weatherServices';
 import { instancesOf, type AdapterProfile, type ObjectMap } from './types';
 
@@ -31,6 +32,7 @@ export const PROFILES: AdapterProfile[] = [
     daswetterProfile,
     dwdProfile,
     eusecProfile,
+    eufyNextProfile,
 ];
 
 export interface ProfilesResult {

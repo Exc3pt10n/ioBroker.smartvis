@@ -162,9 +162,38 @@ tests.integration(path.join(__dirname, '..'), {
                         native: {},
                     },
                 });
+                // eufy-Kamera (eufy-next): brauchbares Ereignisbild unter snapshot.url
+                const next = 'eufy-next.0.T8142N0000000011';
+                Object.assign(objects, {
+                    'eufy-next.0': { type: 'meta', common: { name: 'eufy snapshots', type: 'meta.user' }, native: {} },
+                    [next]: {
+                        type: 'device',
+                        common: { name: 'Einfahrt' },
+                        native: { model: 'T8142', codec: 'camera' },
+                    },
+                    [`${next}.camera`]: { type: 'channel', common: { name: 'Camera' }, native: {} },
+                    [`${next}.snapshot.url`]: {
+                        type: 'state',
+                        common: { name: 'Snapshot URL', role: 'url', type: 'string', read: true, write: false },
+                        native: {},
+                    },
+                });
                 for (const [id, obj] of Object.entries(objects)) {
                     await harness.objects.setObjectAsync(id, { ...obj, _id: id });
                 }
+                const nextPicture = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 9, 9, 9, 9]);
+                await new Promise((resolve, reject) =>
+                    harness.objects.writeFile('eufy-next.0', 'T8142N0000000011/snapshot.jpg', nextPicture, err =>
+                        err ? reject(err) : resolve(),
+                    ),
+                );
+                await new Promise((resolve, reject) =>
+                    harness.states.setState(
+                        `${next}.snapshot.url`,
+                        { val: '/files/eufy-next.0/T8142N0000000011/snapshot.jpg', ack: true },
+                        err => (err ? reject(err) : resolve()),
+                    ),
+                );
                 const picture = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4]);
                 await new Promise((resolve, reject) =>
                     harness.objects.writeFile('eusec.0', 'S1/last_event/C1.jpg', picture, err =>
@@ -200,8 +229,8 @@ tests.integration(path.join(__dirname, '..'), {
                 const { ws, model } = await connect(port);
 
                 // Kamerabild: nur das gespeicherte Standbild; das (verstreifte) eufy-Ereignisbild und alles andere 404
-                expect(model.cameras.map(c => c.name)).to.deep.equal(['Garten']);
-                expect(model.cameras[0].snapshot).to.deep.equal({
+                expect(model.cameras.map(c => c.name).sort()).to.deep.equal(['Einfahrt', 'Garten']);
+                expect(model.cameras.find(c => c.name === 'Garten').snapshot).to.deep.equal({
                     url: '/files/smartvis.0/snapshots/C1.jpg',
                     ts: 1_700_000_000_000,
                 });
@@ -209,7 +238,17 @@ tests.integration(path.join(__dirname, '..'), {
                 expect(image.status).to.equal(200);
                 expect(image.headers.get('content-type')).to.match(/image\/jpeg/);
                 expect(Buffer.from(await image.arrayBuffer())).to.deep.equal(still);
-                for (const path of ['/files/eusec.0/S1/last_event/C1.jpg', '/files/smartvis.0/overrides.json']) {
+                // eufy-next: Ereignisbild des Adapters ist brauchbar und wird ausgeliefert
+                const nextImage = await fetch(
+                    `http://127.0.0.1:${port}/files/eufy-next.0/T8142N0000000011/snapshot.jpg?v=1`,
+                );
+                expect(nextImage.status).to.equal(200);
+                expect(Buffer.from(await nextImage.arrayBuffer())).to.deep.equal(nextPicture);
+                for (const path of [
+                    '/files/eusec.0/S1/last_event/C1.jpg',
+                    '/files/smartvis.0/overrides.json',
+                    '/files/eufy-next.0/T8142N0000000011/other.jpg',
+                ]) {
                     expect((await fetch(`http://127.0.0.1:${port}${path}`)).status).to.equal(404);
                 }
 

@@ -7,6 +7,7 @@ import { Icon } from './Icon';
 import { Sheet } from './Sheet';
 import { Slider } from './Slider';
 import { Toggle } from './Toggle';
+import { showToast } from './Toast';
 
 /** Ereignisbild mit Platzhalter, falls (noch) keines vorhanden ist oder das Laden scheitert */
 export function CameraImage({
@@ -68,7 +69,7 @@ export function CameraTile({ camera, onOpen }: { camera: SvCamera; onOpen: () =>
                 {info.imageTs && !info.disabled && (
                     <span
                         className="camera__time"
-                        title={`Letztes Ereignis ${eventTime(info.imageTs)}`}
+                        title={`${camera.pictureUsable ? 'Bild von' : 'Letztes Ereignis'} ${eventTime(info.imageTs)}`}
                     >
                         {shortEventTime(info.imageTs)}
                     </span>
@@ -226,7 +227,11 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                     <CameraImage
                         className="camera__big"
                         src={info.disabled ? undefined : info.image}
-                        alt={`Standbild aus dem Livestream ${camera.name}`}
+                        alt={
+                            camera.snapshot
+                                ? `Standbild aus dem Livestream ${camera.name}`
+                                : `Letztes Bild ${camera.name}`
+                        }
                     />
                 )}
                 <p className="detail__note">
@@ -235,11 +240,13 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                         : info.events.length
                           ? `Gerade erkannt: ${info.events.join(', ')}`
                           : info.imageTs
-                            ? `Letztes Ereignis ${eventTime(info.imageTs)}`
-                            : 'Noch kein Ereignis'}
+                            ? `${camera.pictureUsable ? 'Bild von' : 'Letztes Ereignis'} ${eventTime(info.imageTs)}`
+                            : camera.pictureUsable
+                              ? 'Noch kein Bild'
+                              : 'Noch kein Ereignis'}
                     {info.battery !== undefined ? ` · 🔋 ${Math.round(info.battery)} %` : ''}
                 </p>
-                {!live && !info.disabled && (
+                {!live && !info.disabled && camera.liveStart && (
                     <p className="detail__note">
                         {info.snapshotTs
                             ? `Bild aus dem Livestream ${eventTime(info.snapshotTs)}`
@@ -247,6 +254,27 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                     </p>
                 )}
                 <div className="detail__controls">
+                    {camera.pictureRefresh?.write && !info.disabled && (
+                        <div>
+                            <button
+                                type="button"
+                                className="action"
+                                onClick={() => {
+                                    connection.setState(camera.pictureRefresh!.id, true);
+                                    showToast(`${camera.name}: aktuelles Bild wird aufgenommen …`);
+                                }}
+                            >
+                                <Icon
+                                    name="camera"
+                                    size={18}
+                                />{' '}
+                                Aktuelles Bild
+                            </button>
+                            {info.battery !== undefined && (
+                                <p className="detail__note">Weckt die Akku-Kamera – sparsam verwenden.</p>
+                            )}
+                        </div>
+                    )}
                     {camera.liveStart && !info.disabled && (
                         <button
                             type="button"
@@ -348,7 +376,12 @@ function CameraSettings({ settings }: { settings: SvCameraSetting[] }): React.JS
             return true;
         }
         const v = states[s.requires.id]?.val;
-        return typeof s.requires.value === 'boolean' ? v === s.requires.value : Number(v) === s.requires.value;
+        const want = s.requires.value;
+        return typeof want === 'boolean'
+            ? v === want
+            : typeof want === 'string'
+              ? String(v) === want
+              : Number(v) === want;
     };
     return (
         <div className="camera__settings">

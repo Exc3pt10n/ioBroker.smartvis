@@ -344,12 +344,17 @@ class SmartVis extends utils.Adapter {
     }
 
     /**
-     * Kamerabild aus dem ioBroker-Dateispeicher: nur von SmartVis gespeicherte Standbilder aus dem Livestream
-     * ("/files/smartvis.0/snapshots/<Kamera>.jpg") – keine beliebigen Dateien.
+     * Kamerabild aus dem ioBroker-Dateispeicher: von SmartVis gespeicherte Standbilder aus dem Livestream
+     * ("/files/smartvis.0/snapshots/<Kamera>.jpg") und das aktuelle Ereignisbild von eufy-next – keine beliebigen Dateien.
      */
     private async readCameraFile(path: string): Promise<{ data: Buffer; mimeType?: string } | null> {
-        // Nur Standbilder aus dem Livestream (die Ereignisbilder von eufy sind seit 2026 unbrauchbar)
-        const allowed = !!this.snapshots?.hasPicture(path);
+        // Standbilder aus dem Livestream (eusec: dessen Ereignisbilder sind seit 2026 unbrauchbar) und brauchbare
+        // Ereignisbilder (eufy-next) – jeweils nur der Pfad, auf den die Kamera gerade verweist
+        const allowed =
+            !!this.snapshots?.hasPicture(path) ||
+            (this.discovery?.model.cameras || []).some(
+                c => c.pictureUsable && c.picture && this.states[c.picture.id]?.val === path,
+            );
         const m = /^\/files\/([^/]+)\/(.+)$/.exec(path);
         if (!allowed || !m || m[2].split('/').includes('..')) {
             return null;

@@ -287,7 +287,7 @@ export interface SvForecastDay {
     windSpeed?: SvStateRef;
 }
 
-/** Kamera (z. B. eufy über ioBroker.eusec) */
+/** Kamera (eufy über ioBroker.eusec oder ioBroker.eufy-next) */
 export interface SvCamera {
     id: string;
     name: string;
@@ -297,6 +297,15 @@ export interface SvCamera {
     model?: string;
     /** Pfad des letzten Ereignisbilds im ioBroker-Dateispeicher ("/files/eusec.0/…") – SmartVis liefert es unter demselben Pfad aus */
     picture?: SvStateRef;
+    /**
+     * Ereignisbild ist brauchbar und wird als Kachelbild gezeigt (eufy-next). Bei eusec nicht: dessen Bilder kommen
+     * seit 2026 verstreift an, dort zählt nur das Standbild aus dem Livestream.
+     */
+    pictureUsable?: boolean;
+    /** Taste "aktuelles Bild aufnehmen" (eufy-next: weckt Akku-Kameras) */
+    pictureRefresh?: SvStateRef;
+    /** Klingel gedrückt (Türklingel-Kameras) */
+    ring?: SvStateRef;
     motion?: SvStateRef;
     person?: SvStateRef;
     pet?: SvStateRef;
@@ -334,7 +343,7 @@ export interface SvCameraSetting {
     hint?: string;
     state: SvStateRef;
     /** Nur zeigen, wenn dieser State den Wert hat (z. B. Empfindlichkeit nur bei eingeschalteter Erkennung) */
-    requires?: { id: string; value: boolean | number };
+    requires?: { id: string; value: boolean | number | string };
 }
 
 /** Sicherheitsstation (z. B. eufy HomeBase oder eine Innenkamera als eigene Station) */

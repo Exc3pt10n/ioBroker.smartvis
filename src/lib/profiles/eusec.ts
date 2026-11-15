@@ -187,7 +187,7 @@ function cameraSettings(id: string, objects: ObjectMap): SvCameraSetting[] {
 }
 
 /** Werteliste ins Deutsche übersetzen (unbekannte Werte bleiben) */
-function translate(
+export function translate(
     r: SvStateRef | undefined,
     objects: ObjectMap,
     table: Record<string, string>,
@@ -283,6 +283,7 @@ export function cameraRefs(c: SvCamera): { read: SvStateRef[]; write: SvStateRef
     const write = [
         c.enabled,
         c.light,
+        c.pictureRefresh,
         c.liveStart,
         c.liveStop,
         c.panLeft,
@@ -298,6 +299,7 @@ export function cameraRefs(c: SvCamera): { read: SvStateRef[]; write: SvStateRef
         c.pet,
         c.sound,
         c.crying,
+        c.ring,
         c.status,
         c.battery,
         c.liveUrl,

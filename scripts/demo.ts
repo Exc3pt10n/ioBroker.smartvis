@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildDiagnosis } from '../src/lib/diagnosis';
 import { dwdTree, openweathermapTree } from '../src/lib/fixtures/weather';
-import { eusecTree } from '../src/lib/fixtures/eusec';
+import { eufyNextTree } from '../src/lib/fixtures/eufyNext';
 import { discover } from '../src/lib/discovery';
 import { applyEdit, applyOverrides } from '../src/lib/overrides';
 import { historyOptions, holdGaps } from '../src/lib/history';
@@ -661,8 +661,8 @@ dwdNow(
 );
 dwdNow('instruction', 'ACHTUNG! Hinweis auf mögliche Gefahren: Es können zum Beispiel einzelne Äste herabstürzen.');
 
-// eufy-Kameras (eusec): HomeBase mit drei Außenkameras, eine Innenkamera (im Privatmodus)
-Object.assign(objects, eusecTree().objects);
+// eufy-Kameras (eufy-next): HomeBase mit zwei Außenkameras, eine Innenkamera mit eigener Station (im Privatmodus)
+Object.assign(objects, eufyNextTree().objects);
 
 // Instanzen aus den Fixtures: als laufende Dienste kennzeichnen
 for (const id of [
@@ -673,7 +673,7 @@ for (const id of [
     'qhome-ess-hyb-g2.0',
     'alexa2.0',
     'dwd.0',
-    'eusec.0',
+    'eufy-next.0',
     'openweathermap.0',
 ]) {
     const sid = `system.adapter.${id}`;
@@ -682,48 +682,46 @@ for (const id of [
         state(`${sid}.alive`, 'indicator', 'boolean', false, true);
     }
 }
-const eusec = (id: string, val: SvStateValue['val'], ago = 0): void => {
-    states[`eusec.0.${id}`] = { val, ack: true, ts: Date.now() - ago };
+const eufy = (id: string, val: SvStateValue['val'], ago = 0): void => {
+    states[`eufy-next.0.${id}`] = { val, ack: true, ts: Date.now() - ago };
 };
 const homeBase = 'T8010N0000000001';
 [
-    ['T8142N0000000011', 'Eingangstür', 25 * 60_000, 92],
-    ['T8142N0000000012', 'Garten', 3 * 3600_000, 64],
-    ['T8142T0000000013', 'Einfahrt', 26 * 3600_000, 15],
-].forEach(([serial, , ago, battery]) => {
-    const c = `${homeBase}.cameras.${String(serial)}`;
-    eusec(`${c}.picture_url`, `/files/eusec.0/${homeBase}/last_event/${String(serial)}.jpg`, Number(ago));
-    eusec(`${c}.enabled`, true);
-    eusec(`${c}.state`, 1);
-    eusec(`${c}.battery`, Number(battery));
-    eusec(`${c}.light`, false);
-    eusec(`${c}.motion_detected`, false);
-    eusec(`${c}.person_detected`, serial === 'T8142N0000000011');
+    ['T8142N0000000011', 25 * 60_000, 92],
+    ['T8142N0000000012', 3 * 3600_000, 15],
+].forEach(([serial, ago, battery]) => {
+    const c = String(serial);
+    eufy(`${c}.snapshot.url`, `/files/eufy-next.0/${c}/snapshot.jpg`, Number(ago));
+    eufy(`${c}.info.available`, true);
+    eufy(`${c}.camera.enabled`, true);
+    eufy(`${c}.battery.level`, Number(battery));
+    eufy(`${c}.battery.charging`, false);
+    eufy(`${c}.light.isOn`, false);
+    eufy(`${c}.light.brightness`, 80);
+    eufy(`${c}.events.motion.triggered`, false);
+    eufy(`${c}.events.personDetected.triggered`, serial === 'T8142N0000000011');
     // Einstellungen
-    eusec(`${c}.motion_detection`, true);
-    eusec(`${c}.motion_detection_type`, 2);
-    eusec(`${c}.motion_detection_sensitivity`, 4);
-    eusec(`${c}.speaker`, true);
-    eusec(`${c}.speaker_volume`, 92);
-    eusec(`${c}.nightvision`, 2);
-    eusec(`${c}.power_working_mode`, 2);
-    eusec(`${c}.recording_clip_length`, 30);
-    eusec(`${c}.status_led`, false);
+    eufy(`${c}.motion.detectionEnabled`, true);
+    eufy(`${c}.camera.nightVision`, 2);
+    eufy(`${c}.camera.statusLed`, false);
+    eufy(`${c}.audio.microphone`, true);
+    eufy(`${c}.audio.speaker`, true);
+    eufy(`${c}.battery.workingMode`, 'Optimal Surveillance');
 });
-const indoorCam = 'T8410P0000000021.cameras.T8410P0000000021';
-eusec(`${indoorCam}.picture_url`, '/files/eusec.0/T8410P0000000021/last_event/T8410P0000000021.jpg', 2 * 86_400_000);
-eusec(`${indoorCam}.enabled`, false);
-eusec(`${indoorCam}.state`, 2);
-eusec(`${homeBase}.station.guard_mode`, 1);
-eusec(`${homeBase}.station.current_mode`, 1);
-eusec(`${homeBase}.station.alarm`, false);
-eusec('T8410P0000000021.station.guard_mode', 63);
+const indoorCam = 'T8410P0000000021';
+eufy(`${indoorCam}.snapshot.url`, `/files/eufy-next.0/${indoorCam}/snapshot.jpg`, 2 * 86_400_000);
+eufy(`${indoorCam}.info.available`, true);
+eufy(`${indoorCam}.camera.enabled`, false);
+eufy(`${homeBase}.info.available`, true);
+eufy(`${homeBase}.arming.mode`, 1);
+eufy(`${homeBase}.events.alarm.triggered`, false);
+eufy(`${indoorCam}.arming.mode`, 63);
 
 /** Demo-Ereignisbild: Farbverlauf mit Kameraname (statt echter Aufnahmen) */
 function demoPicture(path: string): { data: Buffer; mimeType: string } | null {
-    // Standbild ".../snapshots/<Kamera>.jpg"
-    const serial = /\/([^/]+)\.jpg$/.exec(path)?.[1];
-    const id = Object.keys(objects).find(k => objects[k].type === 'device' && k.endsWith(`.cameras.${serial}`));
+    // Ereignisbild von eufy-next ".../<Kamera>/snapshot.jpg"
+    const serial = /\/([^/]+)\/snapshot\.jpg$/.exec(path)?.[1];
+    const id = Object.keys(objects).find(k => objects[k].type === 'device' && k === `eufy-next.0.${serial}`);
     if (!id) {
         return null;
     }
@@ -738,13 +736,6 @@ const result = discover(objects, { language: 'de', ignoreAdapters: [] });
 // Anpassungen aus dem Bearbeiten-Modus (in der Demo nur im Speicher)
 // Anpassungen je Endgerät, nur im Speicher (wie overrides.json im Adapter)
 let store = emptyStore();
-// Standbilder aus dem Livestream (im Adapter: CameraSnapshots); die Einfahrt hat noch keins
-const snapshotAt = Date.now() - 95 * 60_000;
-for (const camera of result.model.cameras || []) {
-    if (!/Einfahrt/.test(camera.name)) {
-        camera.snapshot = { url: `/files/smartvis.0/snapshots/${camera.id.split('.').pop()}.jpg`, ts: snapshotAt };
-    }
-}
 const modelFor = (clientId?: string): SvModel => ({
     ...applyOverrides(result.model, overridesFor(store, clientId), true),
     client: clientInfo(store, clientId),
@@ -792,7 +783,7 @@ const server = new SmartVisServer(
                 states[id] = { val, ack: true, ts: Date.now() };
                 server.queueState(id, states[id]);
                 simulateShutterControl(id, val);
-                simulateLivestream(id);
+                simulateSnapshot(id);
                 // Hue-Raumgruppe schaltet wie die Bridge ihre Lampen mit
                 simulateHueScene(id, val);
                 const groupLamps: Record<string, string[]> = {
@@ -812,24 +803,17 @@ const server = new SmartVisServer(
     },
 );
 
-/** Kamera-Livestream wie eusec: Adresse setzen, nach 20 s (statt 120 s) Höchstdauer wieder löschen */
-function simulateLivestream(id: string): void {
-    const m = /^(eusec\.0\..+\.cameras\.[^.]+)\.(start_stream|stop_stream)$/.exec(id);
+/** "Aktuelles Bild" wie eufy-next: nach kurzer Zeit neues Ereignisbild (gleiche Adresse, neuer Zeitstempel) */
+function simulateSnapshot(id: string): void {
+    const m = /^(eufy-next\.0\.[^.]+)\.snapshot\.refreshLive$/.exec(id);
     if (!m) {
         return;
     }
-    const urlId = `${m[1]}.livestream`;
-    console.log(`Demo: ${m[2]} ${m[1]}`);
-    const set = (val: string): void => {
-        states[urlId] = { val, ack: true, ts: Date.now() };
+    const urlId = `${m[1]}.snapshot.url`;
+    setTimeout(() => {
+        states[urlId] = { val: states[urlId]?.val ?? null, ack: true, ts: Date.now() };
         server.queueState(urlId, states[urlId]);
-    };
-    if (m[2] === 'start_stream') {
-        set('http://localhost:8123/demo-livestream/stream.html?src=demo');
-        setTimeout(() => set(''), 20_000);
-    } else {
-        set('');
-    }
+    }, 2000);
 }
 
 /** Szene ausgelöst: wie die Bridge die aktive Szene der Gruppe melden (Smart Scenes laufen bis zum Ausschalten) */
