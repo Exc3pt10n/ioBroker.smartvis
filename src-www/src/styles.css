@@ -3822,35 +3822,35 @@ button.kpi:hover {
     }
 }
 
-/* "Eingeschaltete Lichter": eine Zeile je Raum */
-.lights__head {
+/* Status-Karten der Startseite (Lichter, Klima, Offenes …): eine Zeile je Raum bzw. Gerät */
+.slist__head {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
 }
 
-.lights__head .subtitle {
+.slist__head .subtitle {
     margin: 0;
 }
 
-.lights__rooms {
+.slist__rows {
     margin: 8px 0 0;
     padding: 0;
     list-style: none;
 }
 
-.lights__room {
+.slist__row {
     display: flex;
     align-items: center;
     gap: 8px;
 }
 
-.lights__room + .lights__room {
+.slist__row + .slist__row {
     border-top: 1px solid var(--surface-2);
 }
 
-.lights__link {
+.slist__link {
     display: flex;
     flex: 1;
     align-items: center;
@@ -3866,7 +3866,7 @@ button.kpi:hover {
     cursor: pointer;
 }
 
-.lights__icon {
+.slist__icon {
     display: grid;
     flex: none;
     place-items: center;
@@ -3877,25 +3877,38 @@ button.kpi:hover {
     color: #fff;
 }
 
-.lights__name {
-    font-weight: 600;
-    white-space: nowrap;
+.slist__icon--warn {
+    background: var(--warn);
 }
 
-.lights__count {
-    min-width: 0;
-    overflow: hidden;
+.slist__icon--neutral {
+    background: var(--surface-2);
     color: var(--text-muted);
-    font-size: 14px;
+}
+
+.slist__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.slist__name,
+.slist__detail {
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.lights__count::before {
-    content: '· ';
+.slist__name {
+    font-weight: 600;
 }
 
-.lights__off {
+.slist__detail {
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.slist__action {
     flex: none;
     min-width: 56px;
     min-height: 36px;
@@ -3908,6 +3921,10 @@ button.kpi:hover {
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
+}
+
+.slist .batteries {
+    margin-top: 4px;
 }
 
 .instance__paused {
@@ -4052,11 +4069,6 @@ button.battery__row {
 
 .battery--low .battery__fill {
     background: var(--warn);
-}
-
-.card--list {
-    margin: 0;
-    padding: 2px 16px;
 }
 
 .tile__battery {

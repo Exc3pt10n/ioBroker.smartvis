@@ -1,16 +1,28 @@
 import { useState } from 'react';
-import type { SvDevice } from '../../../src/shared/protocol';
+import type { SvDevice, SvStateRef } from '../../../src/shared/protocol';
 import { connection, useConnection } from '../connection';
-import { groupByRoom, isActive, isCoveredGroup, isPlaying, warnings } from '../device';
+import {
+    formatValue,
+    groupByRoom,
+    isActive,
+    isCoveredGroup,
+    isPlaying,
+    switchState,
+    valueState,
+    warnings,
+} from '../device';
 import { formatPower, kwh, num, snapshot, wallboxSnapshot } from '../energy';
 import { autoStateInfo } from '../shutters';
-import { DeviceTile } from '../components/DeviceTile';
+import { DeviceTile, acSummary, mediaSummary } from '../components/DeviceTile';
+import { StatusCard } from '../components/StatusCard';
+import { showToast } from '../components/Toast';
+import { useOpenDetail } from '../detail';
 import { SortableGrid } from '../components/SortableGrid';
 import { CustomSections, type SectionDef } from '../components/CustomSections';
 import { EditBanner, EditButton, EditTip } from '../components/EditButton';
 import { favorites, useEditing, visibleDevices } from '../editing';
 import { WarningsCard, WeatherCard } from '../components/WeatherCard';
-import { Icon } from '../components/Icon';
+import { Icon, iconForType } from '../components/Icon';
 import { RecentDetectionsCard } from '../components/Cameras';
 import { eventLabel } from '../cameras';
 import { activeAlarms, primaryStation, recentDetections, securityMode, useNow } from '../security';
@@ -421,9 +433,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             key: 'playing',
             label: 'Läuft gerade',
             node: playing.length ? (
-                <Section
-                    id="home-playing"
-                    title="🎵 Läuft gerade"
+                <PlayingCard
                     devices={playing}
                     roomName={roomName}
                 />
@@ -447,9 +457,8 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             key: 'climate',
             label: 'Klima aktiv',
             node: climateOn.length ? (
-                <Section
-                    id="home-climate"
-                    title={`${climateIcon} Klima aktiv`}
+                <ClimateCard
+                    icon={climateIcon}
                     devices={climateOn}
                     roomName={roomName}
                 />
@@ -461,9 +470,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             key: 'open',
             label: 'Offene Fenster & Türen',
             node: open.length ? (
-                <Section
-                    id="home-open"
-                    title="🪟 Offene Fenster & Türen"
+                <OpenCard
                     devices={open}
                     roomName={roomName}
                 />
@@ -475,9 +482,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             key: 'problems',
             label: 'Störungen',
             node: problems.length ? (
-                <Section
-                    id="home-problems"
-                    title="⚠️ Störungen"
+                <ProblemsCard
                     devices={problems}
                     roomName={roomName}
                 />
@@ -489,19 +494,16 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             key: 'batteries',
             label: 'Batterie schwach',
             node: weakBatteries.length ? (
-                <section id="home-batteries">
-                    <h2 className="subtitle">
-                        🪫 Batterie schwach
-                        <span className="group__count">{weakBatteries.length}</span>
-                    </h2>
-                    <div className="card card--list">
-                        <BatteryList
-                            items={weakBatteries}
-                            rooms={model.rooms}
-                            states={states}
-                        />
-                    </div>
-                </section>
+                <StatusCard
+                    id="home-batteries"
+                    title={`🪫 ${weakBatteries.length} ${weakBatteries.length === 1 ? 'Batterie' : 'Batterien'} schwach`}
+                >
+                    <BatteryList
+                        items={weakBatteries}
+                        rooms={model.rooms}
+                        states={states}
+                    />
+                </StatusCard>
             ) : (
                 placeholder('Erscheint, sobald eine Batterie schwach ist (Anzeige des Geräts oder höchstens 20 %).')
             ),
@@ -659,6 +661,16 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
     );
 }
 
+/** Anzahl mit Einzahl/Mehrzahl: "1 Licht", "6 Lichter" */
+function count(n: number, one: string, many: string): string {
+    return `${n} ${n === 1 ? one : many}`;
+}
+
+/** Raum und Zustand als Kurzinfo: "offen · Küche" */
+function detailWithRoom(text: string, room: string | undefined): string {
+    return [text, room].filter(Boolean).join(' · ');
+}
+
 /**
  * "Eingeschaltete Lichter": eine Zeile je Raum ("Ambiente · 11 an") mit "Aus", oben "Alle aus".
  * Keine Namenslisten – Antippen öffnet den Raum mit den einzelnen Lampen.
@@ -673,92 +685,168 @@ function LightsSection({
     const { model, states } = useConnection();
     const groups = groupByRoom(lights, model?.rooms || []);
     return (
-        <section
+        <StatusCard
             id="home-lights"
-            className="card lights"
-            aria-labelledby="home-lights-title"
-        >
-            <div className="lights__head">
-                <h2
-                    id="home-lights-title"
-                    className="subtitle"
-                >
-                    💡 {lights.length} {lights.length === 1 ? 'Licht' : 'Lichter'} an
-                </h2>
-                {groups.length > 1 && (
-                    <button
-                        type="button"
-                        className="pillbtn"
-                        onClick={() => switchLights(lights, false, states)}
-                    >
-                        Alle aus
-                    </button>
-                )}
-            </div>
-            <ul className="lights__rooms">
-                {groups.map(g => (
-                    <li
-                        key={g.roomId ?? '_none'}
-                        className="lights__room"
-                    >
-                        <button
-                            type="button"
-                            className="lights__link"
-                            onClick={() => onNavigate(`rooms/${g.roomId ? encodeURIComponent(g.roomId) : '_none'}`)}
-                        >
-                            <span
-                                className="lights__icon"
-                                aria-hidden="true"
-                            >
-                                <Icon
-                                    name="light"
-                                    size={18}
-                                />
-                            </span>
-                            <span className="lights__name">{g.name}</span>
-                            <span className="lights__count">
-                                {g.devices.length === 1 ? g.devices[0].name : `${g.devices.length} an`}
-                            </span>
-                        </button>
-                        <button
-                            type="button"
-                            className="lights__off"
-                            aria-label={`${g.name}: ${g.devices.length === 1 ? 'Licht' : 'alle Lichter'} ausschalten`}
-                            onClick={() => switchLights(g.devices, false, states, g.name)}
-                        >
-                            Aus
-                        </button>
-                    </li>
-                ))}
-            </ul>
-        </section>
+            title={`💡 ${count(lights.length, 'Licht', 'Lichter')} an`}
+            action={
+                groups.length > 1
+                    ? { label: 'Alle aus', onClick: () => switchLights(lights, false, states) }
+                    : undefined
+            }
+            rows={groups.map(g => ({
+                key: g.roomId ?? '_none',
+                icon: 'light',
+                name: g.name,
+                detail: g.devices.length === 1 ? g.devices[0].name : `${g.devices.length} an`,
+                onOpen: () => onNavigate(`rooms/${g.roomId ? encodeURIComponent(g.roomId) : '_none'}`),
+                action: {
+                    label: 'Aus',
+                    ariaLabel: `${g.name}: ${g.devices.length === 1 ? 'Licht' : 'alle Lichter'} ausschalten`,
+                    onClick: () => switchLights(g.devices, false, states, g.name),
+                },
+            }))}
+        />
     );
 }
 
-function Section({
-    id,
-    title,
+/** Gerät ausschalten (Klima, Medien) mit "Rückgängig" */
+function turnOff(device: SvDevice, ref: SvStateRef, value: boolean, undo: boolean | undefined): void {
+    connection.setState(ref.id, value);
+    showToast(
+        `${device.name} ${value ? 'pausiert' : 'ausgeschaltet'}`,
+        undo === undefined ? undefined : () => connection.setState(ref.id, undo),
+    );
+}
+
+/** "Klima aktiv": Gerät, Betriebsart und Raum, Schnellaktion "Aus" */
+function ClimateCard({
+    icon,
     devices,
     roomName,
 }: {
-    id: string;
-    title: string;
+    icon: string;
     devices: SvDevice[];
     roomName: (id: string | null) => string | undefined;
 }): React.JSX.Element {
+    const { states } = useConnection();
+    const openDetail = useOpenDetail();
+    const off = (d: SvDevice): void => {
+        const sw = switchState(d);
+        if (sw) {
+            turnOff(d, sw, false, true);
+        }
+    };
     return (
-        <section id={id}>
-            <h2 className="subtitle">{title}</h2>
-            <div className="grid">
-                {devices.map(d => (
-                    <DeviceTile
-                        key={d.id}
-                        device={d}
-                        showRoom={roomName(d.roomId)}
-                    />
-                ))}
-            </div>
-        </section>
+        <StatusCard
+            id="home-climate"
+            title={`${icon} ${count(devices.length, 'Klimagerät', 'Klimageräte')} an`}
+            action={devices.length > 1 ? { label: 'Alle aus', onClick: () => devices.forEach(off) } : undefined}
+            rows={devices.map(d => ({
+                key: d.id,
+                icon: iconForType(d.type),
+                name: d.name,
+                detail: detailWithRoom(acSummary(d, states), roomName(d.roomId)),
+                onOpen: () => openDetail(d.id),
+                action: switchState(d)
+                    ? { label: 'Aus', ariaLabel: `${d.name} ausschalten`, onClick: () => off(d) }
+                    : undefined,
+            }))}
+        />
+    );
+}
+
+/** "Offene Fenster & Türen": je Fenster/Tür mit Zustand und Raum */
+function OpenCard({
+    devices,
+    roomName,
+}: {
+    devices: SvDevice[];
+    roomName: (id: string | null) => string | undefined;
+}): React.JSX.Element {
+    const { states } = useConnection();
+    const openDetail = useOpenDetail();
+    return (
+        <StatusCard
+            id="home-open"
+            title={`🪟 ${devices.length} offen`}
+            rows={devices.map(d => {
+                const value = valueState(d);
+                return {
+                    key: d.id,
+                    icon: iconForType(d.type),
+                    name: d.name,
+                    detail: detailWithRoom(value ? formatValue(value, states[value.id]) : 'offen', roomName(d.roomId)),
+                    onOpen: () => openDetail(d.id),
+                };
+            })}
+        />
+    );
+}
+
+/** "Läuft gerade": Player mit Titel und Raum, Schnellaktion "Pause" */
+function PlayingCard({
+    devices,
+    roomName,
+}: {
+    devices: SvDevice[];
+    roomName: (id: string | null) => string | undefined;
+}): React.JSX.Element {
+    const { states } = useConnection();
+    const openDetail = useOpenDetail();
+    const pauseRef = (d: SvDevice): SvStateRef | undefined =>
+        d.states.find(st => st.name === 'PAUSE' && st.write) ??
+        d.states.find(st => st.name === 'STATE' && st.write && st.type === 'boolean');
+    return (
+        <StatusCard
+            id="home-playing"
+            title={`🎵 ${count(devices.length, 'Player spielt', 'Player spielen')}`}
+            rows={devices.map(d => {
+                const ref = pauseRef(d);
+                return {
+                    key: d.id,
+                    icon: iconForType(d.type),
+                    name: d.name,
+                    detail: detailWithRoom(mediaSummary(d, states).replace(/^▶ /, ''), roomName(d.roomId)),
+                    onOpen: () => openDetail(d.id),
+                    action: ref
+                        ? {
+                              label: 'Pause',
+                              ariaLabel: `${d.name} pausieren`,
+                              onClick: () =>
+                                  ref.name === 'PAUSE'
+                                      ? turnOff(d, ref, true, undefined)
+                                      : turnOff(d, ref, false, true),
+                          }
+                        : undefined,
+                };
+            })}
+        />
+    );
+}
+
+/** "Störungen": Gerät, Art der Störung und Raum */
+function ProblemsCard({
+    devices,
+    roomName,
+}: {
+    devices: SvDevice[];
+    roomName: (id: string | null) => string | undefined;
+}): React.JSX.Element {
+    const { states } = useConnection();
+    const openDetail = useOpenDetail();
+    return (
+        <StatusCard
+            id="home-problems"
+            title={`⚠️ ${count(devices.length, 'Störung', 'Störungen')}`}
+            rows={devices.map(d => ({
+                key: d.id,
+                icon: iconForType(d.type),
+                tone: 'warn',
+                name: d.name,
+                detail: detailWithRoom([...new Set(warnings(d, states))].join(', '), roomName(d.roomId)),
+                onOpen: () => openDetail(d.id),
+            }))}
+        />
     );
 }
 

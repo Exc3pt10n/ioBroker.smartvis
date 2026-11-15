@@ -12,7 +12,7 @@ import { onlyBatteryWarning } from '../battery';
 import { Icon, iconForType } from './Icon';
 
 /** Medien: Titel beim Abspielen, sonst "pausiert" */
-function mediaSummary(device: SvDevice, states: Record<string, SvStateValue | null>): string {
+export function mediaSummary(device: SvDevice, states: Record<string, SvStateValue | null>): string {
     const stateRef = device.states.find(s => s.name === 'STATE');
     const titleRef = device.states.find(s => s.name === 'TITLE');
     const title = titleRef ? states[titleRef.id]?.val : undefined;
@@ -23,7 +23,7 @@ function mediaSummary(device: SvDevice, states: Record<string, SvStateValue | nu
 }
 
 /** Klimagerät: "Kühlen auf 22 °C" bzw. "aus · 24 °C" (Raumtemperatur) */
-function acSummary(device: SvDevice, states: Record<string, SvStateValue | null>): string {
+export function acSummary(device: SvDevice, states: Record<string, SvStateValue | null>): string {
     const ref = (name: string): SvStateRef | undefined => device.states.find(s => s.name === name);
     const power = ref('POWER');
     const actual = ref('ACTUAL');
