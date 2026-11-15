@@ -32,8 +32,15 @@ export function cameraInfo(camera: SvCamera, states: States): CameraInfo {
             ? (camera.status?.states?.[String(statusVal)] ?? String(statusVal))
             : undefined;
     const disabled = camera.enabled ? states[camera.enabled.id]?.val === false : statusVal === 2;
-    const online = statusVal === undefined || statusVal === null ? true : statusVal === 1 || statusVal === 2;
+    // eusec: Status als Zahl (1 Online, 2 manuell aus …); eufy-next: erreichbar ja/nein
+    const online =
+        statusVal === undefined || statusVal === null
+            ? true
+            : typeof statusVal === 'boolean'
+              ? statusVal
+              : statusVal === 1 || statusVal === 2;
     const events = [
+        on(camera.ring, states) && 'Klingel',
         on(camera.person, states) && 'Person',
         on(camera.pet, states) && 'Haustier',
         on(camera.crying, states) && 'Weinen',
@@ -44,12 +51,22 @@ export function cameraInfo(camera: SvCamera, states: States): CameraInfo {
     const live = camera.liveUrl ? states[camera.liveUrl.id]?.val : undefined;
     return {
         // Die Ereignisbilder von eufy kommen seit 2026 falsch entschlüsselt (Streifen) – nur deren Zeitpunkt zählt
-        image: camera.snapshot ? `${camera.snapshot.url}?v=${camera.snapshot.ts}` : undefined,
+        image: camera.snapshot
+            ? `${camera.snapshot.url}?v=${camera.snapshot.ts}`
+            : camera.pictureUsable && path
+              ? `${path}?v=${pic?.ts ?? 0}`
+              : undefined,
         snapshotTs: camera.snapshot?.ts,
         imageTs: path ? pic?.ts : undefined,
         disabled,
         online,
-        status: disabled ? 'Ausgeschaltet' : online ? undefined : statusLabel || 'Offline',
+        status: disabled
+            ? 'Ausgeschaltet'
+            : online
+              ? undefined
+              : typeof statusVal === 'boolean'
+                ? 'Nicht erreichbar'
+                : statusLabel || 'Offline',
         events,
         battery: Number.isFinite(battery) ? battery : undefined,
         liveUrl: typeof live === 'string' && /^https?:\/\//.test(live) ? live : undefined,
