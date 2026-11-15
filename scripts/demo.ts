@@ -20,7 +20,7 @@ import {
     withOverrides,
 } from '../src/lib/clientOverrides';
 import { SmartVisServer } from '../src/lib/server';
-import type { SvCameraEvent, SvModel, SvStateValue } from '../src/shared/protocol';
+import type { SvModel, SvStateValue } from '../src/shared/protocol';
 
 type Obj = ioBroker.Object;
 const objects: Record<string, Obj> = {};
@@ -721,8 +721,8 @@ eusec('T8410P0000000021.station.guard_mode', 63);
 
 /** Demo-Ereignisbild: Farbverlauf mit Kameraname (statt echter Aufnahmen) */
 function demoPicture(path: string): { data: Buffer; mimeType: string } | null {
-    // Aktuelles Bild ".../last_event/<Kamera>.jpg" oder Ereignisbild ".../events/<Kamera>/<ts>.jpg"
-    const serial = /\/events\/([^/]+)\/\d+\.jpg$/.exec(path)?.[1] ?? /\/([^/]+)\.jpg$/.exec(path)?.[1];
+    // Aktuelles Bild ".../last_event/<Kamera>.jpg"
+    const serial = /\/([^/]+)\.jpg$/.exec(path)?.[1];
     const id = Object.keys(objects).find(k => objects[k].type === 'device' && k.endsWith(`.cameras.${serial}`));
     if (!id) {
         return null;
@@ -735,24 +735,6 @@ function demoPicture(path: string): { data: Buffer; mimeType: string } | null {
 
 const result = discover(objects, { language: 'de', ignoreAdapters: [] });
 
-/** Beispiel-Ereignisse (im Adapter: Ereignisprotokoll aus den Erkennungen) */
-const demoEvents: SvCameraEvent[] = [
-    ['T8142N0000000011', ['person', 'motion'], 25],
-    ['T8142N0000000012', ['motion'], 180],
-    ['T8142N0000000011', ['person'], 340],
-    ['T8142T0000000013', ['motion'], 1560],
-    ['T8142N0000000012', ['pet', 'motion'], 1620],
-].map(([serial, kinds, minutes]) => {
-    const cameraId = result.model.cameras!.find(c => c.id.endsWith(`.${String(serial)}`))!.id;
-    const ts = Date.now() - Number(minutes) * 60_000;
-    return {
-        id: `${cameraId}@${ts}`,
-        cameraId,
-        ts,
-        kinds: kinds as string[],
-        picture: `/files/smartvis.0/events/${String(serial)}/${ts}.jpg`,
-    };
-});
 // Anpassungen aus dem Bearbeiten-Modus (in der Demo nur im Speicher)
 // Anpassungen je Endgerät, nur im Speicher (wie overrides.json im Adapter)
 let store = emptyStore();
@@ -788,7 +770,6 @@ const server = new SmartVisServer(
         },
         diagnose: () => buildDiagnosis(result, 'de'),
         file: path => Promise.resolve(demoPicture(path)),
-        cameraEvents: cameraId => demoEvents.filter(e => !cameraId || e.cameraId === cameraId),
         edit: (clientId, edit) => {
             store = withOverrides(store, clientId, applyEdit(overridesFor(store, clientId), edit));
             server.publishModels(false, clientId);

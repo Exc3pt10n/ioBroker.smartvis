@@ -1,5 +1,6 @@
 import { expect } from 'chai';
 import { discover } from './discovery';
+import { batteryType } from './batteries';
 
 type Obj = ioBroker.Object;
 
@@ -107,5 +108,27 @@ describe('batteries', () => {
         expect((model.batteries || []).some(b => b.adapter === 'qhome-ess-hyb-g2' || b.adapter === 'bmw')).to.equal(
             false,
         );
+    });
+});
+
+describe('batteryType', () => {
+    const o = (common: Record<string, unknown>, native: Record<string, unknown>): Obj =>
+        ({ _id: 'x', type: 'device', common, native }) as unknown as Obj;
+
+    it('finds the battery of Homematic IP devices by TYPE', () => {
+        expect(batteryType(o({}, { TYPE: 'HMIP-SWDO' }), 'hm-rpc')).to.equal('AAA');
+        expect(batteryType(o({}, { TYPE: 'HmIP-WTH-2' }), 'hm-rpc')).to.equal('2× AAA');
+        expect(batteryType(o({}, { TYPE: 'HmIP-SWO-PL' }), 'hm-rpc')).to.equal('3× AA');
+    });
+
+    it('finds Hue sensors by model id and Zigbee devices by model', () => {
+        expect(batteryType(o({}, { modelId: 'RWL021' }), 'hue-v2')).to.equal('CR2450');
+        expect(batteryType(o({}, { modelid: 'SML001' }), 'hue')).to.equal('2× AAA');
+        expect(batteryType(o({ type: 'lumi.sensor_magnet.aq2' }, {}), 'zigbee')).to.equal('CR1632');
+    });
+
+    it('knows the built-in battery of eufy cameras and stays empty for unknown models', () => {
+        expect(batteryType(o({}, {}), 'eusec')).to.equal('fester Akku');
+        expect(batteryType(o({}, { TYPE: 'HmIP-UNKNOWN' }), 'hm-rpc')).to.equal(undefined);
     });
 });

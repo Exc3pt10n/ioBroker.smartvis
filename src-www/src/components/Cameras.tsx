@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import type { SvCamera, SvCameraEvent, SvCameraSetting, SvSecurityStation } from '../../../src/shared/protocol';
-import { cameraInfo, eventLabel, eventTime, liveStreamUrl, shortEventTime, stationAlarm } from '../cameras';
+import type { SvCamera, SvCameraSetting, SvSecurityStation } from '../../../src/shared/protocol';
+import { cameraInfo, eventTime, liveStreamUrl, shortEventTime, stationAlarm } from '../cameras';
 import { connection, useConnection } from '../connection';
 import { SelectState } from '../views/DeviceDetail';
 import { Icon } from './Icon';
@@ -129,20 +129,10 @@ export function StationRow({ station }: { station: SvSecurityStation }): React.J
  * Detailansicht einer Kamera: großes Ereignisbild, Status, Livestream (go2rtc-Seite des eusec-Adapters),
  * Kamera an/aus, Licht und Schwenken. Ein gestarteter Stream wird beim Schließen beendet (Akku schonen).
  */
-export function CameraSheet({
-    camera,
-    onClose,
-    initialEvent,
-}: {
-    camera: SvCamera;
-    onClose: () => void;
-    /** Direkt ein Ereignis zeigen (aus der Liste der letzten Ereignisse) */
-    initialEvent?: SvCameraEvent;
-}): React.JSX.Element {
+export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: () => void }): React.JSX.Element {
     const { states, model } = useConnection();
     const info = cameraInfo(camera, states);
     const [live, setLive] = useState(false);
-    const [selected, setSelected] = useState<SvCameraEvent | undefined>(initialEvent);
     const liveRef = useRef(false);
     useEffect(() => {
         liveRef.current = live;
@@ -232,30 +222,12 @@ export function CameraSheet({
                             )}
                         </div>
                     )
-                ) : selected ? (
-                    <CameraImage
-                        className="camera__big"
-                        src={selected.picture}
-                        alt={`${eventLabel(selected.kinds)} ${eventTime(selected.ts)}`}
-                    />
                 ) : (
                     <CameraImage
                         className="camera__big"
                         src={info.disabled ? undefined : info.image}
                         alt={`Letztes Ereignis ${camera.name}`}
                     />
-                )}
-                {selected && !live && (
-                    <p className="detail__note camera__selected">
-                        {eventLabel(selected.kinds)} · {eventTime(selected.ts)}{' '}
-                        <button
-                            type="button"
-                            className="linkbtn camera__back"
-                            onClick={() => setSelected(undefined)}
-                        >
-                            Aktuelles Bild
-                        </button>
-                    </p>
                 )}
                 <p className="detail__note">
                     {info.status
@@ -340,16 +312,6 @@ export function CameraSheet({
                     )}
                     {station?.guardMode && <StationRow station={station} />}
                 </div>
-                <EventList
-                    cameras={[camera]}
-                    cameraId={camera.id}
-                    refreshKey={info.imageTs}
-                    selectedId={selected?.id}
-                    onSelect={e => {
-                        stopLive();
-                        setSelected(e);
-                    }}
-                />
                 {camera.settings && camera.settings.length > 0 && <CameraSettings settings={camera.settings} />}
             </div>
         </Sheet>
@@ -447,141 +409,6 @@ function CameraSettings({ settings }: { settings: SvCameraSetting[] }): React.JS
                 );
             })}
         </div>
-    );
-}
-
-/** Ereignisse vom Adapter laden; neu laden, wenn sich refreshKey ändert (z. B. neues Ereignisbild) */
-function useCameraEvents(cameraId: string | undefined, refreshKey: unknown): SvCameraEvent[] | undefined {
-    const { status } = useConnection();
-    const [events, setEvents] = useState<SvCameraEvent[] | undefined>();
-    useEffect(() => {
-        if (status !== 'online') {
-            return;
-        }
-        let cancelled = false;
-        connection.cameraEvents(cameraId).then(
-            list => !cancelled && setEvents(list),
-            () => !cancelled && setEvents([]),
-        );
-        return () => {
-            cancelled = true;
-        };
-    }, [cameraId, refreshKey, status]);
-    return events;
-}
-
-/** Tag als Überschrift der Zeitleiste: "Heute", "Gestern", "Montag, 12.11." */
-function dayLabel(ts: number, now = Date.now()): string {
-    const d = new Date(ts);
-    const today = new Date(now);
-    const start = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
-    if (ts >= start) {
-        return 'Heute';
-    }
-    if (ts >= start - 86_400_000) {
-        return 'Gestern';
-    }
-    return d.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit' });
-}
-
-/** Liste der letzten Ereignisse mit Vorschaubild; Antippen zeigt das Ereignisbild groß */
-export function EventList({
-    cameras,
-    cameraId,
-    refreshKey,
-    selectedId,
-    onSelect,
-    limit = 20,
-    title = true,
-    groupByDay = false,
-}: {
-    cameras: SvCamera[];
-    cameraId?: string;
-    refreshKey?: unknown;
-    selectedId?: string;
-    onSelect: (event: SvCameraEvent) => void;
-    limit?: number;
-    /** Überschrift (entfällt, wenn die Liste schon in einem "Letzte Ereignisse"-Bereich steht) */
-    title?: boolean;
-    /** Zeitleiste mit Tagesüberschriften (Heute, Gestern …) */
-    groupByDay?: boolean;
-}): React.JSX.Element | null {
-    const events = useCameraEvents(cameraId, refreshKey);
-    if (!events) {
-        return null;
-    }
-    const names = new Map(cameras.map(c => [c.id, c.name]));
-    const shown = events.filter(e => names.has(e.cameraId)).slice(0, limit);
-    return (
-        <div className="camera__events">
-            {title && <h3 className="info__subtitle">Letzte Ereignisse</h3>}
-            {shown.length === 0 ? (
-                <p className="detail__note">
-                    Noch keine Ereignisse. SmartVis merkt sich ab jetzt jede Erkennung mit Bild (7 Tage).
-                </p>
-            ) : (
-                <ul className="camera__eventlist">
-                    {shown.map((e, i) => (
-                        <li key={e.id}>
-                            {groupByDay && (i === 0 || dayLabel(shown[i - 1].ts) !== dayLabel(e.ts)) && (
-                                <h3 className="camera__day">{dayLabel(e.ts)}</h3>
-                            )}
-                            <button
-                                type="button"
-                                className={`camera__event${e.id === selectedId ? ' camera__event--on' : ''}`}
-                                onClick={() => onSelect(e)}
-                            >
-                                <CameraImage
-                                    className="camera__thumb"
-                                    src={e.picture}
-                                    alt=""
-                                />
-                                <span className="camera__event-text">
-                                    <span className="camera__event-kind">{eventLabel(e.kinds)}</span>
-                                    <span className="camera__event-meta">
-                                        {cameraId ? '' : `${names.get(e.cameraId)} · `}
-                                        {groupByDay
-                                            ? new Date(e.ts).toLocaleTimeString('de-DE', {
-                                                  hour: '2-digit',
-                                                  minute: '2-digit',
-                                              })
-                                            : eventTime(e.ts)}
-                                    </span>
-                                </span>
-                            </button>
-                        </li>
-                    ))}
-                </ul>
-            )}
-        </div>
-    );
-}
-
-/** Ereignis-Zeitleiste aller Kameras (Bereich Sicherheit); Antippen öffnet die Kamera mit dem Ereignisbild */
-export function EventTimeline({ cameras, limit = 50 }: { cameras: SvCamera[]; limit?: number }): React.JSX.Element {
-    const { states } = useConnection();
-    const [selected, setSelected] = useState<SvCameraEvent | undefined>();
-    // Neu laden, sobald eine Kamera ein neues Ereignisbild meldet
-    const latest = Math.max(0, ...cameras.map(c => (c.picture ? (states[c.picture.id]?.ts ?? 0) : 0)));
-    const camera = selected && cameras.find(c => c.id === selected.cameraId);
-    return (
-        <>
-            <EventList
-                cameras={cameras}
-                refreshKey={latest}
-                onSelect={setSelected}
-                limit={limit}
-                title={false}
-                groupByDay
-            />
-            {camera && selected && (
-                <CameraSheet
-                    camera={camera}
-                    initialEvent={selected}
-                    onClose={() => setSelected(undefined)}
-                />
-            )}
-        </>
     );
 }
 

@@ -1,5 +1,5 @@
 import type { SvDevice } from '../../../src/shared/protocol';
-import { CameraGrid, EventTimeline, StationRow } from '../components/Cameras';
+import { CameraGrid, StationRow } from '../components/Cameras';
 import { CustomSections, type SectionDef } from '../components/CustomSections';
 import { DeviceTile } from '../components/DeviceTile';
 import { Icon } from '../components/Icon';
@@ -43,7 +43,7 @@ function Tiles({
 }
 
 /**
- * Bereich Sicherheit: Sicherheitsmodus aller Stationen, Kameras, Ereignis-Zeitleiste,
+ * Bereich Sicherheit: Sicherheitsmodus aller Stationen, Kameras,
  * Melder (Rauch, Wasser, CO), Fenster/Türen/Schlösser und Bewegungsmelder.
  */
 export function SecurityView(): React.JSX.Element {
@@ -136,24 +136,6 @@ export function SecurityView(): React.JSX.Element {
                         📷 Kameras <span className="group__count">{cameras.length}</span>
                     </h2>
                     <CameraGrid cameras={cameras} />
-                </section>
-            ) : null,
-        },
-        {
-            key: 'events',
-            label: 'Ereignisse',
-            node: cameras.length ? (
-                <section
-                    className="card"
-                    aria-labelledby="sec-events"
-                >
-                    <h2
-                        id="sec-events"
-                        className="subtitle"
-                    >
-                        🕒 Ereignisse
-                    </h2>
-                    <EventTimeline cameras={cameras} />
                 </section>
             ) : null,
         },

@@ -87,3 +87,36 @@ describe('discovery', () => {
         expect(result.model.devices.some(d => d.adapter === 'system')).to.equal(false);
     });
 });
+
+describe('discovery: Lüfter über die Funktion "Lüftung"', () => {
+    const enumObj = (id: string, name: string, members: string[]): [string, Obj] => [
+        id,
+        { _id: id, type: 'enum', common: { name, members }, native: {} } as unknown as Obj,
+    ];
+    // Homematic IP Wired Schaltaktor (HmIPW-DRS4): nicht umbenannte Kanäle, einer davon schaltet den Lüfter
+    const drs: Record<string, Obj> = Object.fromEntries([
+        folder('hm-rpc.0.DRS', 'device', 'Schaltaktor'),
+        folder('hm-rpc.0.DRS.2', 'channel', 'Schaltaktor:2'),
+        state('hm-rpc.0.DRS.2.STATE', 'switch', 'boolean', true),
+        folder('hm-rpc.0.DRS.6', 'channel', 'Schaltaktor:6'),
+        state('hm-rpc.0.DRS.6.STATE', 'switch', 'boolean', true),
+        folder('hm-rpc.0.DRS.10', 'channel', 'Schaltaktor:10'),
+        state('hm-rpc.0.DRS.10.STATE', 'switch', 'boolean', true),
+        enumObj('enum.functions.ventilation', 'Lüftung', ['hm-rpc.0.DRS.2']),
+        enumObj('enum.rooms.guest_wc', 'Gäste WC', ['hm-rpc.0.DRS.2']),
+        enumObj('enum.rooms.storeroom', 'Abstellraum', ['hm-rpc.0.DRS.6']),
+    ]);
+    const devices = discover(drs, { language: 'de', ignoreAdapters: [] }).model.devices;
+    const byId = Object.fromEntries(devices.map(d => [d.id, d]));
+
+    it('turns the switch channel into a fan named "Lüfter"', () => {
+        expect(byId['hm-rpc.0.DRS.2'].type).to.equal('fan');
+        expect(byId['hm-rpc.0.DRS.2'].name).to.equal('Lüfter');
+        expect(byId['hm-rpc.0.DRS.2'].roomId).to.equal('enum.rooms.guest_wc');
+    });
+
+    it('leaves the other channels as switches', () => {
+        expect(byId['hm-rpc.0.DRS.6'].type).to.equal('socket');
+        expect(byId['hm-rpc.0.DRS.10'].type).to.equal('socket');
+    });
+});

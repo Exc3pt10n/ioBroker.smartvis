@@ -2,7 +2,6 @@ import { useSyncExternalStore } from 'react';
 import type {
     ClientMessage,
     ServerMessage,
-    SvCameraEvent,
     SvClientAction,
     SvDiagnosis,
     SvEdit,
@@ -36,10 +35,6 @@ class Connection {
     private pendingHistory = new Map<
         number,
         { resolve: (p: [number, number][]) => void; reject: (e: Error) => void; timer: number }
-    >();
-    private pendingEvents = new Map<
-        number,
-        { resolve: (r: SvCameraEvent[]) => void; reject: (e: Error) => void; timer: number }
     >();
     private pendingDiagnosis = new Map<
         number,
@@ -82,22 +77,6 @@ class Connection {
             }, 25_000);
             this.pendingHistory.set(reqId, { resolve, reject, timer });
             this.send({ t: 'history', reqId, id, range });
-        });
-    }
-
-    /** Letzte Kamera-Ereignisse (ohne cameraId: aller Kameras), neueste zuerst */
-    cameraEvents(cameraId?: string): Promise<SvCameraEvent[]> {
-        if (this.ws?.readyState !== WebSocket.OPEN) {
-            return Promise.reject(new Error('Keine Verbindung'));
-        }
-        const reqId = this.nextReqId++;
-        return new Promise((resolve, reject) => {
-            const timer = window.setTimeout(() => {
-                this.pendingEvents.delete(reqId);
-                reject(new Error('Zeitüberschreitung beim Laden der Ereignisse'));
-            }, 15_000);
-            this.pendingEvents.set(reqId, { resolve, reject, timer });
-            this.send({ t: 'cameraEvents', reqId, ...(cameraId ? { cameraId } : {}) });
         });
     }
 
@@ -173,19 +152,6 @@ class Connection {
             case 'error':
                 this.update({ lastError: msg.message });
                 break;
-            case 'cameraEvents': {
-                const pending = this.pendingEvents.get(msg.reqId);
-                if (pending) {
-                    window.clearTimeout(pending.timer);
-                    this.pendingEvents.delete(msg.reqId);
-                    if (msg.events) {
-                        pending.resolve(msg.events);
-                    } else {
-                        pending.reject(new Error(msg.error || 'Ereignisse nicht verfügbar'));
-                    }
-                }
-                break;
-            }
             case 'diagnose': {
                 const pending = this.pendingDiagnosis.get(msg.reqId);
                 if (pending) {

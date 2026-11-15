@@ -3,7 +3,7 @@ import { batteryLevel, isBatteryLow } from '../battery';
 import { useOpenDetail } from '../detail';
 
 /**
- * Batteriegeräte als kompakte Liste: Name, Raum, Ladestand (Balken + %) bzw. "schwach"/"in Ordnung".
+ * Batteriegeräte als kompakte Liste: Name, Raum, Batterieart, Ladestand (Balken + %) bzw. "schwach"/"in Ordnung".
  * Geräte mit Kachel öffnen beim Antippen ihre Detailansicht.
  */
 export function BatteryList({
@@ -32,7 +32,15 @@ export function BatteryList({
                         </span>
                         <span className="battery__name">
                             {b.name}
-                            <span className="battery__room">{room || 'ohne Raum'}</span>
+                            <span className="battery__room">
+                                {room || 'ohne Raum'}
+                                {b.batteryType && (
+                                    <>
+                                        {' · '}
+                                        <span className="battery__type">{b.batteryType}</span>
+                                    </>
+                                )}
+                            </span>
                         </span>
                         <span className="battery__value">
                             {level !== undefined ? (

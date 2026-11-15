@@ -1,6 +1,5 @@
 import * as utils from '@iobroker/adapter-core';
 import { join } from 'node:path';
-import { CameraEventLog } from './lib/cameraEvents';
 import { buildDiagnosis } from './lib/diagnosis';
 import { discover, type DiscoveryResult } from './lib/discovery';
 import { historyOptions, holdGaps, toPoints } from './lib/history';
@@ -35,7 +34,6 @@ const NO_INVERTED: InvertMap = new Map();
 class SmartVis extends utils.Adapter {
     private server?: SmartVisServer;
     private discovery?: DiscoveryResult;
-    private cameraEvents?: CameraEventLog;
     /** Anpassungen je Endgerät (overrides.json) */
     private store: SvOverrideStore = emptyStore();
     /** Änderungen nacheinander ausführen */
@@ -54,23 +52,7 @@ class SmartVis extends utils.Adapter {
 
     private async onReady(): Promise<void> {
         await this.loadOverrides();
-        this.cameraEvents = new CameraEventLog(
-            this.namespace,
-            {
-                read: async (meta, path) => {
-                    try {
-                        const { file } = await this.readFileAsync(meta, path);
-                        return Buffer.isBuffer(file) ? file : Buffer.from(file);
-                    } catch {
-                        return null;
-                    }
-                },
-                write: (meta, path, data) => this.writeFileAsync(meta, path, data),
-                remove: (meta, path) => this.delFileAsync(meta, path),
-            },
-            message => this.log.warn(message),
-        );
-        await this.cameraEvents.load();
+        await this.removeEventFiles();
         await this.runDiscovery();
 
         this.server = new SmartVisServer(
@@ -89,7 +71,6 @@ class SmartVis extends utils.Adapter {
                 edit: (clientId, edit) => this.queue(() => this.applyAndSave(clientId, edit)),
                 history: (id, range) => this.readHistory(id, range),
                 file: path => this.readCameraFile(path),
-                cameraEvents: cameraId => this.cameraEvents?.list(cameraId) ?? [],
                 diagnose: () => {
                     if (!this.discovery) {
                         throw new Error('Die Erkennung läuft noch');
@@ -127,7 +108,6 @@ class SmartVis extends utils.Adapter {
             ignoreAdapters: [this.name, ...(this.config.ignoreAdapters || '').split(',')],
         });
 
-        this.cameraEvents?.setCameras(this.discovery.model.cameras ?? []);
         await this.syncSubscriptions(this.discovery.stateIds);
 
         const { devices, rooms } = this.discovery.model;
@@ -283,9 +263,38 @@ class SmartVis extends utils.Adapter {
             const current = await this.getForeignStatesAsync(added);
             for (const id of added) {
                 this.states[id] = toValue(current[id]);
-                this.cameraEvents?.initial(id, this.states[id]);
             }
         }
+    }
+
+    /**
+     * Ereignisbilder früherer Versionen (0.11–0.12: Ereignisprotokoll unter smartvis.<n>/events) entfernen –
+     * das Protokoll gibt es nicht mehr, die Bilder belegen nur Platz
+     */
+    private async removeEventFiles(dir = 'events'): Promise<number> {
+        let entries: ioBroker.ReadDirResult[];
+        try {
+            entries = await this.readDirAsync(this.namespace, dir);
+        } catch {
+            return 0; // nicht vorhanden
+        }
+        let removed = 0;
+        for (const entry of entries) {
+            const path = `${dir}/${entry.file}`;
+            if (entry.isDir) {
+                removed += await this.removeEventFiles(path);
+            } else {
+                await this.delFileAsync(this.namespace, path).then(
+                    () => removed++,
+                    () => undefined,
+                );
+            }
+        }
+        await this.delFileAsync(this.namespace, dir).catch(() => undefined);
+        if (dir === 'events' && removed) {
+            this.log.info(`${removed} gespeicherte Dateien des früheren Kamera-Ereignisprotokolls entfernt`);
+        }
+        return removed;
     }
 
     /** Verlauf aus der History-Instanz (sql, history, influxdb) lesen – nur für erkannte, aufgezeichnete States */
@@ -313,10 +322,9 @@ class SmartVis extends utils.Adapter {
      * stehen (z. B. "/files/eusec.0/<Station>/last_event/<Kamera>.jpg") – keine beliebigen Dateien.
      */
     private async readCameraFile(path: string): Promise<{ data: Buffer; mimeType?: string } | null> {
-        // Aktuelles Ereignisbild einer Kamera oder ein von SmartVis gespeichertes älteres Ereignisbild
-        const allowed =
-            (this.discovery?.model.cameras || []).some(c => c.picture && this.states[c.picture.id]?.val === path) ||
-            !!this.cameraEvents?.hasPicture(path);
+        const allowed = (this.discovery?.model.cameras || []).some(
+            c => c.picture && this.states[c.picture.id]?.val === path,
+        );
         const m = /^\/files\/([^/]+)\/(.+)$/.exec(path);
         if (!allowed || !m || m[2].split('/').includes('..')) {
             return null;
@@ -342,7 +350,6 @@ class SmartVis extends utils.Adapter {
         }
         const value = toValue(state);
         this.states[id] = value;
-        this.cameraEvents?.onState(id, value);
         this.server?.queueState(id, presentValue(id, value, this.inverted()));
     }
 
@@ -363,7 +370,7 @@ class SmartVis extends utils.Adapter {
     }
 
     private onUnload(callback: () => void): void {
-        Promise.all([this.server?.stop(), this.cameraEvents?.flush()])
+        Promise.resolve(this.server?.stop())
             .catch(() => undefined)
             .finally(() => callback());
     }
