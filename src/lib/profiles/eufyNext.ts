@@ -145,8 +145,8 @@ function event(objects: ObjectMap, id: string, names: string[], label: string): 
 /**
  * eufy (ioBroker.eufy-next): je Gerät `eufy-next.0.<SN>`, ein Kanal je Fähigkeit aus dem Manifest des eufy-SDK.
  * Kameras haben `camera.*` und `snapshot.url` (Ereignisbild, vom neuen SDK korrekt entschlüsselt), Stationen
- * (HomeBase, Innenkameras mit eigener Station) `arming.mode`. Kein Livestream: Das SDK liefert Video nur als
- * Datenstrom, nicht als Webseite – SmartVis bietet dafür "Aktuelles Bild" (`snapshot.refreshLive`).
+ * (HomeBase, Innenkameras mit eigener Station) `arming.mode`. Livestream ab eufy-next 0.2.0 über die mitgelieferte
+ * go2rtc-Seite (`livestream.start/stop/url`), außerdem "Aktuelles Bild" (`snapshot.refreshLive`).
  */
 export const eufyNextProfile: AdapterProfile = {
     adapter: 'eufy-next',
@@ -198,6 +198,10 @@ export const eufyNextProfile: AdapterProfile = {
                 status: s('info.available', 'Erreichbar'),
                 battery: s('battery.level', 'Akku'),
                 light: s('light.isOn', 'Licht'),
+                // Livestream (ab eufy-next 0.2.0): go2rtc-Seite in livestream.url, nur solange der Stream läuft
+                liveStart: s('livestream.start', 'Stream starten'),
+                liveStop: s('livestream.stop', 'Stream beenden'),
+                liveUrl: s('livestream.url', 'Livestream'),
                 panLeft: s('ptz.left', 'Nach links'),
                 panRight: s('ptz.right', 'Nach rechts'),
                 tiltUp: s('ptz.up', 'Nach oben'),

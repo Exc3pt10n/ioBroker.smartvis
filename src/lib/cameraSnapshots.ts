@@ -64,7 +64,8 @@ export class CameraSnapshots {
     }
 
     setCameras(cameras: SvCamera[]): void {
-        this.liveIds = new Map(cameras.filter(c => c.liveUrl).map(c => [c.liveUrl!.id, c.id]));
+        // Nur für Kameras ohne brauchbares Ereignisbild (eusec) – eufy-next legt Standbilder selbst ab
+        this.liveIds = new Map(cameras.filter(c => c.liveUrl && !c.pictureUsable).map(c => [c.liveUrl!.id, c.id]));
     }
 
     /** Bild der Kamera für die Kachel (Pfad unter /files/… mit Zeitpunkt) */

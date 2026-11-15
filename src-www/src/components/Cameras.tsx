@@ -214,8 +214,9 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                                 <span>
                                     Livestream beendet
                                     <small>
-                                        eusec begrenzt die Dauer (Einstellung „Max camera livestream duration“, Standard
-                                        120 s)
+                                        {camera.adapter === 'eusec'
+                                            ? 'eusec begrenzt die Dauer (Einstellung „Max camera livestream duration“, Standard 120 s)'
+                                            : 'Der Adapter begrenzt die Dauer, um den Akku zu schonen (Standard 120 s)'}
                                     </small>
                                 </span>
                             ) : (
@@ -246,7 +247,7 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                               : 'Noch kein Ereignis'}
                     {info.battery !== undefined ? ` · 🔋 ${Math.round(info.battery)} %` : ''}
                 </p>
-                {!live && !info.disabled && camera.liveStart && (
+                {!live && !info.disabled && camera.liveStart && !camera.pictureUsable && (
                     <p className="detail__note">
                         {info.snapshotTs
                             ? `Bild aus dem Livestream ${eventTime(info.snapshotTs)}`

@@ -70,4 +70,24 @@ describe('cameraSnapshots', () => {
         const none = setup(null);
         expect(await none.snaps.capture(camera.id, 'u')).to.equal(false);
     });
+
+    it('nimmt keine eigenen Standbilder für Kameras mit brauchbarem Ereignisbild (eufy-next)', async () => {
+        let fetched = 0;
+        const snaps = new CameraSnapshots(
+            'smartvis.0',
+            { read: () => Promise.resolve(null), write: () => Promise.resolve() },
+            () => {
+                fetched++;
+                return Promise.resolve(null);
+            },
+            () => undefined,
+            () => undefined,
+        );
+        snaps.setCameras([{ ...camera, pictureUsable: true }]);
+        snaps.onState('eusec.0.cam.livestream', { val: 'http://h:1984/stream.html?src=x', ack: true, ts: 1 });
+        await new Promise(resolve => setTimeout(resolve, 20));
+        snaps.stopAll();
+        expect(fetched).to.equal(0);
+        expect(snaps.snapshot(camera.id)).to.equal(undefined);
+    });
 });
