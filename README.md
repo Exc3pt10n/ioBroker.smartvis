@@ -167,7 +167,10 @@ scripts/demo.ts Demo-Server ohne ioBroker
 
 ### 0.12.1 (2026-11-15)
 
-- (Exc3pt10n) Energie auf dem Handy: Die aufgeklappten Karten „Energiezähler“ und „Verlauf“ lassen sich mit „… einklappen“ unter der Karte wieder einklappen
+- (Exc3pt10n) Energie auf dem Handy: Die aufgeklappten Karten „Energiezähler“ und „Verlauf“ lassen sich mit „… einklappen“ unter der Karte wieder einklappen; auf dem Tablet bleiben sie wie zuvor offen
+- (Exc3pt10n) Sensoren ohne Schalter (z. B. Temperatur- und Feuchtigkeitssensoren) zeigen in der Detailansicht ihren aktuellen Wert groß mit Zeitpunkt der letzten Änderung
+- (Exc3pt10n) Ja/Nein-Werte von Sensoren, Fenstern und Türen werden in „Alle Werte“ als Zustand angezeigt (z. B. „offen“, „Bewegung“) statt „ja“/„nein“
+- (Exc3pt10n) Mehr: Die Knöpfe „Dieses Gerät zurücksetzen“ und „Alle Geräte zurücksetzen“ stehen wieder auf einer Höhe
 
 ### 0.12.0 (2026-11-14)
 

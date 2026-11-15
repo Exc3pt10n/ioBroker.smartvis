@@ -18,7 +18,7 @@ export function EnergyView(): React.JSX.Element {
     const { model, states } = useConnection();
     const columns = useCardColumns();
     const [focus, setFocus] = useState<{ key: string; n: number }>();
-    const phone = useMediaQuery('(max-width: 899px)');
+    const phone = useMediaQuery('(max-width: 599px)');
     if (!model) {
         return <p className="empty">Lade …</p>;
     }

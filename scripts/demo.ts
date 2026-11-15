@@ -582,15 +582,6 @@ for (const id of [
     }
 }
 
-// Instanzen aus den Fixtures: als laufende Dienste kennzeichnen
-for (const id of ['shuttercontrol.0', 'sql.0', 'kecontact.0', 'pvforecast.0', 'qhome-ess-hyb-g2.0', 'alexa2.0']) {
-    const sid = `system.adapter.${id}`;
-    if (objects[sid]?.type === 'instance') {
-        objects[sid].common = { ...objects[sid].common, enabled: true, mode: 'daemon' } as ioBroker.InstanceCommon;
-        state(`${sid}.alive`, 'indicator', 'boolean', false, true);
-    }
-}
-
 /** Synthetischer Verlauf je Größe: Tagesgang mit etwas Rauschen */
 function demoHistory(id: string, range: string): [number, number][] {
     const span = range === '6h' ? 6 : range === '7d' ? 168 : 24;
@@ -672,6 +663,25 @@ dwdNow('instruction', 'ACHTUNG! Hinweis auf mögliche Gefahren: Es können zum B
 
 // eufy-Kameras (eusec): HomeBase mit drei Außenkameras, eine Innenkamera (im Privatmodus)
 Object.assign(objects, eusecTree().objects);
+
+// Instanzen aus den Fixtures: als laufende Dienste kennzeichnen
+for (const id of [
+    'shuttercontrol.0',
+    'sql.0',
+    'kecontact.0',
+    'pvforecast.0',
+    'qhome-ess-hyb-g2.0',
+    'alexa2.0',
+    'dwd.0',
+    'eusec.0',
+    'openweathermap.0',
+]) {
+    const sid = `system.adapter.${id}`;
+    if (objects[sid]?.type === 'instance') {
+        objects[sid].common = { ...objects[sid].common, enabled: true, mode: 'daemon' } as ioBroker.InstanceCommon;
+        state(`${sid}.alive`, 'indicator', 'boolean', false, true);
+    }
+}
 const eusec = (id: string, val: SvStateValue['val'], ago = 0): void => {
     states[`eusec.0.${id}`] = { val, ack: true, ts: Date.now() - ago };
 };

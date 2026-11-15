@@ -8,7 +8,7 @@ import { Sheet } from '../components/Sheet';
 import { Slider } from '../components/Slider';
 import { Toggle } from '../components/Toggle';
 import { connection, useConnection } from '../connection';
-import { TYPE_LABELS, formatValue, isPlaying, warnings } from '../device';
+import { TYPE_LABELS, formatValue, isPlaying, valueState, warnings } from '../device';
 import { scenesForDevice } from '../scenes';
 import { autoStateInfo, shutterForDevice } from '../shutters';
 
@@ -447,12 +447,30 @@ export function DeviceDetail({
     } else {
         const sw = find(device, ['SET', 'ON', 'ON_SET', 'STATE'], { write: true, type: 'boolean' });
         used = [sw];
+        // Sensoren (Fenster, Temperatur, Bewegung …): Zustand groß oben statt nur in "Alle Werte"
+        const value = sw ? undefined : valueState(device);
+        if (value) {
+            used = [value];
+        }
         main = sw ? (
             <div className="detail__controls">
                 <Toggle
                     state={sw}
                     label="Ein/Aus"
                 />
+            </div>
+        ) : value ? (
+            <div className="detail__controls detail__status">
+                <span className="detail__status-value">{formatValue(value, states[value.id])}</span>
+                {states[value.id]?.ts ? (
+                    <span className="detail__note">
+                        seit{' '}
+                        {new Date(states[value.id]!.ts).toLocaleString('de-DE', {
+                            dateStyle: 'short',
+                            timeStyle: 'short',
+                        })}
+                    </span>
+                ) : null}
             </div>
         ) : null;
     }
@@ -837,7 +855,12 @@ function StateRow({ state, states }: { state: SvStateRef; states: States }): Rea
     if (value === null || value === undefined || value.val === null || value.val === undefined) {
         text = '–';
     } else if (typeof value.val === 'boolean') {
-        text = value.val ? 'ja' : 'nein';
+        // Fenster/Türen/Sensoren: "offen"/"geschlossen" bzw. "an"/"aus" wie auf der Kachel, sonst ja/nein
+        text = /window|door|^sensor\.|^switch|^state$/.test(state.role || '')
+            ? formatValue(state, value)
+            : value.val
+              ? 'ja'
+              : 'nein';
     } else {
         text = formatValue(state, value);
     }

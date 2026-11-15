@@ -3687,6 +3687,10 @@ button.kpi:hover {
     margin-top: 12px;
 }
 
+.custom__actions .action--danger {
+    margin-top: 0;
+}
+
 .custom__devices {
     margin-top: 12px;
 }
@@ -4764,4 +4768,20 @@ button.battery__row {
     display: inline-block;
     transform: rotate(-90deg);
     color: var(--text-muted);
+}
+
+/* Sensor-Detail: Zustand groß */
+.detail__status {
+    display: grid;
+    gap: 2px;
+}
+
+.detail__status-value {
+    font-size: 28px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.detail__status-value::first-letter {
+    text-transform: uppercase;
 }

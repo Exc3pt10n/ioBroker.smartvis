@@ -4,17 +4,17 @@
         "version": "0.12.1",
         "news": {
             "0.12.1": {
-                "en": "Energy on phones: the expanded cards \"Energy counters\" and \"History\" can be collapsed again",
-                "de": "Energie auf dem Handy: Die aufgeklappten Karten „Energiezähler“ und „Verlauf“ lassen sich wieder einklappen",
-                "ru": "Энергия на телефоне: развёрнутые карточки «Счётчики энергии» и «История» снова можно свернуть",
-                "pt": "Energia no telemóvel: os cartões expandidos \"Contadores de energia\" e \"Histórico\" podem voltar a ser recolhidos",
-                "nl": "Energie op de telefoon: de uitgeklapte kaarten \"Energietellers\" en \"Historie\" kunnen weer worden ingeklapt",
-                "fr": "Énergie sur téléphone : les cartes dépliées « Compteurs d'énergie » et « Historique » peuvent de nouveau être repliées",
-                "it": "Energia sul telefono: le schede aperte \"Contatori di energia\" e \"Storico\" si possono di nuovo chiudere",
-                "es": "Energía en el móvil: las tarjetas desplegadas \"Contadores de energía\" e \"Historial\" se pueden volver a plegar",
-                "pl": "Energia na telefonie: rozwinięte karty „Liczniki energii” i „Historia” można ponownie zwinąć",
-                "uk": "Енергія на телефоні: розгорнуті картки «Лічильники енергії» та «Історія» знову можна згорнути",
-                "zh-cn": "手机上的能源页面：展开的“能耗计数”和“历史”卡片可以重新折叠"
+                "en": "Energy on phones: the expanded cards \"Energy counters\" and \"History\" can be collapsed again; sensors without a switch show their current value large in the detail view; yes/no values of sensors, windows and doors are shown as a state; reset buttons in More aligned",
+                "de": "Energie auf dem Handy: Die aufgeklappten Karten „Energiezähler“ und „Verlauf“ lassen sich wieder einklappen; Sensoren ohne Schalter zeigen in der Detailansicht ihren aktuellen Wert groß; Ja/Nein-Werte von Sensoren, Fenstern und Türen erscheinen als Zustand; Zurücksetzen-Knöpfe in Mehr ausgerichtet",
+                "ru": "Энергия на телефоне: развёрнутые карточки «Счётчики энергии» и «История» снова можно свернуть; датчики без выключателя показывают текущее значение крупно в подробном виде; значения да/нет датчиков, окон и дверей отображаются как состояние; кнопки сброса в разделе «Ещё» выровнены",
+                "pt": "Energia no telemóvel: os cartões expandidos \"Contadores de energia\" e \"Histórico\" podem voltar a ser recolhidos; sensores sem interruptor mostram o valor atual em destaque na vista de detalhe; valores sim/não de sensores, janelas e portas aparecem como estado; botões de repor em Mais alinhados",
+                "nl": "Energie op de telefoon: de uitgeklapte kaarten \"Energietellers\" en \"Historie\" kunnen weer worden ingeklapt; sensoren zonder schakelaar tonen hun actuele waarde groot in de detailweergave; ja/nee-waarden van sensoren, ramen en deuren verschijnen als toestand; resetknoppen in Meer uitgelijnd",
+                "fr": "Énergie sur téléphone : les cartes dépliées « Compteurs d'énergie » et « Historique » peuvent de nouveau être repliées ; les capteurs sans interrupteur affichent leur valeur actuelle en grand dans la vue détaillée ; les valeurs oui/non des capteurs, fenêtres et portes s'affichent comme un état ; boutons de réinitialisation dans Plus alignés",
+                "it": "Energia sul telefono: le schede aperte \"Contatori di energia\" e \"Storico\" si possono di nuovo chiudere; i sensori senza interruttore mostrano il valore attuale in grande nella vista dettagliata; i valori sì/no di sensori, finestre e porte appaiono come stato; pulsanti di ripristino in Altro allineati",
+                "es": "Energía en el móvil: las tarjetas desplegadas \"Contadores de energía\" e \"Historial\" se pueden volver a plegar; los sensores sin interruptor muestran su valor actual en grande en la vista de detalle; los valores sí/no de sensores, ventanas y puertas se muestran como estado; botones de restablecer en Más alineados",
+                "pl": "Energia na telefonie: rozwinięte karty „Liczniki energii” i „Historia” można ponownie zwinąć; czujniki bez przełącznika pokazują bieżącą wartość dużą czcionką w widoku szczegółów; wartości tak/nie czujników, okien i drzwi są pokazywane jako stan; przyciski resetowania w Więcej wyrównane",
+                "uk": "Енергія на телефоні: розгорнуті картки «Лічильники енергії» та «Історія» знову можна згорнути; датчики без вимикача показують поточне значення великим шрифтом у детальному вигляді; значення так/ні датчиків, вікон і дверей показуються як стан; кнопки скидання в розділі «Більше» вирівняно",
+                "zh-cn": "手机上的能源页面：展开的“能耗计数”和“历史”卡片可以重新折叠；没有开关的传感器在详情视图中以大字显示当前值；传感器、窗户和门的是/否值显示为状态；“更多”中的重置按钮已对齐"
             },
             "0.12.0": {
                 "en": "Camera settings (eusec) in the camera view, grouped and in German: detection (motion on/off, what to detect, sensitivity, tracking, pets, sounds, anti-theft), recording (power mode, clip length, pause, audio, continuous recording, quality), picture & sound (night vision, light brightness, mirror, watermark, status LED, microphone, speaker, volume, pan speed) and notifications; sub-settings only appear when they take effect; coloured light for colour lamps (e.g. Hue Color Ambiance via hue or hue-v2): 'White | Colour' switch, colour swatches, hue and saturation",
