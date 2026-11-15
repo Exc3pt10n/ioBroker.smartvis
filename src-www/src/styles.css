@@ -1796,8 +1796,7 @@ details[open] > summary > .chevron {
 }
 
 /* Kleine Aktionsschaltfläche ("Alle aus") neben Überschriften */
-.pillbtn,
-.roomgroup__off {
+.pillbtn {
     flex: none;
     min-height: 36px;
     padding: 4px 14px;
@@ -2101,41 +2100,6 @@ section + .chips {
     font-weight: 600;
     text-align: center;
     vertical-align: 1px;
-}
-
-.roomgroup + .roomgroup {
-    margin-top: 14px;
-}
-
-.roomgroup__head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 6px;
-}
-
-.roomgroup__head .roomgroup__title {
-    margin-bottom: 0;
-}
-
-.roomgroup__title {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    min-height: 36px;
-    margin-bottom: 6px;
-    padding: 0;
-    border: 0;
-    background: none;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.roomgroup__title > span[aria-hidden] {
-    margin-left: 6px;
-    color: var(--text-muted);
 }
 
 /* ===== Verläufe ===== */
@@ -3802,7 +3766,6 @@ button.kpi:hover {
 
 /* Desktop: Aktionen ("Alle aus") direkt neben der Überschrift statt am weit entfernten rechten Rand */
 @media (min-width: 900px) {
-    .roomgroup__head,
     .group__head {
         justify-content: flex-start;
         gap: 16px;
@@ -3859,91 +3822,92 @@ button.kpi:hover {
     }
 }
 
-/* ===== Eingeschaltete Lichter auf dem Desktop: kompakte Kacheln, große Räume eingeklappt ===== */
-.grid--compact {
-    gap: 8px;
-}
-
-@media (min-width: 600px) {
-    .grid--compact {
-        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    }
-}
-
-.grid--compact .tile {
-    display: grid;
-    grid-template-columns: 32px minmax(0, 1fr);
+/* "Eingeschaltete Lichter": eine Zeile je Raum */
+.lights__head {
+    display: flex;
     align-items: center;
-    column-gap: 10px;
-    row-gap: 0;
-    min-height: 60px;
-    padding: 10px 40px 10px 10px;
+    justify-content: space-between;
+    gap: 12px;
 }
 
-.grid--compact .tile__icon {
-    grid-row: span 2;
-    width: 32px;
-    height: 32px;
+.lights__head .subtitle {
     margin: 0;
 }
 
-.grid--compact .tile__icon svg {
-    width: 18px;
-    height: 18px;
+.lights__rooms {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
 }
 
-.grid--compact .tile__name,
-.grid--compact .tile__value {
+.lights__room {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.lights__room + .lights__room {
+    border-top: 1px solid var(--surface-2);
+}
+
+.lights__link {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+    min-height: 52px;
+    padding: 6px 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.lights__icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--active);
+    color: #fff;
+}
+
+.lights__name {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.lights__count {
     min-width: 0;
     overflow: hidden;
+    color: var(--text-muted);
+    font-size: 14px;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.grid--compact .tile__name {
-    display: block;
-    font-size: 14px;
+.lights__count::before {
+    content: '· ';
 }
 
-.grid--compact .tile__value {
-    font-size: 13px;
-}
-
-.grid--compact .tile__auto {
-    grid-column: 2;
-}
-
-.grid--compact .tile__warn {
-    top: 8px;
-}
-
-.roomgroup__toggle {
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+.lights__off {
+    flex: none;
+    min-width: 56px;
     min-height: 36px;
-    margin-left: auto;
-    padding: 4px 8px;
+    padding: 4px 14px;
     border: 0;
-    border-radius: 10px;
-    background: none;
-    color: var(--accent);
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--text);
     font: inherit;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-}
-
-.roomgroup__toggle .chevron {
-    border-color: var(--accent);
-}
-
-.roomgroup__names {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 13px;
-    line-height: 1.5;
 }
 
 .instance__paused {

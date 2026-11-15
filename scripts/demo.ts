@@ -721,7 +721,7 @@ eusec('T8410P0000000021.station.guard_mode', 63);
 
 /** Demo-Ereignisbild: Farbverlauf mit Kameraname (statt echter Aufnahmen) */
 function demoPicture(path: string): { data: Buffer; mimeType: string } | null {
-    // Aktuelles Bild ".../last_event/<Kamera>.jpg"
+    // Standbild ".../snapshots/<Kamera>.jpg"
     const serial = /\/([^/]+)\.jpg$/.exec(path)?.[1];
     const id = Object.keys(objects).find(k => objects[k].type === 'device' && k.endsWith(`.cameras.${serial}`));
     if (!id) {
@@ -738,6 +738,13 @@ const result = discover(objects, { language: 'de', ignoreAdapters: [] });
 // Anpassungen aus dem Bearbeiten-Modus (in der Demo nur im Speicher)
 // Anpassungen je Endgerät, nur im Speicher (wie overrides.json im Adapter)
 let store = emptyStore();
+// Standbilder aus dem Livestream (im Adapter: CameraSnapshots); die Einfahrt hat noch keins
+const snapshotAt = Date.now() - 95 * 60_000;
+for (const camera of result.model.cameras || []) {
+    if (!/Einfahrt/.test(camera.name)) {
+        camera.snapshot = { url: `/files/smartvis.0/snapshots/${camera.id.split('.').pop()}.jpg`, ts: snapshotAt };
+    }
+}
 const modelFor = (clientId?: string): SvModel => ({
     ...applyOverrides(result.model, overridesFor(store, clientId), true),
     client: clientInfo(store, clientId),

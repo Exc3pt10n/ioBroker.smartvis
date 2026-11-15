@@ -1,5 +1,6 @@
 import * as utils from '@iobroker/adapter-core';
 import { join } from 'node:path';
+import { CameraSnapshots, fetchFrame } from './lib/cameraSnapshots';
 import { buildDiagnosis } from './lib/diagnosis';
 import { discover, type DiscoveryResult } from './lib/discovery';
 import { historyOptions, holdGaps, toPoints } from './lib/history';
@@ -34,6 +35,7 @@ const NO_INVERTED: InvertMap = new Map();
 class SmartVis extends utils.Adapter {
     private server?: SmartVisServer;
     private discovery?: DiscoveryResult;
+    private snapshots?: CameraSnapshots;
     /** Anpassungen je Endgerät (overrides.json) */
     private store: SvOverrideStore = emptyStore();
     /** Änderungen nacheinander ausführen */
@@ -53,6 +55,24 @@ class SmartVis extends utils.Adapter {
     private async onReady(): Promise<void> {
         await this.loadOverrides();
         await this.removeEventFiles();
+        this.snapshots = new CameraSnapshots(
+            this.namespace,
+            {
+                read: async (meta, path) => {
+                    try {
+                        const { file } = await this.readFileAsync(meta, path);
+                        return Buffer.isBuffer(file) ? file : Buffer.from(file);
+                    } catch {
+                        return null;
+                    }
+                },
+                write: (meta, path, data) => this.writeFileAsync(meta, path, data),
+            },
+            fetchFrame,
+            () => this.server?.publishModels(false),
+            message => this.log.debug(message),
+        );
+        await this.snapshots.load();
         await this.runDiscovery();
 
         this.server = new SmartVisServer(
@@ -108,6 +128,7 @@ class SmartVis extends utils.Adapter {
             ignoreAdapters: [this.name, ...(this.config.ignoreAdapters || '').split(',')],
         });
 
+        this.snapshots?.setCameras(this.discovery.model.cameras ?? []);
         await this.syncSubscriptions(this.discovery.stateIds);
 
         const { devices, rooms } = this.discovery.model;
@@ -138,7 +159,11 @@ class SmartVis extends utils.Adapter {
             overridesFor(this.store, clientId),
             this.config.allowEdit !== false,
         );
-        return { ...model, client: clientInfo(this.store, clientId) };
+        const cameras = model.cameras?.map(c => {
+            const snapshot = this.snapshots?.snapshot(c.id);
+            return snapshot ? { ...c, snapshot } : c;
+        });
+        return { ...model, ...(cameras && { cameras }), client: clientInfo(this.store, clientId) };
     }
 
     private async loadOverrides(): Promise<void> {
@@ -263,6 +288,7 @@ class SmartVis extends utils.Adapter {
             const current = await this.getForeignStatesAsync(added);
             for (const id of added) {
                 this.states[id] = toValue(current[id]);
+                this.snapshots?.initial(id, this.states[id]);
             }
         }
     }
@@ -318,13 +344,12 @@ class SmartVis extends utils.Adapter {
     }
 
     /**
-     * Kamerabild aus dem ioBroker-Dateispeicher: nur Pfade, die gerade in einem erkannten picture_url-State
-     * stehen (z. B. "/files/eusec.0/<Station>/last_event/<Kamera>.jpg") – keine beliebigen Dateien.
+     * Kamerabild aus dem ioBroker-Dateispeicher: nur von SmartVis gespeicherte Standbilder aus dem Livestream
+     * ("/files/smartvis.0/snapshots/<Kamera>.jpg") – keine beliebigen Dateien.
      */
     private async readCameraFile(path: string): Promise<{ data: Buffer; mimeType?: string } | null> {
-        const allowed = (this.discovery?.model.cameras || []).some(
-            c => c.picture && this.states[c.picture.id]?.val === path,
-        );
+        // Nur Standbilder aus dem Livestream (die Ereignisbilder von eufy sind seit 2026 unbrauchbar)
+        const allowed = !!this.snapshots?.hasPicture(path);
         const m = /^\/files\/([^/]+)\/(.+)$/.exec(path);
         if (!allowed || !m || m[2].split('/').includes('..')) {
             return null;
@@ -350,6 +375,7 @@ class SmartVis extends utils.Adapter {
         }
         const value = toValue(state);
         this.states[id] = value;
+        this.snapshots?.onState(id, value);
         this.server?.queueState(id, presentValue(id, value, this.inverted()));
     }
 
@@ -370,6 +396,7 @@ class SmartVis extends utils.Adapter {
     }
 
     private onUnload(callback: () => void): void {
+        this.snapshots?.stopAll();
         Promise.resolve(this.server?.stop())
             .catch(() => undefined)
             .finally(() => callback());

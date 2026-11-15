@@ -226,7 +226,7 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                     <CameraImage
                         className="camera__big"
                         src={info.disabled ? undefined : info.image}
-                        alt={`Letztes Ereignis ${camera.name}`}
+                        alt={`Standbild aus dem Livestream ${camera.name}`}
                     />
                 )}
                 <p className="detail__note">
@@ -236,9 +236,16 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                           ? `Gerade erkannt: ${info.events.join(', ')}`
                           : info.imageTs
                             ? `Letztes Ereignis ${eventTime(info.imageTs)}`
-                            : 'Noch kein Ereignisbild'}
+                            : 'Noch kein Ereignis'}
                     {info.battery !== undefined ? ` · 🔋 ${Math.round(info.battery)} %` : ''}
                 </p>
+                {!live && !info.disabled && (
+                    <p className="detail__note">
+                        {info.snapshotTs
+                            ? `Bild aus dem Livestream ${eventTime(info.snapshotTs)}`
+                            : 'Noch kein Bild: Beim nächsten Livestream speichert SmartVis ein Standbild für die Kachel.'}
+                    </p>
+                )}
                 <div className="detail__controls">
                     {camera.liveStart && !info.disabled && (
                         <button

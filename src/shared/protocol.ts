@@ -321,6 +321,8 @@ export interface SvCamera {
     stationId?: string;
     /** Einstellungen der Kamera (nur, was das Gerät anbietet), Wertelisten auf Deutsch */
     settings?: SvCameraSetting[];
+    /** Standbild aus dem letzten Livestream (von SmartVis gespeichert) – Bild der Kachel */
+    snapshot?: { url: string; ts: number };
 }
 
 /** Einstellung einer Kamera (Schalter, Auswahl oder Zahl) */

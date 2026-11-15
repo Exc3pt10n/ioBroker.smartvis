@@ -63,10 +63,6 @@ const KPI_LIMIT_DESK = 12;
 /** "+N weitere" aufgeklappt (für die Sitzung gemerkt) */
 let kpisExpanded = false;
 
-/** Räume mit vielen Lichtern auf dem Desktop eingeklappt; aufgeklappte merkt sich die Sitzung */
-const COLLAPSE_FROM = 4;
-const expandedRooms = new Set<string>();
-
 export function HomeView({ onNavigate }: { onNavigate: (path: string) => void }): React.JSX.Element {
     const { model, states } = useConnection();
     const { editing } = useEditing();
@@ -441,9 +437,6 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             node: lightsOn.length ? (
                 <LightsSection
                     lights={lightsOn}
-                    compact
-                    // Handy: schon ab zwei Lampen je Raum nur die Namenszeile, Kacheln beim Aufklappen
-                    collapseFrom={dashboard ? COLLAPSE_FROM : 2}
                     onNavigate={onNavigate}
                 />
             ) : (
@@ -666,93 +659,78 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
     );
 }
 
-/** "Eingeschaltete Lichter" je Raum, mit "Alle aus"; compact (Desktop): kleine Kacheln, große Räume einklappbar */
+/**
+ * "Eingeschaltete Lichter": eine Zeile je Raum ("Ambiente · 11 an") mit "Aus", oben "Alle aus".
+ * Keine Namenslisten – Antippen öffnet den Raum mit den einzelnen Lampen.
+ */
 function LightsSection({
     lights,
-    compact,
-    collapseFrom = COLLAPSE_FROM,
     onNavigate,
 }: {
     lights: SvDevice[];
-    compact: boolean;
-    collapseFrom?: number;
     onNavigate: (path: string) => void;
 }): React.JSX.Element {
     const { model, states } = useConnection();
-    const [, rerender] = useState(0);
+    const groups = groupByRoom(lights, model?.rooms || []);
     return (
-        <section id="home-lights">
-            <h2 className="subtitle">💡 Eingeschaltete Lichter</h2>
-            {groupByRoom(lights, model?.rooms || []).map(g => {
-                const key = g.roomId ?? '_none';
-                const collapsible = compact && g.devices.length >= collapseFrom;
-                const open = !collapsible || expandedRooms.has(key);
-                const toggle = (): void => {
-                    if (expandedRooms.has(key)) {
-                        expandedRooms.delete(key);
-                    } else {
-                        expandedRooms.add(key);
-                    }
-                    rerender(n => n + 1);
-                };
-                return (
-                    <div
-                        key={key}
-                        className={`roomgroup${collapsible && !open ? ' roomgroup--collapsed' : ''}`}
+        <section
+            id="home-lights"
+            className="card lights"
+            aria-labelledby="home-lights-title"
+        >
+            <div className="lights__head">
+                <h2
+                    id="home-lights-title"
+                    className="subtitle"
+                >
+                    💡 {lights.length} {lights.length === 1 ? 'Licht' : 'Lichter'} an
+                </h2>
+                {groups.length > 1 && (
+                    <button
+                        type="button"
+                        className="pillbtn"
+                        onClick={() => switchLights(lights, false, states)}
                     >
-                        <div className="roomgroup__head">
-                            <button
-                                type="button"
-                                className="roomgroup__title"
-                                onClick={() => onNavigate(`rooms/${g.roomId ? encodeURIComponent(g.roomId) : '_none'}`)}
-                            >
-                                {g.name}
-                                <span className="group__count">{g.devices.length}</span>
-                                <span aria-hidden="true">›</span>
-                            </button>
-                            <button
-                                type="button"
-                                className="roomgroup__off"
-                                aria-label={`${g.name}: alle Lichter ausschalten`}
-                                title="Alle Lichter ausschalten"
-                                onClick={() => switchLights(g.devices, false, states, g.name)}
+                        Alle aus
+                    </button>
+                )}
+            </div>
+            <ul className="lights__rooms">
+                {groups.map(g => (
+                    <li
+                        key={g.roomId ?? '_none'}
+                        className="lights__room"
+                    >
+                        <button
+                            type="button"
+                            className="lights__link"
+                            onClick={() => onNavigate(`rooms/${g.roomId ? encodeURIComponent(g.roomId) : '_none'}`)}
+                        >
+                            <span
+                                className="lights__icon"
+                                aria-hidden="true"
                             >
                                 <Icon
                                     name="light"
-                                    size={14}
-                                />{' '}
-                                Alle aus
-                            </button>
-                            {collapsible && (
-                                <button
-                                    type="button"
-                                    className="roomgroup__toggle"
-                                    aria-expanded={open}
-                                    onClick={toggle}
-                                >
-                                    {open ? 'Einklappen' : `${g.devices.length} anzeigen`}
-                                    <span
-                                        className="chevron"
-                                        aria-hidden="true"
-                                    />
-                                </button>
-                            )}
-                        </div>
-                        {open ? (
-                            <div className={`grid${compact ? ' grid--compact' : ''}`}>
-                                {g.devices.map(d => (
-                                    <DeviceTile
-                                        key={d.id}
-                                        device={d}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="roomgroup__names">{g.devices.map(d => d.name).join(' · ')}</p>
-                        )}
-                    </div>
-                );
-            })}
+                                    size={18}
+                                />
+                            </span>
+                            <span className="lights__name">{g.name}</span>
+                            <span className="lights__count">
+                                {g.devices.length === 1 ? g.devices[0].name : `${g.devices.length} an`}
+                            </span>
+                        </button>
+                        <button
+                            type="button"
+                            className="lights__off"
+                            aria-label={`${g.name}: ${g.devices.length === 1 ? 'Licht' : 'alle Lichter'} ausschalten`}
+                            onClick={() => switchLights(g.devices, false, states, g.name)}
+                        >
+                            Aus
+                        </button>
+                    </li>
+                ))}
+            </ul>
         </section>
     );
 }
