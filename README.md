@@ -165,6 +165,10 @@ scripts/demo.ts Demo-Server ohne ioBroker
     ### **WORK IN PROGRESS**
 -->
 
+### 0.12.1 (2026-11-15)
+
+- (Exc3pt10n) Energie auf dem Handy: Die aufgeklappten Karten „Energiezähler“ und „Verlauf“ lassen sich mit „… einklappen“ unter der Karte wieder einklappen
+
 ### 0.12.0 (2026-11-14)
 
 - (Exc3pt10n) Farbiges Licht für Farblampen (z. B. Hue Color Ambiance mit `hue` oder `hue-v2`, Zigbee, Tasmota): in der Lampen-Ansicht Umschalter „Weiß | Farbe“ (startet im aktuellen Farbmodus der Lampe), Farbfelder für die schnelle Wahl sowie Farbton und Sättigung; eine ausgeschaltete Lampe wird dabei eingeschaltet. SmartVis nutzt Farbton/Sättigung, die Hex-Farbe oder notfalls R/G/B – je nachdem, was die Lampe anbietet

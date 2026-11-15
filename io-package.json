@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "smartvis",
-        "version": "0.12.0",
+        "version": "0.12.1",
         "news": {
+            "0.12.1": {
+                "en": "Energy on phones: the expanded cards \"Energy counters\" and \"History\" can be collapsed again",
+                "de": "Energie auf dem Handy: Die aufgeklappten Karten „Energiezähler“ und „Verlauf“ lassen sich wieder einklappen",
+                "ru": "Энергия на телефоне: развёрнутые карточки «Счётчики энергии» и «История» снова можно свернуть",
+                "pt": "Energia no telemóvel: os cartões expandidos \"Contadores de energia\" e \"Histórico\" podem voltar a ser recolhidos",
+                "nl": "Energie op de telefoon: de uitgeklapte kaarten \"Energietellers\" en \"Historie\" kunnen weer worden ingeklapt",
+                "fr": "Énergie sur téléphone : les cartes dépliées « Compteurs d'énergie » et « Historique » peuvent de nouveau être repliées",
+                "it": "Energia sul telefono: le schede aperte \"Contatori di energia\" e \"Storico\" si possono di nuovo chiudere",
+                "es": "Energía en el móvil: las tarjetas desplegadas \"Contadores de energía\" e \"Historial\" se pueden volver a plegar",
+                "pl": "Energia na telefonie: rozwinięte karty „Liczniki energii” i „Historia” można ponownie zwinąć",
+                "uk": "Енергія на телефоні: розгорнуті картки «Лічильники енергії» та «Історія» знову можна згорнути",
+                "zh-cn": "手机上的能源页面：展开的“能耗计数”和“历史”卡片可以重新折叠"
+            },
             "0.12.0": {
                 "en": "Camera settings (eusec) in the camera view, grouped and in German: detection (motion on/off, what to detect, sensitivity, tracking, pets, sounds, anti-theft), recording (power mode, clip length, pause, audio, continuous recording, quality), picture & sound (night vision, light brightness, mirror, watermark, status LED, microphone, speaker, volume, pan speed) and notifications; sub-settings only appear when they take effect; coloured light for colour lamps (e.g. Hue Color Ambiance via hue or hue-v2): 'White | Colour' switch, colour swatches, hue and saturation",
                 "de": "Kamera-Einstellungen (eusec) in der Kamera-Ansicht, gruppiert und auf Deutsch: Erkennung (Bewegung an/aus, was erkannt wird, Empfindlichkeit, Verfolgen, Haustiere, Geräusche, Diebstahlwarnung), Aufnahme (Energiemodus, Clip-Länge, Pause, Ton, Daueraufnahme, Qualität), Bild & Ton (Nachtsicht, Lichthelligkeit, Spiegeln, Wasserzeichen, Status-LED, Mikrofon, Lautsprecher, Lautstärke, Schwenkgeschwindigkeit) und Benachrichtigungen; Untereinstellungen erscheinen nur, wenn sie wirken; farbiges Licht für Farblampen (z. B. Hue Color Ambiance über hue oder hue-v2): Umschalter „Weiß | Farbe“, Farbfelder, Farbton und Sättigung",
@@ -249,19 +262,6 @@
                 "pl": "Automatycznie wykrywająca, mobilna wizualizacja: pokoje, oświetlenie ze scenami Hue, rolety, klimatyzacja w tym Toshiba, media, energia (Q.HOME, KEBA, pvforecast), pogoda, shuttercontrol, historia, tryb edycji z konfigurowalnymi widokami, stan ioBroker",
                 "uk": "Мобільна візуалізація з автовиявленням: кімнати, світло зі сценами Hue, жалюзі, клімат включно з Toshiba, медіа, енергія (Q.HOME, KEBA, pvforecast), погода, shuttercontrol, історія, режим редагування з налаштовуваними видами, стан ioBroker",
                 "zh-cn": "自动识别、移动优先的可视化：房间、灯光（含 Hue 场景）、百叶窗、空调（含东芝）、媒体、能源（Q.HOME、KEBA、pvforecast）、天气、shuttercontrol、历史曲线、可自定义视图的编辑模式、ioBroker 状态"
-            },
-            "0.0.1": {
-                "en": "initial release",
-                "de": "Erstveröffentlichung",
-                "ru": "первоначальный выпуск",
-                "pt": "lançamento inicial",
-                "nl": "eerste release",
-                "fr": "version initiale",
-                "it": "rilascio iniziale",
-                "es": "lanzamiento inicial",
-                "pl": "pierwsze wydanie",
-                "uk": "початковий випуск",
-                "zh-cn": "首次发布"
             }
         },
         "titleLang": {

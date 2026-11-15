@@ -4620,6 +4620,8 @@ button.battery__row {
 }
 
 .collapse-card__chevron {
+    display: inline-block;
+    transform: rotate(90deg);
     color: var(--text-muted);
     font-size: 22px;
 }
@@ -4734,4 +4736,32 @@ button.battery__row {
 
 .swatch--on {
     box-shadow: 0 0 0 3px var(--accent);
+}
+
+/* Handy: aufgeklappter Bereich mit "… einklappen" unter der Karte */
+.collapse-open {
+    display: grid;
+    gap: 6px;
+}
+
+.collapse-open__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-self: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 6px 16px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.collapse-open__chevron {
+    display: inline-block;
+    transform: rotate(-90deg);
+    color: var(--text-muted);
 }
