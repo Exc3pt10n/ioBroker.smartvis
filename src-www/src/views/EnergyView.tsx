@@ -18,7 +18,7 @@ export function EnergyView(): React.JSX.Element {
     const { model, states } = useConnection();
     const columns = useCardColumns();
     const [focus, setFocus] = useState<{ key: string; n: number }>();
-    const phone = useMediaQuery('(max-width: 899px)');
+    const phone = useMediaQuery('(max-width: 599px)');
     if (!model) {
         return <p className="empty">Lade …</p>;
     }
@@ -251,8 +251,33 @@ function PhoneCollapse({
     children: React.ReactNode;
 }): React.JSX.Element {
     const [, rerender] = useState(0);
-    if (!phone || openedOnPhone.has(id)) {
+    if (!phone) {
         return <>{children}</>;
+    }
+    if (openedOnPhone.has(id)) {
+        // Aufgeklappt: unter der Karte wieder einklappen
+        return (
+            <div className="collapse-open">
+                {children}
+                <button
+                    type="button"
+                    className="collapse-open__btn"
+                    aria-expanded
+                    onClick={() => {
+                        openedOnPhone.delete(id);
+                        rerender(n => n + 1);
+                    }}
+                >
+                    {title.replace(/^\S+\s/, '')} einklappen
+                    <span
+                        className="collapse-open__chevron"
+                        aria-hidden="true"
+                    >
+                        ›
+                    </span>
+                </button>
+            </div>
+        );
     }
     return (
         <button

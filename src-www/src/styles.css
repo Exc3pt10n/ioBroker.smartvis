@@ -1796,8 +1796,7 @@ details[open] > summary > .chevron {
 }
 
 /* Kleine Aktionsschaltfläche ("Alle aus") neben Überschriften */
-.pillbtn,
-.roomgroup__off {
+.pillbtn {
     flex: none;
     min-height: 36px;
     padding: 4px 14px;
@@ -2101,41 +2100,6 @@ section + .chips {
     font-weight: 600;
     text-align: center;
     vertical-align: 1px;
-}
-
-.roomgroup + .roomgroup {
-    margin-top: 14px;
-}
-
-.roomgroup__head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 6px;
-}
-
-.roomgroup__head .roomgroup__title {
-    margin-bottom: 0;
-}
-
-.roomgroup__title {
-    display: inline-flex;
-    align-items: center;
-    gap: 2px;
-    min-height: 36px;
-    margin-bottom: 6px;
-    padding: 0;
-    border: 0;
-    background: none;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-}
-
-.roomgroup__title > span[aria-hidden] {
-    margin-left: 6px;
-    color: var(--text-muted);
 }
 
 /* ===== Verläufe ===== */
@@ -3687,6 +3651,10 @@ button.kpi:hover {
     margin-top: 12px;
 }
 
+.custom__actions .action--danger {
+    margin-top: 0;
+}
+
 .custom__devices {
     margin-top: 12px;
 }
@@ -3798,7 +3766,6 @@ button.kpi:hover {
 
 /* Desktop: Aktionen ("Alle aus") direkt neben der Überschrift statt am weit entfernten rechten Rand */
 @media (min-width: 900px) {
-    .roomgroup__head,
     .group__head {
         justify-content: flex-start;
         gap: 16px;
@@ -3855,91 +3822,118 @@ button.kpi:hover {
     }
 }
 
-/* ===== Eingeschaltete Lichter auf dem Desktop: kompakte Kacheln, große Räume eingeklappt ===== */
-.grid--compact {
-    gap: 8px;
+/* Status-Karten der Startseite (Lichter, Klima, Offenes …): eine Zeile je Raum bzw. Gerät */
+.slist {
+    padding-top: 14px;
 }
 
-@media (min-width: 600px) {
-    .grid--compact {
-        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-    }
+/* Handy: erste Karte unter Kennzahlen/Wetter braucht den Abstand, den sonst die Überschrift über der Karte gibt */
+.home__sections > .csec:first-child > .card {
+    margin-top: 16px;
 }
 
-.grid--compact .tile {
-    display: grid;
-    grid-template-columns: 32px minmax(0, 1fr);
+.slist__head {
+    display: flex;
     align-items: center;
-    column-gap: 10px;
-    row-gap: 0;
-    min-height: 60px;
-    padding: 10px 40px 10px 10px;
+    justify-content: space-between;
+    gap: 12px;
 }
 
-.grid--compact .tile__icon {
-    grid-row: span 2;
-    width: 32px;
-    height: 32px;
+.slist__head .subtitle {
     margin: 0;
 }
 
-.grid--compact .tile__icon svg {
-    width: 18px;
-    height: 18px;
+.slist__rows {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
 }
 
-.grid--compact .tile__name,
-.grid--compact .tile__value {
+.slist__row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.slist__row + .slist__row {
+    border-top: 1px solid var(--surface-2);
+}
+
+.slist__link {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 12px;
     min-width: 0;
+    min-height: 52px;
+    padding: 6px 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.slist__icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--active);
+    color: #fff;
+}
+
+.slist__icon--warn {
+    background: var(--warn);
+}
+
+.slist__icon--neutral {
+    background: var(--surface-2);
+    color: var(--text-muted);
+}
+
+.slist__text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.slist__name,
+.slist__detail {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.grid--compact .tile__name {
-    display: block;
-    font-size: 14px;
+.slist__name {
+    font-weight: 600;
 }
 
-.grid--compact .tile__value {
+.slist__detail {
+    color: var(--text-muted);
     font-size: 13px;
 }
 
-.grid--compact .tile__auto {
-    grid-column: 2;
-}
-
-.grid--compact .tile__warn {
-    top: 8px;
-}
-
-.roomgroup__toggle {
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
+.slist__action {
+    flex: none;
+    min-width: 56px;
     min-height: 36px;
-    margin-left: auto;
-    padding: 4px 8px;
+    padding: 4px 14px;
     border: 0;
-    border-radius: 10px;
-    background: none;
-    color: var(--accent);
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--text);
     font: inherit;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
 }
 
-.roomgroup__toggle .chevron {
-    border-color: var(--accent);
-}
-
-.roomgroup__names {
-    margin: 0;
-    color: var(--text-muted);
-    font-size: 13px;
-    line-height: 1.5;
+.slist .batteries {
+    margin-top: 4px;
 }
 
 .instance__paused {
@@ -4084,11 +4078,6 @@ button.battery__row {
 
 .battery--low .battery__fill {
     background: var(--warn);
-}
-
-.card--list {
-    margin: 0;
-    padding: 2px 16px;
 }
 
 .tile__battery {
@@ -4452,77 +4441,6 @@ button.battery__row {
     grid-area: down;
 }
 
-/* Kamera-Ereignisse */
-.camera__events {
-    margin-top: 16px;
-}
-
-.camera__eventlist {
-    display: grid;
-    gap: 6px;
-    margin: 8px 0 0;
-    padding: 0;
-    list-style: none;
-}
-
-.camera__event {
-    display: grid;
-    grid-template-columns: 96px minmax(0, 1fr);
-    gap: 12px;
-    align-items: center;
-    width: 100%;
-    padding: 6px;
-    border: 0;
-    border-radius: 12px;
-    background: var(--surface-2);
-    color: var(--text);
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-}
-
-.camera__event--on {
-    outline: 2px solid var(--accent);
-}
-
-.camera__thumb {
-    display: block;
-    width: 96px;
-    aspect-ratio: 16 / 9;
-    border-radius: 8px;
-    object-fit: cover;
-    font-size: 18px;
-}
-
-.camera__event-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 0;
-}
-
-.camera__event-kind {
-    font-weight: 600;
-}
-
-.camera__event-meta {
-    color: var(--text-muted);
-    font-size: 13px;
-}
-
-.camera__selected {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 4px 12px;
-}
-
-.camera__back {
-    display: inline;
-    margin: 0;
-    padding: 0;
-}
-
 /* ===== Bereich Sicherheit ===== */
 .security__modes {
     display: grid;
@@ -4546,17 +4464,6 @@ button.battery__row {
         justify-content: center;
         gap: 6px;
     }
-}
-
-.camera__day {
-    margin: 10px 0 2px;
-    color: var(--text-muted);
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.camera__eventlist > li:first-child .camera__day {
-    margin-top: 0;
 }
 
 /* Handy: Beschattung über "Mehr", wenn es den Bereich Sicherheit gibt (Leiste höchstens 5 Einträge) */
@@ -4620,6 +4527,8 @@ button.battery__row {
 }
 
 .collapse-card__chevron {
+    display: inline-block;
+    transform: rotate(90deg);
     color: var(--text-muted);
     font-size: 22px;
 }
@@ -4734,4 +4643,48 @@ button.battery__row {
 
 .swatch--on {
     box-shadow: 0 0 0 3px var(--accent);
+}
+
+/* Handy: aufgeklappter Bereich mit "… einklappen" unter der Karte */
+.collapse-open {
+    display: grid;
+    gap: 6px;
+}
+
+.collapse-open__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-self: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 6px 16px;
+    border: 0;
+    border-radius: 999px;
+    background: var(--surface-2);
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.collapse-open__chevron {
+    display: inline-block;
+    transform: rotate(-90deg);
+    color: var(--text-muted);
+}
+
+/* Sensor-Detail: Zustand groß */
+.detail__status {
+    display: grid;
+    gap: 2px;
+}
+
+.detail__status-value {
+    font-size: 28px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.detail__status-value::first-letter {
+    text-transform: uppercase;
 }

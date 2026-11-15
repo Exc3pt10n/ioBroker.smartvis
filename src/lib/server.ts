@@ -6,7 +6,6 @@ import {
     PROTOCOL_VERSION,
     type ClientMessage,
     type ServerMessage,
-    type SvCameraEvent,
     type SvClientAction,
     type SvDiagnosis,
     type SvEdit,
@@ -60,8 +59,6 @@ export interface ServerHandlers {
      * null = nicht freigegeben oder nicht vorhanden
      */
     file?(path: string): Promise<{ data: Buffer; mimeType?: string } | null>;
-    /** Letzte Kamera-Ereignisse (ohne cameraId: aller Kameras) */
-    cameraEvents?(cameraId?: string): SvCameraEvent[];
     onClientCountChange?(count: number): void;
     log: ioBroker.Logger;
 }
@@ -178,18 +175,6 @@ export class SmartVisServer {
                     send(ws, { t: 'history', reqId: msg.reqId, points });
                 } catch (e) {
                     send(ws, { t: 'history', reqId: msg.reqId, points: [], error: (e as Error).message });
-                }
-                return;
-            }
-            if (msg.t === 'cameraEvents') {
-                try {
-                    if (!this.handlers.cameraEvents) {
-                        throw new Error('Kamera-Ereignisse sind nicht verfügbar');
-                    }
-                    const cameraId = typeof msg.cameraId === 'string' ? msg.cameraId : undefined;
-                    send(ws, { t: 'cameraEvents', reqId: msg.reqId, events: this.handlers.cameraEvents(cameraId) });
-                } catch (e) {
-                    send(ws, { t: 'cameraEvents', reqId: msg.reqId, error: (e as Error).message });
                 }
                 return;
             }

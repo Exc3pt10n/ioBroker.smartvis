@@ -321,6 +321,8 @@ export interface SvCamera {
     stationId?: string;
     /** Einstellungen der Kamera (nur, was das Gerät anbietet), Wertelisten auf Deutsch */
     settings?: SvCameraSetting[];
+    /** Standbild aus dem letzten Livestream (von SmartVis gespeichert) – Bild der Kachel */
+    snapshot?: { url: string; ts: number };
 }
 
 /** Einstellung einer Kamera (Schalter, Auswahl oder Zahl) */
@@ -333,19 +335,6 @@ export interface SvCameraSetting {
     state: SvStateRef;
     /** Nur zeigen, wenn dieser State den Wert hat (z. B. Empfindlichkeit nur bei eingeschalteter Erkennung) */
     requires?: { id: string; value: boolean | number };
-}
-
-/** Kamera-Ereignis aus dem Ereignisprotokoll von SmartVis */
-export interface SvCameraEvent {
-    /** Eindeutig: "<Kamera-ID>@<ts>" */
-    id: string;
-    cameraId: string;
-    /** Beginn (ms) */
-    ts: number;
-    /** Erkannt: person, pet, motion, sound, crying (leer = nur neues Ereignisbild) */
-    kinds: string[];
-    /** Gespeichertes Ereignisbild (unter /files/<smartvis-Instanz>/events/…) */
-    picture?: string;
 }
 
 /** Sicherheitsstation (z. B. eufy HomeBase oder eine Innenkamera als eigene Station) */
@@ -632,6 +621,8 @@ export interface SvBattery {
     level?: SvStateRef;
     /** Batterie schwach (indicator.lowbat) */
     low?: SvStateRef;
+    /** Batterieart, z. B. "2× AAA", "CR2032", "Akku" (aus dem Gerätemodell) */
+    batteryType?: string;
     /** Erkannte Kachel dieses Geräts (für die Detailansicht) */
     deviceId?: string;
 }
@@ -720,8 +711,7 @@ export type ServerMessage =
     | { t: 'states'; states: Record<string, SvStateValue | null> }
     | { t: 'error'; message: string }
     | { t: 'history'; reqId: number; points: [number, number][]; error?: string }
-    | { t: 'diagnose'; reqId: number; report?: SvDiagnosis; error?: string }
-    | { t: 'cameraEvents'; reqId: number; events?: SvCameraEvent[]; error?: string };
+    | { t: 'diagnose'; reqId: number; report?: SvDiagnosis; error?: string };
 
 /** Nachrichten Client → Server */
 export type ClientMessage =
@@ -733,6 +723,4 @@ export type ClientMessage =
     | { t: 'history'; reqId: number; id: string; range: SvHistoryRange }
     /** Diagnose der Erkennung anfordern (Mehr → Erkennung) */
     | { t: 'diagnose'; reqId: number }
-    /** Letzte Kamera-Ereignisse (ohne cameraId: aller Kameras) */
-    | { t: 'cameraEvents'; reqId: number; cameraId?: string }
     | { t: 'ping' };

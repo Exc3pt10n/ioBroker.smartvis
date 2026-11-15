@@ -179,17 +179,39 @@ tests.integration(path.join(__dirname, '..'), {
                     ),
                 );
 
+                // Standbild aus einem früheren Livestream (von SmartVis gespeichert)
+                await harness.objects.setObjectAsync('smartvis.0', {
+                    _id: 'smartvis.0',
+                    type: 'meta',
+                    common: { name: 'SmartVis', type: 'meta.user' },
+                    native: {},
+                });
+                const still = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(16, 7)]);
+                for (const [path, data] of [
+                    ['snapshots/C1.jpg', still],
+                    ['snapshots/index.json', JSON.stringify({ [cam]: 1_700_000_000_000 })],
+                ]) {
+                    await new Promise((resolve, reject) =>
+                        harness.objects.writeFile('smartvis.0', path, data, err => (err ? reject(err) : resolve())),
+                    );
+                }
+
                 await harness.startAdapterAndWait();
                 const { ws, model } = await connect(port);
 
-                // Kamerabild: freigegeben nur der Pfad aus picture_url, alles andere 404
+                // Kamerabild: nur das gespeicherte Standbild; das (verstreifte) eufy-Ereignisbild und alles andere 404
                 expect(model.cameras.map(c => c.name)).to.deep.equal(['Garten']);
-                const image = await fetch(`http://127.0.0.1:${port}/files/eusec.0/S1/last_event/C1.jpg?v=1`);
+                expect(model.cameras[0].snapshot).to.deep.equal({
+                    url: '/files/smartvis.0/snapshots/C1.jpg',
+                    ts: 1_700_000_000_000,
+                });
+                const image = await fetch(`http://127.0.0.1:${port}/files/smartvis.0/snapshots/C1.jpg?v=1`);
                 expect(image.status).to.equal(200);
                 expect(image.headers.get('content-type')).to.match(/image\/jpeg/);
-                expect(Buffer.from(await image.arrayBuffer())).to.deep.equal(picture);
-                const other = await fetch(`http://127.0.0.1:${port}/files/eusec.0/S1/geheim.jpg`);
-                expect(other.status).to.equal(404);
+                expect(Buffer.from(await image.arrayBuffer())).to.deep.equal(still);
+                for (const path of ['/files/eusec.0/S1/last_event/C1.jpg', '/files/smartvis.0/overrides.json']) {
+                    expect((await fetch(`http://127.0.0.1:${port}${path}`)).status).to.equal(404);
+                }
 
                 // Verlauf nur für aufgezeichnete States – sonst Fehler statt Datenbankabfrage
                 const answer = new Promise(resolve => {

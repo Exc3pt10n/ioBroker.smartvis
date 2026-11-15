@@ -20,7 +20,7 @@ import {
     withOverrides,
 } from '../src/lib/clientOverrides';
 import { SmartVisServer } from '../src/lib/server';
-import type { SvCameraEvent, SvModel, SvStateValue } from '../src/shared/protocol';
+import type { SvModel, SvStateValue } from '../src/shared/protocol';
 
 type Obj = ioBroker.Object;
 const objects: Record<string, Obj> = {};
@@ -582,15 +582,6 @@ for (const id of [
     }
 }
 
-// Instanzen aus den Fixtures: als laufende Dienste kennzeichnen
-for (const id of ['shuttercontrol.0', 'sql.0', 'kecontact.0', 'pvforecast.0', 'qhome-ess-hyb-g2.0', 'alexa2.0']) {
-    const sid = `system.adapter.${id}`;
-    if (objects[sid]?.type === 'instance') {
-        objects[sid].common = { ...objects[sid].common, enabled: true, mode: 'daemon' } as ioBroker.InstanceCommon;
-        state(`${sid}.alive`, 'indicator', 'boolean', false, true);
-    }
-}
-
 /** Synthetischer Verlauf je Größe: Tagesgang mit etwas Rauschen */
 function demoHistory(id: string, range: string): [number, number][] {
     const span = range === '6h' ? 6 : range === '7d' ? 168 : 24;
@@ -672,6 +663,25 @@ dwdNow('instruction', 'ACHTUNG! Hinweis auf mögliche Gefahren: Es können zum B
 
 // eufy-Kameras (eusec): HomeBase mit drei Außenkameras, eine Innenkamera (im Privatmodus)
 Object.assign(objects, eusecTree().objects);
+
+// Instanzen aus den Fixtures: als laufende Dienste kennzeichnen
+for (const id of [
+    'shuttercontrol.0',
+    'sql.0',
+    'kecontact.0',
+    'pvforecast.0',
+    'qhome-ess-hyb-g2.0',
+    'alexa2.0',
+    'dwd.0',
+    'eusec.0',
+    'openweathermap.0',
+]) {
+    const sid = `system.adapter.${id}`;
+    if (objects[sid]?.type === 'instance') {
+        objects[sid].common = { ...objects[sid].common, enabled: true, mode: 'daemon' } as ioBroker.InstanceCommon;
+        state(`${sid}.alive`, 'indicator', 'boolean', false, true);
+    }
+}
 const eusec = (id: string, val: SvStateValue['val'], ago = 0): void => {
     states[`eusec.0.${id}`] = { val, ack: true, ts: Date.now() - ago };
 };
@@ -711,8 +721,8 @@ eusec('T8410P0000000021.station.guard_mode', 63);
 
 /** Demo-Ereignisbild: Farbverlauf mit Kameraname (statt echter Aufnahmen) */
 function demoPicture(path: string): { data: Buffer; mimeType: string } | null {
-    // Aktuelles Bild ".../last_event/<Kamera>.jpg" oder Ereignisbild ".../events/<Kamera>/<ts>.jpg"
-    const serial = /\/events\/([^/]+)\/\d+\.jpg$/.exec(path)?.[1] ?? /\/([^/]+)\.jpg$/.exec(path)?.[1];
+    // Standbild ".../snapshots/<Kamera>.jpg"
+    const serial = /\/([^/]+)\.jpg$/.exec(path)?.[1];
     const id = Object.keys(objects).find(k => objects[k].type === 'device' && k.endsWith(`.cameras.${serial}`));
     if (!id) {
         return null;
@@ -725,27 +735,16 @@ function demoPicture(path: string): { data: Buffer; mimeType: string } | null {
 
 const result = discover(objects, { language: 'de', ignoreAdapters: [] });
 
-/** Beispiel-Ereignisse (im Adapter: Ereignisprotokoll aus den Erkennungen) */
-const demoEvents: SvCameraEvent[] = [
-    ['T8142N0000000011', ['person', 'motion'], 25],
-    ['T8142N0000000012', ['motion'], 180],
-    ['T8142N0000000011', ['person'], 340],
-    ['T8142T0000000013', ['motion'], 1560],
-    ['T8142N0000000012', ['pet', 'motion'], 1620],
-].map(([serial, kinds, minutes]) => {
-    const cameraId = result.model.cameras!.find(c => c.id.endsWith(`.${String(serial)}`))!.id;
-    const ts = Date.now() - Number(minutes) * 60_000;
-    return {
-        id: `${cameraId}@${ts}`,
-        cameraId,
-        ts,
-        kinds: kinds as string[],
-        picture: `/files/smartvis.0/events/${String(serial)}/${ts}.jpg`,
-    };
-});
 // Anpassungen aus dem Bearbeiten-Modus (in der Demo nur im Speicher)
 // Anpassungen je Endgerät, nur im Speicher (wie overrides.json im Adapter)
 let store = emptyStore();
+// Standbilder aus dem Livestream (im Adapter: CameraSnapshots); die Einfahrt hat noch keins
+const snapshotAt = Date.now() - 95 * 60_000;
+for (const camera of result.model.cameras || []) {
+    if (!/Einfahrt/.test(camera.name)) {
+        camera.snapshot = { url: `/files/smartvis.0/snapshots/${camera.id.split('.').pop()}.jpg`, ts: snapshotAt };
+    }
+}
 const modelFor = (clientId?: string): SvModel => ({
     ...applyOverrides(result.model, overridesFor(store, clientId), true),
     client: clientInfo(store, clientId),
@@ -778,7 +777,6 @@ const server = new SmartVisServer(
         },
         diagnose: () => buildDiagnosis(result, 'de'),
         file: path => Promise.resolve(demoPicture(path)),
-        cameraEvents: cameraId => demoEvents.filter(e => !cameraId || e.cameraId === cameraId),
         edit: (clientId, edit) => {
             store = withOverrides(store, clientId, applyEdit(overridesFor(store, clientId), edit));
             server.publishModels(false, clientId);

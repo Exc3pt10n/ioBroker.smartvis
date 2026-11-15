@@ -5,9 +5,11 @@ type States = Record<string, SvStateValue | null>;
 const on = (ref: SvStateRef | undefined, states: States): boolean => !!ref && states[ref.id]?.val === true;
 
 export interface CameraInfo {
-    /** Bild-URL (mit Zeitstempel gegen Zwischenspeichern) oder undefined */
+    /** Standbild aus dem letzten Livestream (URL mit Zeitstempel gegen Zwischenspeichern) oder undefined */
     image?: string;
-    /** Zeitpunkt des letzten Ereignisbilds */
+    /** Zeitpunkt des Standbilds */
+    snapshotTs?: number;
+    /** Zeitpunkt des letzten Ereignisses (neues Ereignisbild von eufy) */
     imageTs?: number;
     /** Kamera ausgeschaltet (Privatmodus) */
     disabled: boolean;
@@ -41,7 +43,9 @@ export function cameraInfo(camera: SvCamera, states: States): CameraInfo {
     const battery = camera.battery ? Number(states[camera.battery.id]?.val) : NaN;
     const live = camera.liveUrl ? states[camera.liveUrl.id]?.val : undefined;
     return {
-        image: path ? `${path}?v=${pic?.ts ?? 0}` : undefined,
+        // Die Ereignisbilder von eufy kommen seit 2026 falsch entschlüsselt (Streifen) – nur deren Zeitpunkt zählt
+        image: camera.snapshot ? `${camera.snapshot.url}?v=${camera.snapshot.ts}` : undefined,
+        snapshotTs: camera.snapshot?.ts,
         imageTs: path ? pic?.ts : undefined,
         disabled,
         online,

@@ -49,12 +49,17 @@ const TYPE_NAMES: Record<string, string> = {
     light: 'Licht',
     dimmer: 'Licht',
     socket: 'Schalter',
+    fan: 'Lüfter',
     thermostat: 'Thermostat',
     window: 'Fenster',
     windowTilt: 'Fenster',
     door: 'Tür',
     percentage: 'Ausgang',
 };
+
+/** Funktion "Lüftung" (enum.functions.ventilation u. ä.) bzw. Lüfter im Gerätenamen */
+const VENTILATION = /ventilat|l(ü|ue)ft|fan\b/i;
+const FAN_NAME = /l(ü|ue)fter|ventilator|\bfan\b/i;
 
 /** Typen, die neben einem "echten" Gerät im selben Kanal nur Hilfswerte sind */
 const SECONDARY_TYPES = new Set<string>([
@@ -184,6 +189,20 @@ export function discover(objects: ObjectMap, options: DiscoveryOptions): Discove
         }
     }
 
+    // Funktion "Lüftung" (enum.functions.ventilation u. ä.): geschaltete Kanäle darin sind Lüfter, keine Steckdosen
+    const ventilation = new Set<string>();
+    for (const [id, obj] of Object.entries(filtered)) {
+        if (
+            id.startsWith('enum.functions.') &&
+            obj.type === 'enum' &&
+            VENTILATION.test(`${id} ${getName(obj, lang)}`)
+        ) {
+            for (const member of (obj.common as ioBroker.EnumCommon).members || []) {
+                ventilation.add(member);
+            }
+        }
+    }
+
     // 2. Räume aus Adaptern
     const hue = hueRoomHints(filtered, lang, [...new Set([...rooms.names(), ...DEFAULT_ROOM_NAMES])]);
 
@@ -267,6 +286,7 @@ export function discover(objects: ObjectMap, options: DiscoveryOptions): Discove
         }
         const device = toDevice(id, id, control, filtered, lang, memberToRoom, hue, rooms);
         if (device) {
+            markFan(device, id, ventilation);
             devices.push(device);
             for (const s of device.states) {
                 stateIds.add(s.id);
@@ -328,6 +348,7 @@ export function discover(objects: ObjectMap, options: DiscoveryOptions): Discove
             if (!device) {
                 continue;
             }
+            markFan(device, id, ventilation);
             devices.push(device);
             for (const s of device.states) {
                 stateIds.add(s.id);
@@ -468,10 +489,29 @@ const ROOM_NAMED_TYPES: Record<string, string> = {
     windowTilt: 'Fenster',
     door: 'Tür',
     socket: 'Steckdose',
+    fan: 'Lüfter',
     temperature: 'Temperatur',
     humidity: 'Klima',
     motion: 'Bewegungsmelder',
 };
+
+/**
+ * Schalter, die einen Lüfter steuern: Mitglied der Funktion "Lüftung" oder "Lüfter"/"Ventilator" im Namen.
+ * Der type-detector kennt keinen Lüfter-Typ und meldet sie als Steckdose.
+ */
+function markFan(device: SvDevice, channelId: string, ventilation: Set<string>): void {
+    if (device.type !== 'socket') {
+        return;
+    }
+    const ids = [channelId, parentId(channelId), ...device.states.map(s => s.id)];
+    if (!ids.some(i => ventilation.has(i)) && !FAN_NAME.test(device.name)) {
+        return;
+    }
+    device.type = 'fan';
+    if (device.name === ROOM_NAMED_TYPES.socket) {
+        device.name = ROOM_NAMED_TYPES.fan;
+    }
+}
 
 function toDevice(
     id: string,

@@ -1,4 +1,5 @@
 import type { SvBattery, SvDevice, SvStateRef } from '../shared/protocol';
+import { BATTERY_MODELS } from './batteryModels';
 import { getName } from './names';
 import type { ObjectMap } from './profiles/types';
 
@@ -38,6 +39,30 @@ function isHueMotionPart(obj: ioBroker.Object | undefined): boolean {
         typeof native.modelid === 'string' &&
         native.modelid.startsWith('SML')
     );
+}
+
+/** Felder, in denen Adapter das Gerätemodell ablegen (Homematic: TYPE, Hue: modelid/modelId, Zigbee: model) */
+const MODEL_FIELDS = ['TYPE', 'model', 'modelId', 'modelid', 'modelID', 'productId'];
+
+/**
+ * Batterieart aus dem Gerätemodell (Tabelle aus der Battery-Notes-Bibliothek), z. B. HmIP-SWDO → "AAA".
+ * eufy-Kameras haben einen fest eingebauten Akku.
+ */
+export function batteryType(obj: ioBroker.Object | undefined, adapter: string): string | undefined {
+    if (adapter === 'eusec') {
+        return 'fester Akku';
+    }
+    const native = (obj?.native || {}) as Record<string, unknown>;
+    const common = (obj?.common || {}) as Record<string, unknown>;
+    // ioBroker.zigbee: Modell als common.type (z. B. "lumi.sensor_magnet.aq2")
+    const candidates = [...MODEL_FIELDS.map(f => native[f]), common.type];
+    for (const c of candidates) {
+        const type = typeof c === 'string' && c ? BATTERY_MODELS[c.trim().toUpperCase()] : undefined;
+        if (type) {
+            return type;
+        }
+    }
+    return undefined;
 }
 
 /** Gerät, zu dem ein Batterie-Datenpunkt gehört: nächstes "device", sonst der übergeordnete Kanal */
@@ -129,11 +154,13 @@ export function batteryDevices(
         const roomId = device?.roomId ?? enumRoom ?? null;
         // Ohne Kachel und Aufzählung: Raum aus dem Namen ("Rollladenschalter Küche" → Küche, "Rollladenschalter")
         const guessed = roomId ? undefined : roomFromName(name);
+        const type = batteryType(objects[entry.id], entry.adapter);
         result.push({
             ...entry,
             name: guessed?.name || name,
             roomId: roomId ?? guessed?.roomId ?? null,
             ...(device && { deviceId: device.id }),
+            ...(type && { batteryType: type }),
         });
     }
     return result.sort((a, b) => a.name.localeCompare(b.name, lang));

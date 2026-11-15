@@ -15,6 +15,7 @@ export const TYPE_LABELS: Record<string, string> = {
     rgbwSingle: 'Farblicht',
     cie: 'Farblicht',
     socket: 'Steckdose',
+    fan: 'Lüfter',
     blind: 'Rollladen',
     thermostat: 'Thermostat',
     airCondition: 'Klima',
