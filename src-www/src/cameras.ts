@@ -44,6 +44,7 @@ export function cameraInfo(camera: SvCamera, states: States): CameraInfo {
         on(camera.person, states) && 'Person',
         on(camera.pet, states) && 'Haustier',
         on(camera.crying, states) && 'Weinen',
+        on(camera.vehicle, states) && 'Fahrzeug',
         on(camera.sound, states) && 'Geräusch',
         !on(camera.person, states) && !on(camera.pet, states) && on(camera.motion, states) && 'Bewegung',
     ].filter((e): e is string => !!e);
