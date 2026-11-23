@@ -24,7 +24,7 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
     // Hue-Zone: eigener Zonen-Schalter plus ihre Lampen aus den anderen Räumen
     const devices = isNone ? visible.filter(d => !d.roomId) : room ? roomDevices(room, visible) : [];
     const groups = groupByType(devices);
-    const status = roomStatus(devices, states);
+    const status = roomStatus(devices, states, new Set(visible.filter(d => !d.hidden).map(d => d.id)));
     // Lampen für "Alle aus/an" – Gruppen ("Alle Lichter") nicht zusätzlich, wenn ihre Lampen sichtbar sind
     const shownIds = new Set(devices.filter(d => !d.hidden).map(d => d.id));
     const lamps = devices.filter(d => !d.hidden && isLight(d) && !isCoveredGroup(d, shownIds));

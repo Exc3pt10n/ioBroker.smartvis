@@ -166,6 +166,11 @@ scripts/demo.ts Demo-Server ohne ioBroker
     ### **WORK IN PROGRESS**
 -->
 
+### 0.15.1 (2026-11-23)
+
+- (Exc3pt10n) Lichter richtig gezählt: Eine Hue-Raumgruppe mit Smart Scene (hue-v2, z. B. „Natürliches Licht“) wurde in „Alle Lichter“ und einen zusätzlichen Schalter „Licht“ aufgeteilt; „Alle Lichter“ verlor dabei die Zuordnung zu ihren Lampen und zählte als weitere Lampe. Szenen-Knöpfe und -Schalter einer Gruppe werden nicht mehr als eigenes Gerät erkannt
+- (Exc3pt10n) Raumliste: „Alle Lichter“ zählt auch dann nicht als zusätzliche Lampe, wenn Lampen der Gruppe in einem anderen Raum stehen (z. B. nach dem Verschieben in der App)
+
 ### 0.15.0 (2026-11-15)
 
 - (Exc3pt10n) eufy-next: Livestream mit Ton in der Kamera-Ansicht (ab eufy-next 0.2.0, go2rtc-Seite aus `livestream.url`, Start/Stopp über `livestream.start/stop`); der Stream wird beim Schließen beendet, nach der Höchstdauer des Adapters gibt es „Weiter ansehen“. Eigene Standbilder aus dem Livestream legt SmartVis nur noch für eusec an – eufy-next speichert sie selbst als Ereignisbild

@@ -20,6 +20,8 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
         return <p className="empty">Lade Räume …</p>;
     }
     const devices = visibleDevices(model, editing);
+    // Sichtbare Geräte aller Räume: Lichtgruppen zählen nicht doppelt, wenn ihre Lampen woanders stehen
+    const shownIds = new Set(devices.filter(d => !d.hidden).map(d => d.id));
     const withoutRoom = devices.filter(d => !d.roomId);
     // Im Bearbeiten-Modus auch leere (z. B. neu angelegte) und ausgeblendete Räume zeigen
     const rooms = visibleRooms(model, editing)
@@ -56,7 +58,7 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
                         <RoomCard
                             key={room.id}
                             room={room}
-                            status={roomStatus(list, states)}
+                            status={roomStatus(list, states, shownIds)}
                             scene={sceneOf(list)}
                             weakBatteries={weakIn(room.id)}
                             count={list.length}
@@ -122,7 +124,7 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
                             <RoomCard
                                 key={room.id}
                                 room={room}
-                                status={roomStatus(list, states)}
+                                status={roomStatus(list, states, shownIds)}
                                 scene={sceneOf(list)}
                                 count={list.length}
                                 editing={editing}

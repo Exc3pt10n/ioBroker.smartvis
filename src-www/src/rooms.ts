@@ -99,10 +99,15 @@ function numberOf(states: States, id: string | undefined): number | undefined {
 /** Bevorzugte Quelle für die Raumtemperatur: Thermostat, dann Sensor, dann Klimagerät */
 const TEMP_PRIORITY = ['thermostat', 'temperature', 'humidity', 'airCondition'];
 
-/** Was ist in diesem Raum los? (nur sichtbare Geräte) */
-export function roomStatus(devices: SvDevice[], states: States): RoomStatus {
+/**
+ * Was ist in diesem Raum los? (nur sichtbare Geräte)
+ *
+ * @param shownIds alle sichtbaren Geräte der App: Eine Lichtgruppe ("Alle Lichter") zählt nicht als eigene Lampe,
+ *   sobald eine ihrer Lampen irgendwo sichtbar ist – auch wenn sie in einem anderen Raum steht
+ */
+export function roomStatus(devices: SvDevice[], states: States, shownIds?: Set<string>): RoomStatus {
     const visible = devices.filter(d => !d.hidden);
-    const visibleIds = new Set(visible.map(d => d.id));
+    const visibleIds = new Set([...visible.map(d => d.id), ...(shownIds ?? [])]);
     const status: RoomStatus = { lights: [], open: 0, playing: 0, problems: 0 };
 
     const sorted = [...visible].sort(
