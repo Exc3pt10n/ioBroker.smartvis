@@ -306,6 +306,8 @@ export interface SvCamera {
     pictureRefresh?: SvStateRef;
     /** Klingel gedrückt (Türklingel-Kameras) */
     ring?: SvStateRef;
+    /** Fahrzeug erkannt */
+    vehicle?: SvStateRef;
     motion?: SvStateRef;
     person?: SvStateRef;
     pet?: SvStateRef;

@@ -87,6 +87,32 @@ function hueV2(withLights: boolean): [string, Obj][] {
             ...lights(['light-spot']),
         }),
         ...controls('hue-v2.0.rooms.Küche', false),
+        // Raum mit zwei reinen Dimm-Lampen und einer Smart Scene: kein eigener Schalter neben "Alle Lichter"
+        channel('hue-v2.0.lights.Terrasse_links', 'Terrasse links', {
+            id: 'light-tl',
+            type: 'light',
+            deviceId: 'dev-tl',
+        }),
+        ...controls('hue-v2.0.lights.Terrasse_links', false),
+        channel('hue-v2.0.lights.Terrasse_rechts', 'Terrasse rechts', {
+            id: 'light-tr',
+            type: 'light',
+            deviceId: 'dev-tr',
+        }),
+        ...controls('hue-v2.0.lights.Terrasse_rechts', false),
+        channel('hue-v2.0.rooms.Terrasse', 'Terrasse', {
+            id: 'room-terrace',
+            type: 'room',
+            groupedLightId: 'gl-terrace',
+            ...lights(['light-tl', 'light-tr']),
+        }),
+        ...controls('hue-v2.0.rooms.Terrasse', false),
+        folder('hue-v2.0.rooms.Terrasse.smartScenes', 'Smart scenes'),
+        state(
+            'hue-v2.0.rooms.Terrasse.smartScenes.Natürliches_Licht',
+            { name: 'Natürliches Licht', type: 'boolean', role: 'switch', write: true },
+            { id: 'smart-natural-terrace', type: 'smart_scene' },
+        ),
         folder('hue-v2.0.zones', 'Zones'),
         // Zone innerhalb eines Raums
         channel('hue-v2.0.zones.Esstisch', 'Esstisch', {
@@ -184,6 +210,18 @@ describe('hue-v2 and disabled instances', () => {
         expect(byId['hue-v2.0.zones.Erdgeschoss']?.name).to.equal('Alle Lichter');
         expect(model.rooms.find(r => r.id === byId['hue-v2.0.lights.Spot'].roomId)?.name).to.equal('Küche');
         expect(model.rooms.filter(r => r.kind === 'zone')).to.have.length(1);
+    });
+
+    it('does not split a group with a smart scene into "Alle Lichter" and a switch', () => {
+        const { model } = run(true);
+        const byId = Object.fromEntries(model.devices.map(d => [d.id, d]));
+        expect(model.devices.filter(d => d.id.includes('#')).map(d => d.id)).to.deep.equal([]);
+        expect(model.devices.some(d => d.states.some(st => st.id.includes('.smartScenes.')))).to.equal(false);
+        expect(byId['hue-v2.0.rooms.Terrasse']?.name).to.equal('Alle Lichter');
+        expect(byId['hue-v2.0.rooms.Terrasse']?.groupOf).to.have.members([
+            'hue-v2.0.lights.Terrasse_links',
+            'hue-v2.0.lights.Terrasse_rechts',
+        ]);
     });
 
     it('reports the active scene of a group', () => {

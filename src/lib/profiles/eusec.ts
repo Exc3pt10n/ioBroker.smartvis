@@ -300,6 +300,7 @@ export function cameraRefs(c: SvCamera): { read: SvStateRef[]; write: SvStateRef
         c.sound,
         c.crying,
         c.ring,
+        c.vehicle,
         c.status,
         c.battery,
         c.liveUrl,

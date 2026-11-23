@@ -57,6 +57,12 @@ const TYPE_NAMES: Record<string, string> = {
     percentage: 'Ausgang',
 };
 
+/** Szene einer Lichtgruppe (hue-v2 kennzeichnet sie im native-Typ) */
+function isSceneState(obj: ioBroker.Object | undefined): boolean {
+    const type = (obj?.native as { type?: unknown } | undefined)?.type;
+    return type === 'scene' || type === 'smart_scene';
+}
+
 /** Funktion "Lüftung" (enum.functions.ventilation u. ä.) bzw. Lüfter im Gerätenamen */
 const VENTILATION = /ventilat|l(ü|ue)ft|fan\b/i;
 const FAN_NAME = /l(ü|ue)fter|ventilator|\bfan\b/i;
@@ -324,7 +330,13 @@ export function discover(objects: ObjectMap, options: DiscoveryOptions): Discove
             continue;
         }
         const allowed = ADAPTER_ALLOWED_TYPES[id.split('.')[0]];
-        controls = controls.filter(c => !allowed || allowed.includes(c.type));
+        // Szenen-Knöpfe und -Schalter einer Lichtgruppe (hue-v2: scenes.*, smartScenes.*) sind kein eigenes Gerät –
+        // sonst teilt sich die Gruppe in "Alle Lichter" und einen Schalter auf und zählt doppelt
+        controls = controls.filter(
+            c =>
+                (!allowed || allowed.includes(c.type)) &&
+                !c.states.every(st => !st.id || isSceneState(filtered[st.id])),
+        );
         if (!controls.length) {
             unmatched.push({ id, reason: 'filtered' });
             continue;

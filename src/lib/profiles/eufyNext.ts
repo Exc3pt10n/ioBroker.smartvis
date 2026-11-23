@@ -21,6 +21,14 @@ const VALUE_LABELS: Record<string, string> = {
     Off: 'Aus',
     Infrared: 'Infrarot (schwarz-weiß)',
     FullColor: 'Farbe',
+    'Full Color': 'Farbe',
+    'Timestamp + Logo': 'Zeitstempel und Logo',
+    'Text Only': 'Nur Text (schnell)',
+    'Included Thumbnail': 'Mit Vorschaubild',
+    'Text First, Then Thumbnail': 'Erst Text, dann Bild',
+    'All Sound': 'Alle Geräusche',
+    Events: 'Bei Ereignissen',
+    Continuous: 'Durchgehend',
     'Optimal Battery Life': 'Lange Akkulaufzeit',
     'Optimal Surveillance': 'Beste Überwachung',
     'Customize Recording': 'Benutzerdefiniert',
@@ -112,6 +120,14 @@ function cameraSettings(id: string, objects: ObjectMap): SvCameraSetting[] {
         if (!r?.write || !['boolean', 'number', 'string'].includes(String(r.type))) {
             continue;
         }
+        // Nur Einstellungen, deren aktuellen Wert die Kamera meldet (nicht die reinen Befehle "set…")
+        if ((objects[r.id]?.common as ioBroker.StateCommon | undefined)?.read === false) {
+            continue;
+        }
+        // Zahl ohne Werteliste und ohne Bereich (z. B. Energiemodus als Index) wäre ein nichtssagender Regler
+        if (r.type === 'number' && !r.states && (r.min === undefined || r.max === undefined)) {
+            continue;
+        }
         // Text nur mit Werteliste (Auswahl), sonst wäre es ein freies Eingabefeld
         if (r.type === 'string' && !r.states) {
             continue;
@@ -194,6 +210,7 @@ export const eufyNextProfile: AdapterProfile = {
                 sound: event(objects, id, ['soundDetected'], 'Geräusch'),
                 crying: event(objects, id, ['cryingDetected'], 'Weinen'),
                 ring: event(objects, id, ['doorbellPress'], 'Klingel'),
+                vehicle: event(objects, id, ['vehicleDetected'], 'Fahrzeug'),
                 enabled: s('camera.enabled', 'Kamera an'),
                 status: s('info.available', 'Erreichbar'),
                 battery: s('battery.level', 'Akku'),

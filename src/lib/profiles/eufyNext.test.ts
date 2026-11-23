@@ -60,7 +60,10 @@ describe('profile: eufy-next (eufy v6 cloud)', () => {
             1: 'Infrarot (schwarz-weiß)',
             2: 'Farbe',
         });
-        expect(setting('battery.workingMode')?.state.states?.['Optimal Battery Life']).to.equal('Lange Akkulaufzeit');
+        // Energiemodus nur als Index ohne Werteliste, Befehle ohne gemeldeten Wert: nicht anbieten
+        expect(setting('battery.workingMode')).to.equal(undefined);
+        expect(setting('camera.setPrivacy')).to.equal(undefined);
+        expect(garden.vehicle?.id).to.equal(`${garden.id}.events.vehicleDetected.triggered`);
         expect(setting('motion.detectionEnabled')?.group).to.equal('detection');
         expect(setting('light.brightness')?.state.write).to.equal(true);
         expect(r.writableIds.has(setting('camera.statusLed')!.state.id)).to.equal(true);
@@ -70,6 +73,8 @@ describe('profile: eufy-next (eufy v6 cloud)', () => {
         const batteries = r.model.batteries ?? [];
         const garden = batteries.find(b => b.name === 'Garten');
         expect(garden?.batteryType).to.equal('fester Akku');
+        // Ladestand, nicht der Akkuzustand (beide mit Rolle value.battery)
+        expect(garden?.level?.id).to.match(/\.battery\.level$/);
         expect(batteries.map(b => b.name)).to.not.include('Wohnzimmer');
     });
 });

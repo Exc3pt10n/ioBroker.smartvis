@@ -54,6 +54,11 @@ export function batteryType(obj: ioBroker.Object | undefined, adapter: string): 
     }
     const native = (obj?.native || {}) as Record<string, unknown>;
     const common = (obj?.common || {}) as Record<string, unknown>;
+    // eufy-next: Kameras (Gerätefamilie "camera") haben einen fest eingebauten Akku – vor der Tabelle,
+    // damit alle Kameras gleich heißen (die Bibliothek nennt manche Varianten nur "Akku")
+    if (adapter === 'eufy-next' && native.codec === 'camera') {
+        return 'fester Akku';
+    }
     // ioBroker.zigbee: Modell als common.type (z. B. "lumi.sensor_magnet.aq2")
     const candidates = [...MODEL_FIELDS.map(f => native[f]), common.type];
     for (const c of candidates) {
@@ -61,10 +66,6 @@ export function batteryType(obj: ioBroker.Object | undefined, adapter: string): 
         if (type) {
             return type;
         }
-    }
-    // eufy-next: Kameras (Gerätefamilie "camera") haben einen fest eingebauten Akku
-    if (adapter === 'eufy-next' && native.codec === 'camera') {
-        return 'fester Akku';
     }
     return undefined;
 }
@@ -114,7 +115,8 @@ export function batteryDevices(
         const common = obj.common as ioBroker.StateCommon;
         const role = String(common.role || '');
         const isLow = LOW_ROLE.test(role) && common.type === 'boolean';
-        const isLevel = LEVEL_ROLE.test(role) && common.type === 'number';
+        // Akkuzustand (eufy-next battery.health, ebenfalls value.battery) ist kein Ladestand
+        const isLevel = LEVEL_ROLE.test(role) && common.type === 'number' && !/[._]health$/i.test(id);
         if (!isLow && !isLevel) {
             continue;
         }

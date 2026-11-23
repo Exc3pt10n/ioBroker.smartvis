@@ -58,9 +58,11 @@ export function eufyNextTree(): Tree {
                 type: 'number',
                 role: 'level.mode',
                 write: true,
-                states: { 0: 'Off', 1: 'Infrared', 2: 'FullColor' },
+                states: { 0: 'Off', 1: 'Infrared', 2: 'Full Color' },
             })
             .state(`${d}.camera.wifiRssi`, { type: 'number', role: 'value', unit: 'dBm' })
+            // Befehl ohne gemeldeten Wert (nur schreibbar) – nicht als Einstellung anbieten
+            .state(`${d}.camera.setPrivacy`, { type: 'boolean', role: 'switch', read: false, write: true })
             .channel(`${d}.motion`, 'Motion')
             .state(`${d}.motion.detectionEnabled`, { type: 'boolean', role: 'switch', write: true })
             .channel(`${d}.audio`, 'Audio')
@@ -80,21 +82,16 @@ export function eufyNextTree(): Tree {
             .state(`${d}.livestream.active`, { type: 'boolean', role: 'indicator' });
         event(d, 'motion', 'sensor.motion');
         event(d, 'personDetected', 'indicator');
+        event(d, 'vehicleDetected', 'indicator');
         if (battery) {
             t.channel(`${d}.battery`, 'Battery')
+                // Akkuzustand mit derselben Rolle wie der Ladestand (wie im echten Baum)
+                .state(`${d}.battery.health`, { type: 'number', role: 'value.battery' })
                 .state(`${d}.battery.level`, { type: 'number', role: 'value.battery', unit: '%', min: 0, max: 100 })
                 .state(`${d}.battery.charging`, { type: 'boolean', role: 'indicator' })
                 .state(`${d}.battery.temperature`, { type: 'number', role: 'value.temperature', unit: '°C' })
-                .state(`${d}.battery.workingMode`, {
-                    type: 'string',
-                    role: 'level.mode',
-                    write: true,
-                    states: {
-                        'Optimal Battery Life': 'Optimal Battery Life',
-                        'Optimal Surveillance': 'Optimal Surveillance',
-                        'Customize Recording': 'Customize Recording',
-                    },
-                })
+                // Energiemodus als Index ohne Werteliste (wie im echten Baum)
+                .state(`${d}.battery.workingMode`, { type: 'number', role: 'level', write: true })
                 .channel(`${d}.light`, 'Light')
                 .state(`${d}.light.isOn`, { type: 'boolean', role: 'switch', write: true })
                 .state(`${d}.light.brightness`, {
