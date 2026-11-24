@@ -4,17 +4,18 @@
     "items": {
         "_server": {
             "type": "header",
-            "text": "Webserver",
+            "text": "Web server",
             "size": 3
         },
         "bind": {
             "type": "ip",
-            "label": "IP-Adresse",
+            "label": "IP address",
             "listenOnAllPorts": true,
             "xs": 12,
             "sm": 12,
             "md": 6,
-            "lg": 4
+            "lg": 4,
+            "xl": 4
         },
         "port": {
             "type": "port",
@@ -24,17 +25,18 @@
             "xs": 12,
             "sm": 12,
             "md": 6,
-            "lg": 4
+            "lg": 4,
+            "xl": 4
         },
         "_discovery": {
             "type": "header",
-            "text": "Automatische Erkennung",
+            "text": "Automatic discovery",
             "size": 3,
             "newLine": true
         },
         "language": {
             "type": "select",
-            "label": "Sprache für Gerätenamen",
+            "label": "Language for device names",
             "options": [
                 {
                     "label": "Deutsch",
@@ -48,42 +50,46 @@
             "xs": 12,
             "sm": 12,
             "md": 6,
-            "lg": 4
+            "lg": 4,
+            "xl": 4
         },
         "rediscoverDelay": {
             "type": "number",
-            "label": "Neu-Erkennung nach Objektänderung (Sekunden)",
+            "label": "Rediscovery after object change (seconds)",
             "min": 1,
             "max": 3600,
             "xs": 12,
             "sm": 12,
             "md": 6,
-            "lg": 4
+            "lg": 4,
+            "xl": 4
         },
         "ignoreAdapters": {
             "type": "text",
-            "label": "Ignorierte Adapter (kommagetrennt)",
-            "help": "Diese Adapter werden bei der Erkennung nicht berücksichtigt",
+            "label": "Ignored adapters (comma-separated)",
+            "help": "These adapters are skipped during discovery",
             "newLine": true,
             "xs": 12,
             "sm": 12,
             "md": 12,
-            "lg": 8
+            "lg": 8,
+            "xl": 8
         },
         "_ui": {
             "type": "header",
-            "text": "Oberfläche",
+            "text": "User interface",
             "size": 3,
             "newLine": true
         },
         "allowEdit": {
             "type": "checkbox",
-            "label": "Bearbeiten-Modus erlauben",
-            "help": "Umbenennen, Ausblenden, Verschieben und Favoriten in der App. Solange es keinen Login gibt, kann jeder im Netz Anpassungen speichern.",
+            "label": "Allow edit mode",
+            "help": "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.",
             "xs": 12,
             "sm": 12,
             "md": 12,
-            "lg": 12
+            "lg": 12,
+            "xl": 12
         }
     }
 }

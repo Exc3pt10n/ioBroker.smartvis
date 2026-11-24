@@ -1,9 +1,10 @@
 {
   "name": "iobroker.smartvis",
-  "version": "0.15.1",
+  "version": "0.16.0",
   "description": "Selbstkonfigurierende, mobile-first Visualisierung für ioBroker",
   "author": {
-    "name": "Exc3pt10n"
+    "name": "Exc3pt10n",
+    "email": "kontakt@jansesoft.de"
   },
   "homepage": "https://github.com/Exc3pt10n/ioBroker.smartvis",
   "license": "MIT",
@@ -32,7 +33,6 @@
   ],
   "scripts": {
     "build": "npm run build:backend && npm run build:www",
-    "prepare": "npm run build",
     "build:backend": "tsc -p tsconfig.build.json",
     "build:www": "vite build",
     "dev:www": "vite",
@@ -46,23 +46,19 @@
     "test": "npm run test:unit && npm run test:package"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^3.2.3",
+    "@iobroker/adapter-core": "^3.4.3",
     "@iobroker/type-detector": "^6.2.0",
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@iobroker/eslint-config": "^2.0.2",
-    "@iobroker/testing": "^5.0.4",
-    "@types/chai": "^5.2.2",
+    "@iobroker/eslint-config": "^2.3.4",
+    "@iobroker/testing": "^6.3.3",
     "@types/iobroker": "npm:@iobroker/types@^7.0.7",
-    "@types/mocha": "^10.0.10",
     "@types/node": "^22.15.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
     "@types/ws": "^8.18.1",
     "@vitejs/plugin-react": "^4.4.1",
-    "chai": "^5.2.0",
-    "mocha": "^11.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "tsx": "^4.19.3",

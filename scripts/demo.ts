@@ -20,6 +20,7 @@ import {
     withOverrides,
 } from '../src/lib/clientOverrides';
 import { SmartVisServer } from '../src/lib/server';
+import { nodeTimers } from '../src/lib/timers';
 import type { SvModel, SvStateValue } from '../src/shared/protocol';
 
 type Obj = ioBroker.Object;
@@ -802,6 +803,7 @@ const server = new SmartVisServer(
         },
         log: console as unknown as ioBroker.Logger,
     },
+    nodeTimers,
 );
 
 /** "Aktuelles Bild" wie eufy-next: nach kurzer Zeit neues Ereignisbild (gleiche Adresse, neuer Zeitstempel) */

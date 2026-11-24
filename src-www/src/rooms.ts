@@ -102,6 +102,8 @@ const TEMP_PRIORITY = ['thermostat', 'temperature', 'humidity', 'airCondition'];
 /**
  * Was ist in diesem Raum los? (nur sichtbare Geräte)
  *
+ * @param devices Geräte des Raums
+ * @param states aktuelle Werte
  * @param shownIds alle sichtbaren Geräte der App: Eine Lichtgruppe ("Alle Lichter") zählt nicht als eigene Lampe,
  *   sobald eine ihrer Lampen irgendwo sichtbar ist – auch wenn sie in einem anderen Raum steht
  */

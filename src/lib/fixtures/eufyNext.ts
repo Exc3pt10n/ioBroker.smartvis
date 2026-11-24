@@ -1,7 +1,7 @@
 import { Tree } from './build';
 
 /**
- * ioBroker.eufy-next (eufy v6 cloud über @mega-yfue/eufy-sdk), Struktur wie vom Adapter aus dem Geräte-Manifest
+ * ioBroker.eufy-next (eufy v6 cloud über `@mega-yfue/eufy-sdk`), Struktur wie vom Adapter aus dem Geräte-Manifest
  * erzeugt (Seriennummern erfunden): je Gerät `eufy-next.0.<SN>` mit einem Kanal je Fähigkeit (`camera`, `battery`,
  * `motion`, `light`, `ptz`, `arming` …), `events.<name>.triggered` und bei Kameras `snapshot.url`.
  * HomeBase mit zwei Akku-Kameras und eine schwenkbare Innenkamera, die selbst Station ist.

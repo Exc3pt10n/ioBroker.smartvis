@@ -15,6 +15,7 @@ import {
     type ioBrokerValue,
 } from '../shared/protocol';
 import { isClientId } from './clientOverrides';
+import type { Timers } from './timers';
 
 const MIME: Record<string, string> = {
     '.html': 'text/html; charset=utf-8',
@@ -70,7 +71,7 @@ export class SmartVisServer {
     private http?: Server;
     private wss?: WebSocketServer;
     private pending: Record<string, SvStateValue | null> = {};
-    private flushTimer?: NodeJS.Timeout;
+    private flushTimer?: ioBroker.Timeout;
     private readonly root: string;
     /** Angemeldete Verbindungen → Geräte-Kennung (undefined = ohne Kennung, z. B. ältere App) */
     private readonly sessions = new Map<WebSocket, string | undefined>();
@@ -78,6 +79,7 @@ export class SmartVisServer {
     constructor(
         private readonly options: ServerOptions,
         private readonly handlers: ServerHandlers,
+        private readonly timers: Timers,
     ) {
         this.root = resolve(options.wwwDir);
     }
@@ -97,7 +99,7 @@ export class SmartVisServer {
     }
 
     async stop(): Promise<void> {
-        clearTimeout(this.flushTimer);
+        this.timers.clearTimeout(this.flushTimer);
         for (const client of this.wss?.clients || []) {
             client.terminate();
         }
@@ -131,7 +133,7 @@ export class SmartVisServer {
     queueState(id: string, state: SvStateValue | null): void {
         this.pending[id] = state;
         if (!this.flushTimer) {
-            this.flushTimer = setTimeout(() => this.flush(), this.options.batchMs ?? 100);
+            this.flushTimer = this.timers.setTimeout(() => this.flush(), this.options.batchMs ?? 100);
         }
     }
 
@@ -156,7 +158,7 @@ export class SmartVisServer {
         send(ws, { t: 'hello', protocol: PROTOCOL_VERSION, version: this.options.version });
         // Die App meldet sich mit ihrer Geräte-Kennung; ältere Apps/Tools ohne Kennung nach kurzer Wartezeit
         // mit der gemeinsamen Ausgangsbasis
-        const fallback = setTimeout(() => !this.sessions.has(ws) && this.startSession(ws, undefined), 500);
+        const fallback = this.timers.setTimeout(() => !this.sessions.has(ws) && this.startSession(ws, undefined), 500);
 
         ws.on('message', async (raw: Buffer) => {
             let msg: ClientMessage;
@@ -193,7 +195,7 @@ export class SmartVisServer {
                 if (this.sessions.has(ws) || !isClientId(msg.clientId)) {
                     return;
                 }
-                clearTimeout(fallback);
+                this.timers.clearTimeout(fallback);
                 try {
                     await this.handlers.hello?.(msg.clientId, msg.name);
                     this.startSession(ws, msg.clientId);
@@ -223,7 +225,7 @@ export class SmartVisServer {
             }
         });
         ws.on('close', () => {
-            clearTimeout(fallback);
+            this.timers.clearTimeout(fallback);
             this.sessions.delete(ws);
             this.handlers.onClientCountChange?.(this.wss!.clients.size);
         });

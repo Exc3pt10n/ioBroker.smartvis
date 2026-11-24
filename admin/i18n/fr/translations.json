@@ -1,0 +1,13 @@
+{
+    "Web server": "Serveur web",
+    "IP address": "Adresse IP",
+    "Port": "Port",
+    "Automatic discovery": "Détection automatique",
+    "Language for device names": "Langue des noms d'appareils",
+    "Rediscovery after object change (seconds)": "Nouvelle détection après modification d'objets (secondes)",
+    "Ignored adapters (comma-separated)": "Adaptateurs ignorés (séparés par des virgules)",
+    "These adapters are skipped during discovery": "Ces adaptateurs sont ignorés lors de la détection",
+    "User interface": "Interface",
+    "Allow edit mode": "Autoriser le mode édition",
+    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "Renommer, masquer, déplacer et marquer des favoris dans l'application. Tant qu'il n'y a pas de connexion, toute personne du réseau peut enregistrer des personnalisations."
+}
