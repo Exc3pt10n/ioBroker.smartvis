@@ -1,3 +1,5 @@
+import { t } from '../../src/shared/i18n';
+import { applyLanguage } from './language';
 import { useSyncExternalStore } from 'react';
 import type {
     ClientMessage,
@@ -67,13 +69,13 @@ class Connection {
     /** Verlauf eines aufgezeichneten States anfragen (Punkte [ts, wert]) */
     history(id: string, range: SvHistoryRange): Promise<[number, number][]> {
         if (this.ws?.readyState !== WebSocket.OPEN) {
-            return Promise.reject(new Error('Keine Verbindung'));
+            return Promise.reject(new Error(t('No connection')));
         }
         const reqId = this.nextReqId++;
         return new Promise((resolve, reject) => {
             const timer = window.setTimeout(() => {
                 this.pendingHistory.delete(reqId);
-                reject(new Error('Zeitüberschreitung beim Laden des Verlaufs'));
+                reject(new Error(t('Timeout while loading the history')));
             }, 25_000);
             this.pendingHistory.set(reqId, { resolve, reject, timer });
             this.send({ t: 'history', reqId, id, range });
@@ -83,13 +85,13 @@ class Connection {
     /** Diagnose der Erkennung anfordern (erkannte Geräte, Kanäle ohne Kachel) */
     diagnose(): Promise<SvDiagnosis> {
         if (this.ws?.readyState !== WebSocket.OPEN) {
-            return Promise.reject(new Error('Keine Verbindung'));
+            return Promise.reject(new Error(t('No connection')));
         }
         const reqId = this.nextReqId++;
         return new Promise((resolve, reject) => {
             const timer = window.setTimeout(() => {
                 this.pendingDiagnosis.delete(reqId);
-                reject(new Error('Zeitüberschreitung bei der Diagnose'));
+                reject(new Error(t('Timeout during diagnosis')));
             }, 15_000);
             this.pendingDiagnosis.set(reqId, { resolve, reject, timer });
             this.send({ t: 'diagnose', reqId });
@@ -144,6 +146,8 @@ class Connection {
                 this.update({ version: msg.version });
                 break;
             case 'model':
+                // Vor dem Neuzeichnen: alle Texte erscheinen gleich in der Sprache des Adapters
+                applyLanguage(msg.model.language);
                 this.update({ model: msg.model });
                 break;
             case 'states':
@@ -160,7 +164,7 @@ class Connection {
                     if (msg.report) {
                         pending.resolve(msg.report);
                     } else {
-                        pending.reject(new Error(msg.error || 'Diagnose fehlgeschlagen'));
+                        pending.reject(new Error(msg.error || t('Diagnosis failed')));
                     }
                 }
                 break;

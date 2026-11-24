@@ -1,3 +1,5 @@
+// Zuerst: Sprache festlegen (vor allen Modulen mit Texten)
+import './boot';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';

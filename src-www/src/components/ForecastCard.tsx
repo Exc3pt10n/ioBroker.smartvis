@@ -1,3 +1,4 @@
+import { locale, t } from '../../../src/shared/i18n';
 import { useEffect, useMemo, useState } from 'react';
 import type { SvPvForecast, SvStateRef } from '../../../src/shared/protocol';
 import { connection, useConnection } from '../connection';
@@ -5,7 +6,7 @@ import { kwh, num, watts } from '../energy';
 import { ForecastChart, type Point } from './ForecastChart';
 
 function fmtKwh(v: number | undefined): string {
-    return v === undefined ? '–' : `${v.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kWh`;
+    return v === undefined ? '–' : `${v.toLocaleString(locale(), { maximumFractionDigits: 1 })} kWh`;
 }
 
 /** Faktor der Leistungseinheit nach W (pvforecast liefert je nach Einstellung W oder kW) */
@@ -109,23 +110,23 @@ export function ForecastCard({
 
     return (
         <section className="card forecast">
-            <h2 className="subtitle">☀️ PV-Prognose</h2>
+            <h2 className="subtitle">☀️ {t('PV forecast')}</h2>
             <div className="forecast__body">
                 <div className="forecast__summary">
                     <div className="stats">
                         <div className="stat">
                             <span className="stat__value">{fmtKwh(todayKwh)}</span>
                             <span className="stat__label">
-                                Heute erwartet
+                                {t('Expected today')}
                                 {/* "noch 0 kWh" neben einer verfehlten Prognose verwirrt – nur zeigen, wenn noch etwas kommt */}
                                 {remainingKwh !== undefined && remainingKwh >= 0.05
-                                    ? ` · noch ${fmtKwh(remainingKwh)}`
+                                    ? ` · ${t('{value} to go', { value: fmtKwh(remainingKwh) })}`
                                     : ''}
                             </span>
                         </div>
                         <div className="stat">
                             <span className="stat__value">{fmtKwh(tomorrowKwh)}</span>
-                            <span className="stat__label">Morgen erwartet</span>
+                            <span className="stat__label">{t('Expected tomorrow')}</span>
                         </div>
                     </div>
                     {progress !== undefined && (
@@ -135,12 +136,16 @@ export function ForecastCard({
                             aria-valuemin={0}
                             aria-valuemax={100}
                             aria-valuenow={Math.round(progress * 100)}
-                            aria-label="Erzeugt im Vergleich zur Prognose"
+                            aria-label={t('Generated compared to the forecast')}
                         >
                             <div className="progress__text">
                                 {progress >= 1
-                                    ? `Erzeugt: ${fmtKwh(producedTodayKwh)} – Prognose erreicht`
-                                    : `Erzeugt: ${fmtKwh(producedTodayKwh)} von ${fmtKwh(todayKwh)} erwartet (${Math.round(progress * 100)} %)`}
+                                    ? t('Generated: {value} – forecast reached', { value: fmtKwh(producedTodayKwh) })
+                                    : t('Generated: {value} of {expected} expected ({percent} %)', {
+                                          value: fmtKwh(producedTodayKwh),
+                                          expected: fmtKwh(todayKwh),
+                                          percent: Math.round(progress * 100),
+                                      })}
                             </div>
                             <div className="progress__track">
                                 <div
@@ -154,10 +159,10 @@ export function ForecastCard({
                         <table className="plants">
                             <thead>
                                 <tr>
-                                    <th scope="col">Anlage</th>
-                                    <th scope="col">Jetzt</th>
-                                    <th scope="col">Heute</th>
-                                    <th scope="col">Morgen</th>
+                                    <th scope="col">{t('Plant')}</th>
+                                    <th scope="col">{t('Now')}</th>
+                                    <th scope="col">{t('Today')}</th>
+                                    <th scope="col">{t('Tomorrow')}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -178,7 +183,7 @@ export function ForecastCard({
                     <div
                         className="segmented"
                         role="tablist"
-                        aria-label="Tag"
+                        aria-label={t('Day')}
                     >
                         {(['today', 'tomorrow'] as const).map(d => (
                             <button
@@ -189,7 +194,7 @@ export function ForecastCard({
                                 className={day === d ? 'segmented--active' : ''}
                                 onClick={() => setDay(d)}
                             >
-                                {d === 'today' ? 'Heute' : 'Morgen'}
+                                {d === 'today' ? t('Today') : t('Tomorrow')}
                             </button>
                         ))}
                     </div>
@@ -198,13 +203,18 @@ export function ForecastCard({
                         now={day === 'today' ? now : undefined}
                         actualW={day === 'today' ? actualPvW : undefined}
                         actual={day === 'today' ? actual : undefined}
-                        label={`PV-Prognose ${day === 'today' ? 'heute' : 'morgen'} im Tagesverlauf`}
+                        label={
+                            day === 'today'
+                                ? t('PV forecast for today over the day')
+                                : t('PV forecast for tomorrow over the day')
+                        }
                     />
                 </div>
             </div>
             {updated !== undefined && (
                 <p className="detail__note">
-                    Prognose vom {new Date(updated).toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' })}
+                    {t('Forecast from')}{' '}
+                    {new Date(updated).toLocaleString(locale(), { dateStyle: 'short', timeStyle: 'short' })}
                 </p>
             )}
         </section>
@@ -222,7 +232,8 @@ function PlantRow({
     today?: number;
     tomorrow?: number;
 }): React.JSX.Element {
-    const kw = power === undefined ? '–' : `${(power / 1000).toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW`;
+    const kw =
+        power === undefined ? '–' : `${(power / 1000).toLocaleString(locale(), { maximumFractionDigits: 1 })} kW`;
     return (
         <tr>
             <th scope="row">{name}</th>

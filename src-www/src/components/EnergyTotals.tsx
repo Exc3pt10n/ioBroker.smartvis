@@ -1,33 +1,20 @@
+import { locale, t } from '../../../src/shared/i18n';
 import { useState } from 'react';
 import type { SvEnergyPeriod, SvEnergySystem, SvStateRef, SvStateValue } from '../../../src/shared/protocol';
 import { num } from '../energy';
 
 const GROUP_LABELS: Record<string, string> = {
-    day: 'Tag',
-    week: 'Woche',
-    month: 'Monat',
-    quarter: 'Quartal',
-    halfyear: 'Halbjahr',
-    year: 'Jahr',
-    total: 'Gesamt',
+    day: t('Day'),
+    week: t('Week'),
+    month: t('Month'),
+    quarter: t('Quarter'),
+    halfyear: t('Half-year'),
+    year: t('Year'),
+    total: t('Total'),
 };
 /** Direkt wählbare Zeiträume; seltenere (Quartal, Halbjahr) stehen unter "Mehr" */
 const MAIN_GROUPS = ['day', 'week', 'month', 'year', 'total'];
 const STORAGE_KEY = 'smartvis.energyPeriod';
-const MONTHS = [
-    'Januar',
-    'Februar',
-    'März',
-    'April',
-    'Mai',
-    'Juni',
-    'Juli',
-    'August',
-    'September',
-    'Oktober',
-    'November',
-    'Dezember',
-];
 
 function loadPeriod(): string | undefined {
     try {
@@ -50,11 +37,11 @@ export function fmtEnergy(kwh: number | undefined): string {
     if (kwh === undefined) {
         return '–';
     }
-    return `${kwh.toLocaleString('de-DE', { maximumFractionDigits: Math.abs(kwh) >= 100 ? 0 : 1 })} kWh`;
+    return `${kwh.toLocaleString(locale(), { maximumFractionDigits: Math.abs(kwh) >= 100 ? 0 : 1 })} kWh`;
 }
 
 function fmtPercent(v: number | undefined): string {
-    return v === undefined ? '–' : `${Math.round(v).toLocaleString('de-DE')} %`;
+    return v === undefined ? '–' : `${Math.round(v).toLocaleString(locale())} %`;
 }
 
 /** Zeitraum-Kennung des Adapters lesbar machen ("2026-11" → "November 2026") */
@@ -64,23 +51,26 @@ function periodText(raw: unknown): string | undefined {
     }
     let m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw);
     if (m) {
-        return `${m[3]}.${m[2]}.${m[1]}`;
+        return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).toLocaleDateString(locale());
     }
     m = /^(\d{4})-(\d{2})$/.exec(raw);
     if (m && Number(m[2]) >= 1 && Number(m[2]) <= 12) {
-        return `${MONTHS[Number(m[2]) - 1]} ${m[1]}`;
+        return new Date(Number(m[1]), Number(m[2]) - 1, 1).toLocaleDateString(locale(), {
+            month: 'long',
+            year: 'numeric',
+        });
     }
     m = /^(\d{4})-W(\d{1,2})$/i.exec(raw);
     if (m) {
-        return `KW ${Number(m[2])} ${m[1]}`;
+        return t('Week {week} {year}', { week: Number(m[2]), year: m[1] });
     }
     m = /^(\d{4})-Q([1-4])$/i.exec(raw);
     if (m) {
-        return `${m[2]}. Quartal ${m[1]}`;
+        return t('Q{n} {year}', { n: m[2], year: m[1] });
     }
     m = /^(\d{4})-H([12])$/i.exec(raw);
     if (m) {
-        return `${m[2]}. Halbjahr ${m[1]}`;
+        return t('H{n} {year}', { n: m[2], year: m[1] });
     }
     m = /^(\d{4})$/.exec(raw);
     if (m) {
@@ -101,7 +91,7 @@ export function EnergyTotals({
     const periods: SvEnergyPeriod[] = system.periods?.length
         ? system.periods
         : system.today
-          ? [{ key: 'day', group: 'day', label: 'Heute', totals: system.today }]
+          ? [{ key: 'day', group: 'day', label: t('Today'), totals: system.today }]
           : [];
     const [selected, setSelected] = useState(loadPeriod);
     const [showMore, setShowMore] = useState(false);
@@ -121,15 +111,15 @@ export function EnergyTotals({
         savePeriod(key);
     };
     const value = (ref: SvStateRef | undefined): number | undefined => num(ref, states);
-    const t = period.totals;
+    const totals = period.totals;
     const subtitle = period.periodKey ? periodText(states[period.periodKey.id]?.val) : undefined;
     // Vorperiode (z. B. gestern) zum Vergleich der Quoten
     const prev = inGroup[index + 1];
-    const prevValue = (pick: (tt: typeof t) => SvStateRef | undefined): number | undefined =>
+    const prevValue = (pick: (tt: typeof totals) => SvStateRef | undefined): number | undefined =>
         prev ? value(pick(prev.totals)) : undefined;
     const quotas = [
-        { label: 'Autarkie', ref: t.autarky, prev: prevValue(x => x.autarky) },
-        { label: 'Eigenverbrauch', ref: t.selfConsumption, prev: prevValue(x => x.selfConsumption) },
+        { label: t('Self-sufficiency'), ref: totals.autarky, prev: prevValue(x => x.autarky) },
+        { label: t('Self-consumption'), ref: totals.selfConsumption, prev: prevValue(x => x.selfConsumption) },
     ].filter(q => q.ref);
     // Mengen paarweise: was zusammengehört, steht in einer Zeile
     const pair = (a?: SvStateRef, aLabel?: string, b?: SvStateRef, bLabel?: string): string[] =>
@@ -138,17 +128,17 @@ export function EnergyTotals({
         );
     type AmountRow = { icon: string; label: string; text: string | string[] };
     const rowCandidates: (AmountRow | undefined | false)[] = [
-        t.pv && { icon: '☀️', label: 'PV-Erzeugung', text: fmtEnergy(value(t.pv)) },
-        t.home && { icon: '🏠', label: 'Verbrauch', text: fmtEnergy(value(t.home)) },
-        (t.gridImport || t.gridExport) && {
+        totals.pv && { icon: '☀️', label: t('PV generation'), text: fmtEnergy(value(totals.pv)) },
+        totals.home && { icon: '🏠', label: t('Consumption'), text: fmtEnergy(value(totals.home)) },
+        (totals.gridImport || totals.gridExport) && {
             icon: '🔌',
-            label: 'Netz',
-            text: pair(t.gridImport, 'bezogen', t.gridExport, 'eingespeist'),
+            label: t('Grid'),
+            text: pair(totals.gridImport, t('imported'), totals.gridExport, t('exported')),
         },
-        (t.batteryCharge || t.batteryDischarge) && {
+        (totals.batteryCharge || totals.batteryDischarge) && {
             icon: '🔋',
-            label: 'Batterie',
-            text: pair(t.batteryCharge, 'geladen', t.batteryDischarge, 'entladen'),
+            label: t('Battery'),
+            text: pair(totals.batteryCharge, t('charged'), totals.batteryDischarge, t('discharged')),
         },
     ];
     const rows = rowCandidates.filter((r): r is AmountRow => !!r);
@@ -165,7 +155,7 @@ export function EnergyTotals({
                         <button
                             type="button"
                             className="iconbtn iconbtn--small"
-                            aria-label="Vorheriger Zeitraum"
+                            aria-label={t('Previous period')}
                             disabled={index >= inGroup.length - 1}
                             onClick={() => select(inGroup[index + 1].key)}
                         >
@@ -174,7 +164,7 @@ export function EnergyTotals({
                         <button
                             type="button"
                             className="iconbtn iconbtn--small"
-                            aria-label="Nächster Zeitraum"
+                            aria-label={t('Next period')}
                             disabled={index <= 0}
                             onClick={() => select(inGroup[index - 1].key)}
                         >
@@ -187,7 +177,7 @@ export function EnergyTotals({
                 <div
                     className="segmented totals__groups"
                     role="tablist"
-                    aria-label="Zeitraum"
+                    aria-label={t('Period')}
                 >
                     {mainGroups.map(g => (
                         <button
@@ -211,7 +201,7 @@ export function EnergyTotals({
                             className={moreGroups.includes(period.group) ? 'segmented--active' : ''}
                             onClick={() => setShowMore(!showMore)}
                         >
-                            {moreGroups.includes(period.group) ? groupLabel(period.group) : 'Mehr'}
+                            {moreGroups.includes(period.group) ? groupLabel(period.group) : t('More')}
                         </button>
                     )}
                 </div>
@@ -220,7 +210,7 @@ export function EnergyTotals({
                 <div
                     className="chips chips--small totals__more"
                     role="group"
-                    aria-label="Weitere Zeiträume"
+                    aria-label={t('More periods')}
                 >
                     {moreGroups.map(g => (
                         <button
@@ -255,10 +245,11 @@ export function EnergyTotals({
                                         className={`quota__diff${diff > 0 ? ' quota__diff--up' : diff < 0 ? ' quota__diff--down' : ''}`}
                                     >
                                         {diff > 0 ? '▲' : diff < 0 ? '▼' : '='} {diff > 0 ? '+' : ''}
-                                        {diff} Pkt. ggü.{' '}
-                                        {/^(Gestern|Vorgestern)$/.test(prev.label)
-                                            ? prev.label.toLowerCase()
-                                            : prev.label}
+                                        {t('{diff} pts vs. {period}', {
+                                            diff,
+                                            period:
+                                                prev.label === t('Yesterday') ? prev.label.toLowerCase() : prev.label,
+                                        })}
                                     </span>
                                 )}
                             </div>

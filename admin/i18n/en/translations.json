@@ -3,11 +3,15 @@
     "IP address": "IP address",
     "Port": "Port",
     "Automatic discovery": "Automatic discovery",
-    "Language for device names": "Language for device names",
     "Rediscovery after object change (seconds)": "Rediscovery after object change (seconds)",
     "Ignored adapters (comma-separated)": "Ignored adapters (comma-separated)",
     "These adapters are skipped during discovery": "These adapters are skipped during discovery",
     "User interface": "User interface",
     "Allow edit mode": "Allow edit mode",
-    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations."
+    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.",
+    "Language": "Language",
+    "User interface and generated device names": "User interface and generated device names",
+    "System language": "System language",
+    "Deutsch": "Deutsch",
+    "English": "English"
 }

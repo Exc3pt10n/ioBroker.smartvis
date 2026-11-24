@@ -1,3 +1,4 @@
+import { getLanguage, locale, t, tn } from '../../../src/shared/i18n';
 import { useCardColumns } from '../media';
 import { CustomSections } from '../components/CustomSections';
 import { EditBanner, EditButton } from '../components/EditButton';
@@ -19,31 +20,32 @@ export function MoreView({ onNavigate }: { onNavigate: (path: string) => void })
 
     // Diagnose-Infos: kurz zusammengefasst, Einzelheiten zum Aufklappen
     const deviceCount = model?.devices.length ?? 0;
-    const statusText = status === 'online' ? 'verbunden' : status === 'connecting' ? 'verbinde …' : 'getrennt';
+    const statusText =
+        status === 'online' ? t('connected') : status === 'connecting' ? t('connecting …') : t('disconnected');
     const infoCard = (
         <section className="card">
-            <h2 className="subtitle">Info</h2>
+            <h2 className="subtitle">{t('Info')}</h2>
             <p className="info__summary">
-                {status === 'online' ? '🟢' : '🟠'} {statusText} · Version {version || '–'} · {deviceCount}{' '}
-                {deviceCount === 1 ? 'Gerät' : 'Geräte'}
+                {status === 'online' ? '🟢' : '🟠'} {statusText} · {t('Version')} {version || '–'} ·{' '}
+                {tn(deviceCount, '{n} device', '{n} devices')}
             </p>
             <details className="info__details">
-                <summary>Details</summary>
+                <summary>{t('Details')}</summary>
                 <dl className="facts">
-                    <dt>Status</dt>
+                    <dt>{t('Status')}</dt>
                     <dd>{status}</dd>
-                    <dt>Adapter-Version</dt>
+                    <dt>{t('Adapter version')}</dt>
                     <dd>{version || '–'}</dd>
-                    <dt>Letzte Erkennung</dt>
-                    <dd>{model ? new Date(model.generatedAt).toLocaleString('de-DE') : '–'}</dd>
+                    <dt>{t('Last detection')}</dt>
+                    <dd>{model ? new Date(model.generatedAt).toLocaleString(locale()) : '–'}</dd>
                     {lastError && (
                         <>
-                            <dt>Letzter Fehler</dt>
+                            <dt>{t('Last error')}</dt>
                             <dd>{lastError}</dd>
                         </>
                     )}
                 </dl>
-                <h3 className="info__subtitle">Erkannte Geräte je Adapter</h3>
+                <h3 className="info__subtitle">{t('Detected devices per adapter')}</h3>
                 <dl className="facts">
                     {[...byAdapter.entries()].map(([adapter, count]) => (
                         <div
@@ -62,10 +64,10 @@ export function MoreView({ onNavigate }: { onNavigate: (path: string) => void })
     return (
         <>
             <div className="titlebar titlebar--split">
-                <h1 className="title">Mehr</h1>
+                <h1 className="title">{t('More')}</h1>
                 <EditButton />
             </div>
-            <EditBanner text="Bereiche am Griff ⠿ ziehen oder mit ↑ ↓ sortieren und aus- oder einblenden" />
+            <EditBanner text={t('Drag sections by the handle ⠿ or sort them with ↑ ↓, and hide or show them')} />
             <CustomSections
                 view="more"
                 columns={columns}
@@ -74,21 +76,21 @@ export function MoreView({ onNavigate }: { onNavigate: (path: string) => void })
                     {
                         // Auf dem Handy ist "Beschattung" nicht in der Leiste, wenn es den Bereich Sicherheit gibt
                         key: 'shortcuts',
-                        label: 'Weitere Bereiche',
-                        note: 'nur Handy',
+                        label: t('More sections'),
+                        note: t('phone only'),
                         node:
                             model?.shutterControl.length &&
                             (model.cameras?.length || model.securityStations?.length) ? (
                                 <nav
                                     className="card more__links"
-                                    aria-label="Weitere Bereiche"
+                                    aria-label={t('More sections')}
                                 >
                                     <button
                                         type="button"
                                         className="more__link"
                                         onClick={() => onNavigate('shutters')}
                                     >
-                                        <span aria-hidden="true">🪟</span> Beschattung
+                                        <span aria-hidden="true">🪟</span> {t('Shading')}
                                         <span
                                             className="chevron-right"
                                             aria-hidden="true"
@@ -111,13 +113,13 @@ export function MoreView({ onNavigate }: { onNavigate: (path: string) => void })
                     },
                     {
                         key: 'batteries',
-                        label: 'Batterien',
+                        label: t('Batteries'),
                         node: model?.batteries?.length ? <BatteryCard /> : null,
                     },
-                    { key: 'display', label: 'Darstellung', node: <DisplayCard /> },
+                    { key: 'display', label: t('Display'), node: <DisplayCard /> },
                     {
                         key: 'customizations',
-                        label: 'Anpassungen',
+                        label: t('Customizations'),
                         node:
                             model?.editable && model.client ? (
                                 <CustomizationsCard
@@ -126,8 +128,8 @@ export function MoreView({ onNavigate }: { onNavigate: (path: string) => void })
                                 />
                             ) : null,
                     },
-                    { key: 'connection', label: 'Info', node: infoCard },
-                    { key: 'diagnosis', label: 'Erkennung', node: <DiagnosisCard /> },
+                    { key: 'connection', label: t('Info'), node: infoCard },
+                    { key: 'diagnosis', label: t('Detection'), node: <DiagnosisCard /> },
                 ]}
             />
         </>
@@ -142,7 +144,7 @@ function BatteryCard(): React.JSX.Element | null {
         (a, b) =>
             Number(isBatteryLow(b, states)) - Number(isBatteryLow(a, states)) ||
             (batteryLevel(a, states) ?? 101) - (batteryLevel(b, states) ?? 101) ||
-            a.name.localeCompare(b.name, 'de'),
+            a.name.localeCompare(b.name, getLanguage()),
     );
     const low = sorted.filter(b => isBatteryLow(b, states));
     if (!model || !all.length) {
@@ -150,13 +152,13 @@ function BatteryCard(): React.JSX.Element | null {
     }
     return (
         <section className="card">
-            <h2 className="subtitle">🔋 Batterien</h2>
+            <h2 className="subtitle">🔋 {t('Batteries')}</h2>
             <p className={`info__summary${low.length ? ' system__summary--warn' : ''}`}>
                 {low.length
-                    ? `🪫 ${low.length} ${low.length === 1 ? 'Batterie' : 'Batterien'} schwach`
-                    : '✅ Alle Batterien in Ordnung'}{' '}
+                    ? `🪫 ${tn(low.length, '{n} battery low', '{n} batteries low')}`
+                    : `✅ ${t('All batteries OK')}`}{' '}
                 <span className="system__count">
-                    · {all.length} {all.length === 1 ? 'Gerät' : 'Geräte'} mit Batterie
+                    · {tn(all.length, '{n} device with battery', '{n} devices with battery')}
                 </span>
             </p>
             {low.length > 0 && (
@@ -167,7 +169,9 @@ function BatteryCard(): React.JSX.Element | null {
                 />
             )}
             <details className="info__details">
-                <summary>Alle Batteriegeräte ({all.length})</summary>
+                <summary>
+                    {t('All battery devices')} ({all.length})
+                </summary>
                 <BatteryList
                     items={sorted}
                     rooms={model.rooms}
@@ -179,9 +183,9 @@ function BatteryCard(): React.JSX.Element | null {
 }
 
 const MOTION_OPTIONS: { value: MotionSetting; label: string }[] = [
-    { value: 'system', label: 'Wie im System' },
-    { value: 'on', label: 'Immer an' },
-    { value: 'off', label: 'Aus' },
+    { value: 'system', label: t('As in the system') },
+    { value: 'on', label: t('Always on') },
+    { value: 'off', label: t('Off') },
 ];
 
 /** Darstellung auf diesem Gerät (im Browser gespeichert) */
@@ -189,13 +193,13 @@ function DisplayCard(): React.JSX.Element {
     const { setting, systemReduced } = useMotion();
     return (
         <section className="card">
-            <h2 className="subtitle">Darstellung</h2>
+            <h2 className="subtitle">{t('Display')}</h2>
             <div className="setting setting--select setting--first">
                 <label
                     className="setting__text"
                     htmlFor="motion"
                 >
-                    Animationen
+                    {t('Animations')}
                 </label>
                 <select
                     id="motion"
@@ -216,9 +220,13 @@ function DisplayCard(): React.JSX.Element {
             <p className="detail__note">
                 {systemReduced
                     ? setting === 'on'
-                        ? 'Dein System wünscht reduzierte Bewegung – SmartVis animiert hier trotzdem (z. B. den Energiefluss).'
-                        : 'Dein System wünscht reduzierte Bewegung (z. B. Windows: Animationseffekte aus) – deshalb ruhen die Animationen. Mit „Immer an“ laufen sie trotzdem.'
-                    : 'Gilt nur für dieses Gerät bzw. diesen Browser.'}
+                        ? t(
+                              'Your system asks for reduced motion – SmartVis animates here anyway (e.g. the energy flow).',
+                          )
+                        : t(
+                              'Your system asks for reduced motion (e.g. Windows: animation effects off) – therefore the animations rest. With “Always on” they run anyway.',
+                          )
+                    : t('Applies to this device or browser only.')}
             </p>
         </section>
     );

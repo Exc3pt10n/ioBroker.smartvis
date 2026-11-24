@@ -1,3 +1,4 @@
+import { t } from '../../shared/i18n';
 import type { SvEnergyPeriod, SvEnergySystem, SvEnergyTotals } from '../../shared/protocol';
 import { getName } from '../names';
 import { ref, type AdapterProfile, type ObjectMap } from './types';
@@ -13,13 +14,13 @@ import { ref, type AdapterProfile, type ObjectMap } from './types';
 
 /** Bekannte Zeiträume: Reihenfolge und Bezeichnungen; weitere Kanäle unter counters.* werden ebenfalls erkannt */
 const KNOWN_PERIODS: Record<string, { order: number; group: string; current: string; previous: string }> = {
-    day: { order: 0, group: 'Tag', current: 'Heute', previous: 'Gestern' },
-    week: { order: 1, group: 'Woche', current: 'Diese Woche', previous: 'Vorwoche' },
-    month: { order: 2, group: 'Monat', current: 'Dieser Monat', previous: 'Vormonat' },
-    quarter: { order: 3, group: 'Quartal', current: 'Dieses Quartal', previous: 'Vorquartal' },
-    halfyear: { order: 4, group: 'Halbjahr', current: 'Dieses Halbjahr', previous: 'Vorhalbjahr' },
-    year: { order: 5, group: 'Jahr', current: 'Dieses Jahr', previous: 'Vorjahr' },
-    total: { order: 99, group: 'Gesamt', current: 'Gesamt', previous: 'Gesamt (vorher)' },
+    day: { order: 0, group: 'Day', current: 'Today', previous: 'Yesterday' },
+    week: { order: 1, group: 'Week', current: 'This week', previous: 'Last week' },
+    month: { order: 2, group: 'Month', current: 'This month', previous: 'Last month' },
+    quarter: { order: 3, group: 'Quarter', current: 'This quarter', previous: 'Last quarter' },
+    halfyear: { order: 4, group: 'Half-year', current: 'This half-year', previous: 'Last half-year' },
+    year: { order: 5, group: 'Year', current: 'This year', previous: 'Last year' },
+    total: { order: 99, group: 'Total', current: 'Total', previous: 'Total (before)' },
 };
 /** Unbekannte Zeiträume stehen vor "Gesamt" */
 const UNKNOWN_ORDER = 50;
@@ -47,24 +48,26 @@ function findPeriods(objects: ObjectMap, instance: string, lang: string): SvEner
         const base = `${prefix}${key}`;
         const known = KNOWN_PERIODS[key];
         const name = getName(objects[base], lang);
-        const groupLabel = known?.group || (name ? name.replace(/^aktuelle[rs]?\s+/i, '') : key);
+        const groupLabel = known ? t(known.group) : name ? name.replace(/^(aktuelle[rs]?|current)\s+/i, '') : key;
         const add = (subKey: string, label: string): void => {
-            const t = totals(objects, `${prefix}${subKey}`);
-            if (Object.values(t).some(Boolean)) {
+            const sums = totals(objects, `${prefix}${subKey}`);
+            if (Object.values(sums).some(Boolean)) {
                 periods.push({
                     key: subKey,
                     group: key,
                     groupLabel,
                     label,
-                    periodKey: ref(objects, `${prefix}${subKey}.periodKey`, 'Zeitraum'),
-                    totals: t,
+                    periodKey: ref(objects, `${prefix}${subKey}.periodKey`, 'Period'),
+                    totals: sums,
                 });
             }
         };
-        add(key, known?.current || name || key);
+        add(key, known ? t(known.current) : name || key);
         add(
             `${key}.previous`,
-            known?.previous || getName(objects[`${base}.previous`], lang) || `${groupLabel} (vorher)`,
+            known
+                ? t(known.previous)
+                : getName(objects[`${base}.previous`], lang) || t('{period} (before)', { period: groupLabel }),
         );
     }
     return periods;
@@ -73,15 +76,15 @@ function findPeriods(objects: ObjectMap, instance: string, lang: string): SvEner
 function totals(objects: ObjectMap, base: string): SvEnergyTotals {
     const c = (s: string): string => `${base}.${s}`;
     return {
-        pv: ref(objects, c('PvGen'), 'PV-Erzeugung'),
-        home: ref(objects, c('Cons'), 'Verbrauch'),
-        gridImport: ref(objects, c('GridPurchase'), 'Netzbezug'),
-        gridExport: ref(objects, c('GridFeedIn'), 'Einspeisung'),
-        batteryCharge: ref(objects, c('BtCharged'), 'Batterie geladen'),
-        batteryDischarge: ref(objects, c('BtDischarged'), 'Batterie entladen'),
-        autarky: ref(objects, c('Autarky'), 'Autarkie'),
-        selfConsumption: ref(objects, c('SelfConsRate'), 'Eigenverbrauch'),
-        selfSupply: ref(objects, c('SelfSupply'), 'Eigenversorgung'),
+        pv: ref(objects, c('PvGen'), 'PV generation'),
+        home: ref(objects, c('Cons'), 'Consumption'),
+        gridImport: ref(objects, c('GridPurchase'), 'Grid import'),
+        gridExport: ref(objects, c('GridFeedIn'), 'Grid export'),
+        batteryCharge: ref(objects, c('BtCharged'), 'Battery charged'),
+        batteryDischarge: ref(objects, c('BtDischarged'), 'Battery discharged'),
+        autarky: ref(objects, c('Autarky'), 'Self-sufficiency'),
+        selfConsumption: ref(objects, c('SelfConsRate'), 'Self-consumption'),
+        selfSupply: ref(objects, c('SelfSupply'), 'Self-supply'),
     };
 }
 export const qhomeProfile: AdapterProfile = {
@@ -94,30 +97,30 @@ export const qhomeProfile: AdapterProfile = {
             return null;
         }
         // Zusätzliche Erzeuger (Adapter ab 0.3.0): PvPwTotal = PvPw + PvPwExt; ohne sie wie bisher PvPw
-        const extPv = ref(objects, id('PvPwExt'), 'Weitere Erzeuger');
+        const extPv = ref(objects, id('PvPwExt'), 'Other generators');
         const pv = ref(objects, id('PvPwTotal'), 'PV') || { ...ownPv, name: 'PV' };
         const periods = findPeriods(objects, instance, lang);
 
         const energy: SvEnergySystem = {
             id: instance,
-            name: 'Q.HOME Speicher',
+            name: t('Q.HOME storage'),
             adapter: 'qhome-ess-hyb-g2',
             flows: {
                 pv,
-                home: ref(objects, id('ConsPw'), 'Haus'),
-                gridImport: ref(objects, id('GridPwPurchaseWb'), 'Netzbezug'),
-                gridExport: ref(objects, id('GridPwFeedInWb'), 'Einspeisung'),
-                batteryCharge: ref(objects, id('BtPwCharge'), 'Laden'),
-                batteryDischarge: ref(objects, id('BtPwDisCharge'), 'Entladen'),
+                home: ref(objects, id('ConsPw'), 'House'),
+                gridImport: ref(objects, id('GridPwPurchaseWb'), 'Grid import'),
+                gridExport: ref(objects, id('GridPwFeedInWb'), 'Grid export'),
+                batteryCharge: ref(objects, id('BtPwCharge'), 'Charging'),
+                batteryDischarge: ref(objects, id('BtPwDisCharge'), 'Discharging'),
             },
             ...(extPv && pv.id !== ownPv.id && { pvParts: [ownPv, extPv] }),
             battery: {
-                soc: ref(objects, id('BtSoc'), 'Ladezustand'),
-                remaining: ref(objects, id('BtLast'), 'Restlaufzeit'),
+                soc: ref(objects, id('BtSoc'), 'State of charge'),
+                remaining: ref(objects, id('BtLast'), 'Remaining time'),
             },
             today: periods.find(p => p.key === 'day')?.totals,
             periods,
-            connected: ref(objects, id('info.connection'), 'Verbunden'),
+            connected: ref(objects, id('info.connection'), 'Connected'),
         };
         return { energy };
     },

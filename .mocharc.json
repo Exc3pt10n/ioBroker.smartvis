@@ -1,4 +1,9 @@
 {
-    "node-option": ["import=tsx"],
-    "reporter": "spec"
+    "node-option": [
+        "import=tsx"
+    ],
+    "reporter": "spec",
+    "file": [
+        "./src/lib/i18n.setup.ts"
+    ]
 }

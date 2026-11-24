@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import { useLayoutEffect, useRef } from 'react';
 import type { SvCardWidth, SvViewLayout } from '../../../src/shared/protocol';
 import { connection, useConnection } from '../connection';
@@ -23,10 +24,10 @@ export interface SectionDef {
 }
 
 const WIDTH_CHOICES: { width: SvCardWidth; label: string; title: string }[] = [
-    { width: 'third', label: '⅓', title: 'ein Drittel' },
-    { width: 'half', label: '½', title: 'halbe Breite' },
-    { width: 'twothirds', label: '⅔', title: 'zwei Drittel' },
-    { width: 'full', label: '▭', title: 'volle Breite' },
+    { width: 'third', label: '⅓', title: t('one third') },
+    { width: 'half', label: '½', title: t('half width') },
+    { width: 'twothirds', label: '⅔', title: t('two thirds') },
+    { width: 'full', label: '▭', title: t('full width') },
 ];
 
 /** Zeilenhöhe des Mauerwerk-Rasters und Abstand zwischen Karten (px) */
@@ -274,7 +275,7 @@ export function CustomSections({
                     className="linkbtn csecs__reset"
                     onClick={() => connection.edit({ kind: 'view', view, order: null, hidden: null, widths: null })}
                 >
-                    Anordnung dieser Ansicht zurücksetzen
+                    {t('Reset the arrangement of this view')}
                 </button>
             )}
         </>
@@ -321,7 +322,7 @@ function EditableSection({
                 <button
                     type="button"
                     className="csec__btn"
-                    aria-label={`${section.label} nach oben`}
+                    aria-label={t('Move {name} up', { name: section.label })}
                     disabled={index <= 0}
                     onClick={() => onMove(-1)}
                 >
@@ -330,7 +331,7 @@ function EditableSection({
                 <button
                     type="button"
                     className="csec__btn"
-                    aria-label={`${section.label} nach unten`}
+                    aria-label={t('Move {name} down', { name: section.label })}
                     disabled={index >= count - 1}
                     onClick={() => onMove(1)}
                 >
@@ -342,15 +343,15 @@ function EditableSection({
                     aria-pressed={!hidden}
                     onClick={onToggle}
                 >
-                    {hidden ? 'Einblenden' : 'Ausblenden'}
+                    {hidden ? t('Show') : t('Hide')}
                 </button>
                 {width && (
                     <span
                         className="csec__widths"
                         role="radiogroup"
-                        aria-label={`Breite von ${section.label}`}
+                        aria-label={t('Width of {name}', { name: section.label })}
                     >
-                        <span className="csec__widths-label">Breite</span>
+                        <span className="csec__widths-label">{t('Width')}</span>
                         {WIDTH_CHOICES.map(c => (
                             <button
                                 key={c.width}

@@ -1,20 +1,21 @@
+import { locale, t } from '../../../src/shared/i18n';
 import { useState } from 'react';
 import type { SvClientInfo } from '../../../src/shared/protocol';
 import { connection } from '../connection';
 
 function seen(ts: number, now = Date.now()): string {
     if (!ts) {
-        return 'unbekannt';
+        return t('unknown');
     }
     const days = Math.floor((new Date(now).setHours(0, 0, 0, 0) - new Date(ts).setHours(0, 0, 0, 0)) / 86_400_000);
-    const time = new Date(ts).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    const time = new Date(ts).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
     if (days <= 0) {
-        return `heute ${time}`;
+        return t('today {time}', { time });
     }
     if (days === 1) {
-        return `gestern ${time}`;
+        return t('yesterday {time}', { time });
     }
-    return days < 7 ? `vor ${days} Tagen` : new Date(ts).toLocaleDateString('de-DE');
+    return days < 7 ? t('{n} days ago', { n: days }) : new Date(ts).toLocaleDateString(locale());
 }
 
 /**
@@ -35,10 +36,11 @@ export function CustomizationsCard({ client }: { client: SvClientInfo }): React.
 
     return (
         <section className="card custom">
-            <h2 className="subtitle">Anpassungen</h2>
+            <h2 className="subtitle">{t('Customizations')}</h2>
             <p className="detail__note">
-                Namen, Räume, Favoriten, ausgeblendete Geräte und die Anordnung gelten je Gerät. Neue Geräte starten mit
-                den bisherigen gemeinsamen Anpassungen.
+                {t(
+                    'Names, rooms, favorites, hidden devices and the arrangement apply per device. New devices start with the previous shared customizations.',
+                )}
             </p>
 
             {client.id ? (
@@ -48,7 +50,7 @@ export function CustomizationsCard({ client }: { client: SvClientInfo }): React.
                             className="setting__text"
                             htmlFor="client-name"
                         >
-                            Dieses Gerät
+                            {t('This device')}
                         </label>
                         <input
                             id="client-name"
@@ -67,7 +69,7 @@ export function CustomizationsCard({ client }: { client: SvClientInfo }): React.
                                 className="setting__text"
                                 htmlFor="client-source"
                             >
-                                Übernehmen von
+                                {t('Copy from')}
                             </label>
                             <div className="custom__row">
                                 <select
@@ -94,14 +96,17 @@ export function CustomizationsCard({ client }: { client: SvClientInfo }): React.
                                         if (
                                             from &&
                                             window.confirm(
-                                                `Anpassungen von „${from.name}“ übernehmen? Die Anpassungen dieses Geräts werden ersetzt.`,
+                                                t(
+                                                    'Copy the customizations of “{name}”? The customizations of this device will be replaced.',
+                                                    { name: from.name },
+                                                ),
                                             )
                                         ) {
                                             connection.client({ action: 'copyFrom', id: from.id });
                                         }
                                     }}
                                 >
-                                    Übernehmen
+                                    {t('Copy')}
                                 </button>
                             </div>
                         </div>
@@ -114,14 +119,16 @@ export function CustomizationsCard({ client }: { client: SvClientInfo }): React.
                             onClick={() => {
                                 if (
                                     window.confirm(
-                                        'Alle Anpassungen dieses Geräts verwerfen? Danach gilt wieder die automatische Erkennung.',
+                                        t(
+                                            'Discard all customizations of this device? The automatic detection applies again afterwards.',
+                                        ),
                                     )
                                 ) {
                                     connection.client({ action: 'reset' });
                                 }
                             }}
                         >
-                            ↺ Dieses Gerät zurücksetzen
+                            ↺ {t('Reset this device')}
                         </button>
                         <button
                             type="button"
@@ -129,20 +136,24 @@ export function CustomizationsCard({ client }: { client: SvClientInfo }): React.
                             onClick={() => {
                                 if (
                                     window.confirm(
-                                        'Alle Anpassungen auf ALLEN Geräten verwerfen? Danach gilt überall wieder die automatische Erkennung.',
+                                        t(
+                                            'Discard all customizations on ALL devices? The automatic detection applies everywhere again afterwards.',
+                                        ),
                                     )
                                 ) {
                                     connection.client({ action: 'resetAll' });
                                 }
                             }}
                         >
-                            ⚠️ Alle Geräte zurücksetzen
+                            ⚠️ {t('Reset all devices')}
                         </button>
                     </div>
 
                     {others.length > 0 && (
                         <details className="custom__devices">
-                            <summary>Andere Geräte ({others.length})</summary>
+                            <summary>
+                                {t('Other devices')} ({others.length})
+                            </summary>
                             <ul className="instances">
                                 {others.map(d => (
                                     <li
@@ -151,7 +162,9 @@ export function CustomizationsCard({ client }: { client: SvClientInfo }): React.
                                     >
                                         <span className="instance__name">
                                             {d.name}
-                                            <span className="instance__id">zuletzt {seen(d.lastSeen)}</span>
+                                            <span className="instance__id">
+                                                {t('last seen {time}', { time: seen(d.lastSeen) })}
+                                            </span>
                                         </span>
                                         <button
                                             type="button"
@@ -159,14 +172,17 @@ export function CustomizationsCard({ client }: { client: SvClientInfo }): React.
                                             onClick={() => {
                                                 if (
                                                     window.confirm(
-                                                        `„${d.name}“ mit seinen Anpassungen entfernen? Meldet sich das Gerät wieder, startet es mit den gemeinsamen Anpassungen.`,
+                                                        t(
+                                                            'Remove “{name}” with its customizations? If the device connects again, it starts with the shared customizations.',
+                                                            { name: d.name },
+                                                        ),
                                                     )
                                                 ) {
                                                     connection.client({ action: 'remove', id: d.id });
                                                 }
                                             }}
                                         >
-                                            Entfernen
+                                            {t('Remove')}
                                         </button>
                                     </li>
                                 ))}
@@ -176,8 +192,9 @@ export function CustomizationsCard({ client }: { client: SvClientInfo }): React.
                 </>
             ) : (
                 <p className="detail__note">
-                    Diese App-Version meldet kein Gerät an – bitte die Seite neu laden, um Anpassungen je Gerät zu
-                    nutzen.
+                    {t(
+                        'This app version does not register a device – please reload the page to use customizations per device.',
+                    )}
                 </p>
             )}
         </section>

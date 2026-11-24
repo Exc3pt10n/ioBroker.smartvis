@@ -1,3 +1,4 @@
+import { tn } from '../../src/shared/i18n';
 import type { SvDevice, SvScene, SvSceneGroup, SvStateValue } from '../../src/shared/protocol';
 import { connection } from './connection';
 import { showToast } from './components/Toast';
@@ -54,7 +55,7 @@ export function switchLights(lights: SvDevice[], on: boolean, states: States, wh
     }
     const n = changes.length;
     showToast(
-        `${n} ${n === 1 ? 'Licht' : 'Lichter'} ${on ? 'eingeschaltet' : 'ausgeschaltet'}${where ? ` · ${where}` : ''}`,
+        `${on ? tn(n, '{n} light switched on', '{n} lights switched on') : tn(n, '{n} light switched off', '{n} lights switched off')}${where ? ` · ${where}` : ''}`,
         () => {
             // Lampen einer Gruppe mit aktiver Szene: Szene aufrufen statt einzeln einschalten
             const byScene = new Set(

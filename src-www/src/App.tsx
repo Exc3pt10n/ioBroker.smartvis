@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
+import { getLanguage, t } from '../../src/shared/i18n';
 import { Icon } from './components/Icon';
 import { Toast } from './components/Toast';
 import { motionAllowed } from './motion';
@@ -118,12 +119,12 @@ function useScrollMemory(route: string[]): void {
 }
 
 const TABS = [
-    { id: 'home', label: 'Home', icon: 'home' },
-    { id: 'rooms', label: 'Räume', icon: 'rooms' },
-    { id: 'energy', label: 'Energie', icon: 'energy', needs: 'energy' },
-    { id: 'security', label: 'Sicherheit', icon: 'shield', needs: 'security' },
-    { id: 'shutters', label: 'Beschattung', icon: 'blind', needs: 'shutters' },
-    { id: 'more', label: 'Mehr', icon: 'more' },
+    { id: 'home', label: t('Home'), icon: 'home' },
+    { id: 'rooms', label: t('Rooms'), icon: 'rooms' },
+    { id: 'energy', label: t('Energy'), icon: 'energy', needs: 'energy' },
+    { id: 'security', label: t('Security'), icon: 'shield', needs: 'security' },
+    { id: 'shutters', label: t('Shading'), icon: 'blind', needs: 'shutters' },
+    { id: 'more', label: t('More'), icon: 'more' },
 ];
 
 export function App(): React.JSX.Element {
@@ -132,12 +133,12 @@ export function App(): React.JSX.Element {
     const { status, model } = useConnection();
     const hasSecurity = !!model?.cameras?.length || !!model?.securityStations?.length;
     const tabs = TABS.filter(
-        t =>
-            !t.needs ||
-            (t.needs === 'energy' &&
+        item =>
+            !item.needs ||
+            (item.needs === 'energy' &&
                 (!!model?.energy.length || !!model?.wallboxes.length || !!model?.pvForecast.length)) ||
-            (t.needs === 'shutters' && !!model?.shutterControl.length) ||
-            (t.needs === 'security' && hasSecurity),
+            (item.needs === 'shutters' && !!model?.shutterControl.length) ||
+            (item.needs === 'security' && hasSecurity),
     );
     const [tab = 'home', param] = route;
     const [detailId, setDetailId] = useState<string | null>(null);
@@ -171,36 +172,40 @@ export function App(): React.JSX.Element {
     return (
         <EditContext.Provider value={{ editing: editing && !!model?.editable, setEditing }}>
             <DetailContext.Provider value={setDetailId}>
-                <div className="app">
+                {/* Neu aufbauen, wenn sich die Sprache ändert (Texte stehen auch in gespeicherten Zuständen) */}
+                <div
+                    className="app"
+                    key={getLanguage()}
+                >
                     <nav
                         className="nav"
-                        aria-label="Hauptnavigation"
+                        aria-label={t('Main navigation')}
                     >
                         <div className="nav__brand">SmartVis</div>
-                        {tabs.map(t => (
+                        {tabs.map(item => (
                             <a
-                                key={t.id}
-                                href={`#/${t.id}`}
-                                className={`nav__item${tab === t.id ? ' nav__item--active' : ''}${
+                                key={item.id}
+                                href={`#/${item.id}`}
+                                className={`nav__item${tab === item.id ? ' nav__item--active' : ''}${
                                     // Handy: höchstens 5 Einträge – Beschattung ist dann über "Mehr" erreichbar
-                                    t.id === 'shutters' && hasSecurity ? ' nav__item--wide' : ''
+                                    item.id === 'shutters' && hasSecurity ? ' nav__item--wide' : ''
                                 }`}
-                                aria-current={tab === t.id ? 'page' : undefined}
+                                aria-current={tab === item.id ? 'page' : undefined}
                                 onClick={e => {
                                     // Über navigate (statt reinem Hash-Link), damit der Wechsel überblendet wird
                                     if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) {
                                         e.preventDefault();
                                         // Erneut auf den aktiven Tab: nach oben (wie bei iOS-Apps)
-                                        if (tab === t.id && route.length <= 1) {
+                                        if (tab === item.id && route.length <= 1) {
                                             window.scrollTo({ top: 0, behavior: motionAllowed() ? 'smooth' : 'auto' });
                                         } else {
-                                            navigate(t.id);
+                                            navigate(item.id);
                                         }
                                     }
                                 }}
                             >
-                                <Icon name={t.icon} />
-                                <span>{t.label}</span>
+                                <Icon name={item.icon} />
+                                <span>{item.label}</span>
                             </a>
                         ))}
                     </nav>
@@ -210,7 +215,7 @@ export function App(): React.JSX.Element {
                                 className={`banner banner--${status}`}
                                 role="status"
                             >
-                                {status === 'connecting' ? 'Verbinde …' : 'Keine Verbindung – versuche erneut …'}
+                                {status === 'connecting' ? t('Connecting …') : t('No connection – trying again …')}
                             </div>
                         )}
                         {/* key: neue Seite = neuer Knoten; ohne View Transitions blendet CSS ihn kurz ein */}

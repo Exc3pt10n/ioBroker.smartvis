@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import { useEffect, useRef } from 'react';
 
 /**
@@ -83,7 +84,7 @@ export function Sheet({
                             type="button"
                             className="iconbtn"
                             onClick={onClose}
-                            aria-label="Schließen"
+                            aria-label={t('Close')}
                         >
                             ✕
                         </button>

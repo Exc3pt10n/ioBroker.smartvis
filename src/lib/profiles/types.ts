@@ -1,3 +1,4 @@
+import { t } from '../../shared/i18n';
 import type {
     SvEnergySystem,
     SvPvForecast,
@@ -48,7 +49,8 @@ export function ref(objects: ObjectMap, id: string, name: string): SvStateRef | 
     }
     const common = obj.common as ioBroker.StateCommon;
     return {
-        name,
+        // Bezeichnung englisch im Code, hier in die Sprache der Oberfläche
+        name: t(name),
         id,
         type: common.type,
         role: common.role,

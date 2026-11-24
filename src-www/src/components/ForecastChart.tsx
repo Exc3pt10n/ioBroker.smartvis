@@ -1,3 +1,4 @@
+import { locale, t } from '../../../src/shared/i18n';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 export interface Point {
@@ -12,11 +13,11 @@ const H = 192;
 const PAD = { top: 24, right: 12, bottom: 24, left: 40 };
 
 function formatKw(w: number): string {
-    return `${(w / 1000).toLocaleString('de-DE', { maximumFractionDigits: 1, minimumFractionDigits: 1 })} kW`;
+    return `${(w / 1000).toLocaleString(locale(), { maximumFractionDigits: 1, minimumFractionDigits: 1 })} kW`;
 }
 
 function hhmm(t: number): string {
-    return new Date(t).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    return new Date(t).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
 }
 
 /** "Schöne" Achsenschritte in kW */
@@ -98,7 +99,7 @@ export function ForecastChart({
                 ref={wrap}
                 className="fchart"
             >
-                <p className="empty">Keine Prognosedaten für diesen Tag.</p>
+                <p className="empty">{t('No forecast data for this day.')}</p>
             </div>
         );
     }
@@ -190,7 +191,7 @@ export function ForecastChart({
                             className="fchart__axis"
                             textAnchor="end"
                         >
-                            {(v / 1000).toLocaleString('de-DE')}
+                            {(v / 1000).toLocaleString(locale())}
                         </text>
                     </g>
                 ))}
@@ -202,15 +203,15 @@ export function ForecastChart({
                 >
                     kW
                 </text>
-                {xTicks.map(t => (
+                {xTicks.map(tick => (
                     <text
-                        key={t}
-                        x={x(t)}
+                        key={tick}
+                        x={x(tick)}
                         y={H - 6}
                         className="fchart__axis"
                         textAnchor="middle"
                     >
-                        {new Date(t).getHours()} Uhr
+                        {new Date(tick).toLocaleTimeString(locale(), { hour: 'numeric' })}
                     </text>
                 ))}
                 <path
@@ -243,7 +244,7 @@ export function ForecastChart({
                             className="fchart__axis"
                             textAnchor={x(now) > width - PAD.right - 34 ? 'end' : 'start'}
                         >
-                            jetzt
+                            {t('now')}
                         </text>
                         {actualW !== undefined && (
                             <circle
@@ -282,9 +283,13 @@ export function ForecastChart({
                     <span className="fchart__tip-time">{hhmm(hovered.t)}</span>{' '}
                     {withActual ? (
                         <>
-                            <span className="fchart__tip-row">Prognose {formatKw(hovered.w)}</span>
+                            <span className="fchart__tip-row">
+                                {t('Forecast')} {formatKw(hovered.w)}
+                            </span>
                             {hoveredActual !== undefined && (
-                                <span className="fchart__tip-row">Ist {formatKw(hoveredActual)}</span>
+                                <span className="fchart__tip-row">
+                                    {t('Actual')} {formatKw(hoveredActual)}
+                                </span>
                             )}
                         </>
                     ) : (
@@ -299,27 +304,28 @@ export function ForecastChart({
                 >
                     <span>
                         <i className={`fchart__key fchart__key--line${withActual ? ' fchart__key--dashed' : ''}`} />{' '}
-                        Prognose
+                        {t('Forecast')}
                     </span>
                     {withActual && (
                         <span>
-                            <i className="fchart__key fchart__key--line fchart__key--actual" /> Erzeugt
+                            <i className="fchart__key fchart__key--line fchart__key--actual" /> {t('Generated')}
                         </span>
                     )}
                     {actualW !== undefined && showNow && (
                         <span>
-                            <i className="fchart__key fchart__key--dot" /> Ist jetzt: {formatKw(actualW)}
+                            <i className="fchart__key fchart__key--dot" />{' '}
+                            {t('Actual now: {value}', { value: formatKw(actualW) })}
                         </span>
                     )}
                 </div>
             )}
             <details className="fchart__table">
-                <summary>Als Tabelle</summary>
+                <summary>{t('As table')}</summary>
                 <table>
                     <thead>
                         <tr>
-                            <th scope="col">Uhrzeit</th>
-                            <th scope="col">Prognose</th>
+                            <th scope="col">{t('Time')}</th>
+                            <th scope="col">{t('Forecast')}</th>
                         </tr>
                     </thead>
                     <tbody>

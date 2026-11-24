@@ -1,3 +1,4 @@
+import { locale, t } from '../../src/shared/i18n';
 import type { SvCamera, SvSecurityStation, SvStateRef, SvStateValue } from '../../src/shared/protocol';
 
 type States = Record<string, SvStateValue | null>;
@@ -40,13 +41,13 @@ export function cameraInfo(camera: SvCamera, states: States): CameraInfo {
               ? statusVal
               : statusVal === 1 || statusVal === 2;
     const events = [
-        on(camera.ring, states) && 'Klingel',
-        on(camera.person, states) && 'Person',
-        on(camera.pet, states) && 'Haustier',
-        on(camera.crying, states) && 'Weinen',
-        on(camera.vehicle, states) && 'Fahrzeug',
-        on(camera.sound, states) && 'Geräusch',
-        !on(camera.person, states) && !on(camera.pet, states) && on(camera.motion, states) && 'Bewegung',
+        on(camera.ring, states) && t('Doorbell'),
+        on(camera.person, states) && t('Person'),
+        on(camera.pet, states) && t('Pet'),
+        on(camera.crying, states) && t('Crying'),
+        on(camera.vehicle, states) && t('Vehicle'),
+        on(camera.sound, states) && t('Sound'),
+        !on(camera.person, states) && !on(camera.pet, states) && on(camera.motion, states) && t('Motion'),
     ].filter((e): e is string => !!e);
     const battery = camera.battery ? Number(states[camera.battery.id]?.val) : NaN;
     const live = camera.liveUrl ? states[camera.liveUrl.id]?.val : undefined;
@@ -62,11 +63,11 @@ export function cameraInfo(camera: SvCamera, states: States): CameraInfo {
         disabled,
         online,
         status: disabled
-            ? 'Ausgeschaltet'
+            ? t('Switched off')
             : online
               ? undefined
               : typeof statusVal === 'boolean'
-                ? 'Nicht erreichbar'
+                ? t('Not reachable')
                 : statusLabel || 'Offline',
         events,
         battery: Number.isFinite(battery) ? battery : undefined,
@@ -83,15 +84,15 @@ export function stationAlarm(station: SvSecurityStation, states: States): boolea
 export function eventTime(ts: number, now = Date.now()): string {
     const d = new Date(ts);
     const today = new Date(now);
-    const time = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    const time = d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
     const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
     if (ts >= startOfToday) {
-        return `heute ${time}`;
+        return t('today {time}', { time });
     }
     if (ts >= startOfToday - 86_400_000) {
-        return `gestern ${time}`;
+        return t('yesterday {time}', { time });
     }
-    return `${d.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })} ${time}`;
+    return `${d.toLocaleDateString(locale(), { weekday: 'short', day: '2-digit', month: '2-digit' })} ${time}`;
 }
 
 /** Kurzform für Kacheln: "19:35" (heute), "gestern", sonst Wochentag */
@@ -100,12 +101,12 @@ export function shortEventTime(ts: number, now = Date.now()): string {
     const today = new Date(now);
     const startOfToday = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
     if (ts >= startOfToday) {
-        return d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        return d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
     }
     if (ts >= startOfToday - 86_400_000) {
-        return 'gestern';
+        return t('yesterday');
     }
-    return d.toLocaleDateString('de-DE', { weekday: 'short' });
+    return d.toLocaleDateString(locale(), { weekday: 'short' });
 }
 
 /**
@@ -120,14 +121,14 @@ export function liveStreamUrl(url: string): string {
 }
 
 const KIND_LABELS: Record<string, string> = {
-    person: 'Person',
-    pet: 'Haustier',
-    motion: 'Bewegung',
-    sound: 'Geräusch',
-    crying: 'Weinen',
+    person: t('Person'),
+    pet: t('Pet'),
+    motion: t('Motion'),
+    sound: t('Sound'),
+    crying: t('Crying'),
 };
 
 /** "Person · Bewegung" bzw. "Ereignis" */
 export function eventLabel(kinds: string[]): string {
-    return kinds.length ? kinds.map(k => KIND_LABELS[k] ?? k).join(' · ') : 'Ereignis';
+    return kinds.length ? kinds.map(k => KIND_LABELS[k] ?? k).join(' · ') : t('Event');
 }

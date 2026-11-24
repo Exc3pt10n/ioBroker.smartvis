@@ -1,3 +1,4 @@
+import { locale, t } from '../../../src/shared/i18n';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { SvHistoryRange } from '../../../src/shared/protocol';
 import { READ_STEP_MS, valueAt } from '../../../src/shared/series';
@@ -16,7 +17,7 @@ export interface ChartLine {
 export function formatNumber(v: number, unit?: string): string {
     const abs = Math.abs(v);
     const digits = unit === 'lx' || unit === 'Lux' || abs >= 1000 ? 0 : abs >= 100 ? 0 : 1;
-    return `${v.toLocaleString('de-DE', { maximumFractionDigits: digits })}${unit ? ` ${unit}` : ''}`;
+    return `${v.toLocaleString(locale(), { maximumFractionDigits: digits })}${unit ? ` ${unit}` : ''}`;
 }
 
 /** "Schöne" Achsenwerte (3–5 Schritte) */
@@ -36,21 +37,21 @@ function niceScale(min: number, max: number, zeroBased: boolean): { lo: number; 
 function timeLabel(t: number, range: SvHistoryRange): string {
     const d = new Date(t);
     return range === '7d'
-        ? d.toLocaleDateString('de-DE', { weekday: 'short' })
+        ? d.toLocaleDateString(locale(), { weekday: 'short' })
         : `${String(d.getHours()).padStart(2, '0')}:00`;
 }
 
 function tooltipTime(t: number, range: SvHistoryRange): string {
     const d = new Date(t);
     return range === '7d'
-        ? d.toLocaleString('de-DE', {
+        ? d.toLocaleString(locale(), {
               weekday: 'short',
               day: '2-digit',
               month: '2-digit',
               hour: '2-digit',
               minute: '2-digit',
           })
-        : d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+        : d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
 }
 
 /**
@@ -143,7 +144,7 @@ export function HistoryChart({
                 ref={wrap}
                 className="fchart"
             >
-                <p className="empty">Keine Daten in diesem Zeitraum.</p>
+                <p className="empty">{t('No data in this period.')}</p>
             </div>
         );
     }
@@ -204,7 +205,7 @@ export function HistoryChart({
                             className="fchart__axis"
                             textAnchor="end"
                         >
-                            {v.toLocaleString('de-DE')}
+                            {v.toLocaleString(locale())}
                         </text>
                     </g>
                 ))}
@@ -326,12 +327,12 @@ export function HistoryChart({
                 </p>
             )}
             <details className="fchart__table">
-                <summary>Als Tabelle</summary>
+                <summary>{t('As table')}</summary>
                 <table>
                     <thead>
                         <tr>
-                            <th scope="col">Zeit</th>
-                            <th scope="col">Wert</th>
+                            <th scope="col">{t('Time')}</th>
+                            <th scope="col">{t('Value')}</th>
                         </tr>
                     </thead>
                     <tbody>

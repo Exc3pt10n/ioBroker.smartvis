@@ -1,3 +1,4 @@
+import { locale, t } from '../../../src/shared/i18n';
 import { useEffect, useState } from 'react';
 import type { SvStateRef } from '../../../src/shared/protocol';
 import { connection } from '../connection';
@@ -70,18 +71,24 @@ export function Sparkline({
     const area = `${line}L${x(points[points.length - 1][0]).toFixed(1)},${H}L${x(points[0][0]).toFixed(1)},${H}Z`;
     const minAt = points[values.indexOf(min)];
     const maxAt = points[values.indexOf(max)];
-    const summary = `${label}, letzte 24 Stunden: Min. ${formatNumber(min, unit)}, Max. ${formatNumber(max, unit)}`;
+    const summary = t('{name}, last 24 hours: min. {min}, max. {max}', {
+        name: label,
+        min: formatNumber(min, unit),
+        max: formatNumber(max, unit),
+    });
 
     return (
         <button
             type="button"
             className="spark"
             onClick={onOpen}
-            aria-label={`${summary}. Verlauf öffnen`}
+            aria-label={`${summary}. ${t('Open history')}`}
             title={summary}
         >
             <span className="spark__head">
-                <span className="spark__label">{label} · 24 Std.</span>
+                <span className="spark__label">
+                    {label} · {t('24 h')}
+                </span>
                 <span className="spark__range">
                     {formatNumber(min, unit)} – {formatNumber(max, unit)}
                 </span>
@@ -107,10 +114,12 @@ export function Sparkline({
                 aria-hidden="true"
             >
                 <span>
-                    Max. {new Date(maxAt[0]).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+                    {t('Max.')}{' '}
+                    {new Date(maxAt[0]).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })}
                 </span>
                 <span>
-                    Min. {new Date(minAt[0]).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+                    {t('Min.')}{' '}
+                    {new Date(minAt[0]).toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })}
                 </span>
             </span>
         </button>

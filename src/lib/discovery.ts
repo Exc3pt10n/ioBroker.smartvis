@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n';
 import ChannelDetector, { Types, type PatternControl } from '@iobroker/type-detector';
 import type { RoomSource, SvDevice, SvModel, SvRoom, SvSceneGroup, SvStateRef } from '../shared/protocol';
 import { batteryDevices } from './batteries';
@@ -44,17 +45,18 @@ type ObjectMap = Record<string, ioBroker.Object>;
 /** Interne Markierung für Geräte mit generischem Kanalnamen (Wert: Eltern-Geräte-ID) */
 const GENERIC = '__genericParent';
 
+/** Namen nach Gerätetyp (englisch, übersetzt beim Erzeugen) */
 const TYPE_NAMES: Record<string, string> = {
-    blind: 'Rollladen',
-    light: 'Licht',
-    dimmer: 'Licht',
-    socket: 'Schalter',
-    fan: 'Lüfter',
+    blind: 'Blind',
+    light: 'Light',
+    dimmer: 'Light',
+    socket: 'Switch',
+    fan: 'Fan',
     thermostat: 'Thermostat',
-    window: 'Fenster',
-    windowTilt: 'Fenster',
-    door: 'Tür',
-    percentage: 'Ausgang',
+    window: 'Window',
+    windowTilt: 'Window',
+    door: 'Door',
+    percentage: 'Output',
 };
 
 /** Szene einer Lichtgruppe (hue-v2 kennzeichnet sie im native-Typ) */
@@ -146,7 +148,7 @@ function placeHueZones(devices: SvDevice[], zones: Map<string, string>, rooms: R
         rooms.rooms.set(id, { id, name: zoneName, source: 'adapter', kind: 'zone', members: [...device.groupOf] });
         device.roomId = id;
         device.roomSource = 'adapter';
-        device.name = 'Alle Lichter';
+        device.name = t('All lights');
     }
 }
 
@@ -494,17 +496,17 @@ export function discover(objects: ObjectMap, options: DiscoveryOptions): Discove
 
 /** Name für Geräte, die genauso heißen wie ihr Raum (z. B. Klimaanlage "Arbeitszimmer") */
 const ROOM_NAMED_TYPES: Record<string, string> = {
-    airCondition: 'Klimaanlage',
-    blind: 'Rollladen',
+    airCondition: 'Air conditioner',
+    blind: 'Blind',
     thermostat: 'Thermostat',
-    window: 'Fenster',
-    windowTilt: 'Fenster',
-    door: 'Tür',
-    socket: 'Steckdose',
-    fan: 'Lüfter',
-    temperature: 'Temperatur',
-    humidity: 'Klima',
-    motion: 'Bewegungsmelder',
+    window: 'Window',
+    windowTilt: 'Window',
+    door: 'Door',
+    socket: 'Socket',
+    fan: 'Fan',
+    temperature: 'Temperature',
+    humidity: 'Climate',
+    motion: 'Motion sensor',
 };
 
 /**
@@ -622,15 +624,15 @@ function toDevice(
         const roomName = rooms.rooms.get(roomId)!.name;
         if (hue.roomGroups.has(id) && LIGHT_TYPES.has(control.type)) {
             // Hue-Raumgruppe → "Alle Lichter"
-            name = 'Alle Lichter';
+            name = t('All lights');
         } else if (normalize(name) !== normalize(roomName)) {
             name = stripRoomFromName(name, roomName);
         } else if (LIGHT_TYPES.has(control.type)) {
             // Einzelne Lampe, die wie ihr Raum heißt (z. B. Hue-Lampe "Wohnzimmer") – Raumgruppen sind oben erledigt
-            name = 'Licht';
+            name = t('Light');
         } else if (ROOM_NAMED_TYPES[control.type]) {
             // Gerät heißt wie der Raum → Gerätetyp als Name
-            name = ROOM_NAMED_TYPES[control.type];
+            name = t(ROOM_NAMED_TYPES[control.type]);
         }
     }
 
@@ -747,7 +749,7 @@ function renameGenericChannels(devices: SvDevice[]): void {
         const record = d as unknown as Record<string, string>;
         const parent = record[GENERIC];
         delete record[GENERIC];
-        const base = TYPE_NAMES[d.type];
+        const base = TYPE_NAMES[d.type] && t(TYPE_NAMES[d.type]);
         if (!parent || !base || (channelsPerParent.get(parent)?.size || 0) < 2) {
             continue;
         }

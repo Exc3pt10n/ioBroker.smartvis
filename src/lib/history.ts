@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n';
 import type { SvHistoryRange, SvHistoryRef, SvModel, SvStateRef } from '../shared/protocol';
 
 type ObjectMap = Record<string, ioBroker.Object>;
@@ -107,7 +108,7 @@ export function historyOptions(range: SvHistoryRange, now = Date.now()): Record<
     };
     const span = spans[range];
     if (!span) {
-        throw new Error('Unbekannter Zeitraum');
+        throw new Error(t('Unknown period'));
     }
     return {
         start: now - span.ms,

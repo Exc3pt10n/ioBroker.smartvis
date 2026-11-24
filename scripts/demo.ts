@@ -3,6 +3,7 @@
  *   npm run demo   →  http://localhost:8099
  * Nützlich für Frontend-Entwicklung (zusammen mit "npm run dev:www").
  */
+import { setLanguage, toLanguage } from '../src/shared/i18n';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildDiagnosis } from '../src/lib/diagnosis';
@@ -732,13 +733,17 @@ function demoPicture(path: string): { data: Buffer; mimeType: string } | null {
     return { data: Buffer.from(svg), mimeType: 'image/svg+xml' };
 }
 
-const result = discover(objects, { language: 'de', ignoreAdapters: [] });
+// Sprache der Demo: SMARTVIS_LANG=en|de (Standard de)
+const language = toLanguage(process.env.SMARTVIS_LANG || 'de');
+setLanguage(language);
+const result = discover(objects, { language, ignoreAdapters: [] });
 
 // Anpassungen aus dem Bearbeiten-Modus (in der Demo nur im Speicher)
 // Anpassungen je Endgerät, nur im Speicher (wie overrides.json im Adapter)
 let store = emptyStore();
 const modelFor = (clientId?: string): SvModel => ({
     ...applyOverrides(result.model, overridesFor(store, clientId), true),
+    language,
     client: clientInfo(store, clientId),
 });
 

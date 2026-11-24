@@ -3,11 +3,15 @@
     "IP address": "IP-adres",
     "Port": "Poort",
     "Automatic discovery": "Automatische detectie",
-    "Language for device names": "Taal voor apparaatnamen",
     "Rediscovery after object change (seconds)": "Opnieuw detecteren na objectwijziging (seconden)",
     "Ignored adapters (comma-separated)": "Genegeerde adapters (kommagescheiden)",
     "These adapters are skipped during discovery": "Deze adapters worden bij de detectie overgeslagen",
     "User interface": "Gebruikersinterface",
     "Allow edit mode": "Bewerkmodus toestaan",
-    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "Hernoemen, verbergen, verplaatsen en favorieten in de app. Zolang er geen login is, kan iedereen in het netwerk aanpassingen opslaan."
+    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "Hernoemen, verbergen, verplaatsen en favorieten in de app. Zolang er geen login is, kan iedereen in het netwerk aanpassingen opslaan.",
+    "Language": "Taal",
+    "User interface and generated device names": "Gebruikersinterface en gegenereerde apparaatnamen",
+    "System language": "Systeemtaal",
+    "Deutsch": "Deutsch",
+    "English": "English"
 }

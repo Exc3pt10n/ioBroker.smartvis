@@ -1,3 +1,4 @@
+import { locale, t, tn } from '../../../src/shared/i18n';
 import { useState } from 'react';
 import type { SvDevice, SvStateRef } from '../../../src/shared/protocol';
 import { connection, useConnection } from '../connection';
@@ -39,11 +40,11 @@ const LIGHT_TYPES = ['light', 'dimmer', 'ct', 'hue', 'rgb', 'rgbSingle', 'rgbwSi
 const OPENING_TYPES = ['window', 'windowTilt', 'door'];
 /** Erkennungen (Anzeige "Person", "Bewegung" …) → Schlüssel für eventLabel */
 const KIND_KEYS: Record<string, string> = {
-    Person: 'person',
-    Haustier: 'pet',
-    Bewegung: 'motion',
-    Geräusch: 'sound',
-    Weinen: 'crying',
+    [t('Person')]: 'person',
+    [t('Pet')]: 'pet',
+    [t('Motion')]: 'motion',
+    [t('Sound')]: 'sound',
+    [t('Crying')]: 'crying',
 };
 
 /** Wichtigkeit der Kennzahlen (kleiner = weiter vorn) */
@@ -83,7 +84,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
     const now = useNow(30_000);
     const [showAllKpis, setShowAllKpis] = useState(kpisExpanded);
     if (!model) {
-        return <p className="empty">Lade Geräte …</p>;
+        return <p className="empty">{t('Loading devices …')}</p>;
     }
     const roomName = (id: string | null): string | undefined => model.rooms.find(r => r.id === id)?.name;
     // Statuslisten zeigen nie ausgeblendete Geräte
@@ -144,7 +145,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
 
     // Kennzahlen: auf dem Handy als wischbare Reihe, auf dem Desktop als Kacheln
     const fmtKwh = (v: number | undefined): string =>
-        v === undefined ? '–' : `${v.toLocaleString('de-DE', { maximumFractionDigits: 0 })} kWh`;
+        v === undefined ? '–' : `${v.toLocaleString(locale(), { maximumFractionDigits: 0 })} kWh`;
     const toEnergy = (): void => onNavigate('energy');
     const toShutters = (): void => onNavigate('shutters');
     // Statuskennzahlen springen zur passenden Liste weiter unten
@@ -170,84 +171,84 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             key: 'pv',
             icon: 'sun',
             value: formatPower(energy.pv),
-            label: 'PV jetzt',
+            label: t('PV now'),
             onClick: toEnergy,
         },
         energy?.soc !== undefined && {
             key: 'soc',
             icon: 'battery',
             value: `${Math.round(energy.soc)} %`,
-            label: 'Batterie',
+            label: t('Battery'),
             onClick: toEnergy,
         },
         energy?.home !== undefined && {
             key: 'home',
             icon: 'home',
             value: formatPower(energy.home),
-            label: 'Verbrauch',
+            label: t('Consumption'),
             onClick: toEnergy,
         },
         ...charging.map((w, i) => ({
             key: `car${i}`,
             icon: 'car',
             value: formatPower(w.power),
-            label: 'Wallbox lädt',
+            label: t('Wallbox charging'),
             onClick: toEnergy,
         })),
         forecastToday !== undefined && {
             key: 'forecast',
             icon: 'chart',
             value: fmtKwh(forecastToday),
-            label: 'PV heute',
+            label: t('PV today'),
             onClick: toEnergy,
         },
         forecastTomorrow !== undefined && {
             key: 'forecast2',
             icon: 'chart',
             value: fmtKwh(forecastTomorrow),
-            label: 'PV morgen',
+            label: t('PV tomorrow'),
             onClick: toEnergy,
         },
         lightsOn.length > 0 && {
             key: 'lights',
             icon: 'light',
             value: String(lightsOn.length),
-            label: lightsOn.length === 1 ? 'Licht an' : 'Lichter an',
+            label: lightsOn.length === 1 ? t('light on') : t('lights on'),
             onClick: lightsOn.length ? jump('lights') : undefined,
         },
         climateOn.length > 0 && {
             key: 'climate',
             icon: climateIcon === '❄️' ? 'snow' : 'flame',
             value: String(climateOn.length),
-            label: 'Klima an',
+            label: t('climate on'),
             onClick: jump('climate'),
         },
         open.length > 0 && {
             key: 'open',
             icon: 'window',
             value: String(open.length),
-            label: 'offen',
+            label: t('open'),
             onClick: open.length ? jump('open') : undefined,
         },
         playing.length > 0 && {
             key: 'playing',
             icon: 'media',
             value: String(playing.length),
-            label: 'spielt',
+            label: t('playing'),
             onClick: jump('playing'),
         },
         sunProtected > 0 && {
             key: 'sun',
             icon: 'sunProtect',
             value: String(sunProtected),
-            label: 'Sonnenschutz',
+            label: t('Sun protection'),
             onClick: toShutters,
         },
         !!shutterAlarm && {
             key: 'alarm',
             icon: 'warning',
             value: autoStateInfo(shutterAlarm)?.label || shutterAlarm,
-            label: 'Rollläden',
+            label: t('Blinds'),
             onClick: toShutters,
             warn: true,
         },
@@ -256,7 +257,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             key: 'batteries',
             icon: 'batteryLow',
             value: String(weakBatteries.length),
-            label: weakBatteries.length === 1 ? 'Batterie schwach' : 'Batterien schwach',
+            label: weakBatteries.length === 1 ? t('battery low') : t('batteries low'),
             onClick: jump('batteries'),
             warn: true,
         },
@@ -264,12 +265,12 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             key: 'security',
             icon: alarms.length ? 'warning' : 'shield',
             // Beschriftung "Modus …" – "Zuhause" allein wäre mit dem Seitentitel zu verwechseln
-            value: alarms.length ? 'Alarm' : mode.label !== '–' ? mode.label : 'Sicherheit',
+            value: alarms.length ? t('Alarm') : mode.label !== '–' ? mode.label : t('Security'),
             label: alarms.length
                 ? alarms[0]
                 : latestDetection
-                  ? `Modus · ${eventLabel(latestDetection.kinds)} ${latestDetection.camera}`
-                  : 'Sicherheitsmodus',
+                  ? `${t('Mode')} · ${eventLabel(latestDetection.kinds)} ${latestDetection.camera}`
+                  : t('Security mode'),
             onClick: () => onNavigate('security'),
             warn: alarms.length > 0,
         },
@@ -277,7 +278,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
             key: 'problems',
             icon: 'warning',
             value: String(problems.length),
-            label: problems.length === 1 ? 'Störung' : 'Störungen',
+            label: problems.length === 1 ? t('fault') : t('faults'),
             onClick: jump('problems'),
             warn: true,
         },
@@ -299,12 +300,12 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
     const kpiSections: SectionDef[] = [
         {
             key: 'kpis',
-            label: 'Kennzahlen',
+            label: t('Key figures'),
             node: (
                 <div
                     className="kpis"
                     role="list"
-                    aria-label="Kennzahlen"
+                    aria-label={t('Key figures')}
                 >
                     {(showAllKpis ? kpis : kpis.slice(0, kpiLimit)).map(k => (
                         <KpiTile
@@ -324,9 +325,9 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                                 }}
                             >
                                 <span className="kpi__value">
-                                    {showAllKpis ? 'Weniger' : `+${kpis.length - kpiLimit}`}
+                                    {showAllKpis ? t('Less') : `+${kpis.length - kpiLimit}`}
                                 </span>
-                                <span className="kpi__label">{showAllKpis ? 'einklappen' : 'weitere'}</span>
+                                <span className="kpi__label">{showAllKpis ? t('collapse') : t('more')}</span>
                             </button>
                         </div>
                     )}
@@ -345,7 +346,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
     const overviewSections: SectionDef[] = [
         {
             key: 'weather',
-            label: 'Wetter',
+            label: t('Weather'),
             node: weatherMain ? (
                 <WeatherCard
                     weather={weatherMain}
@@ -360,19 +361,19 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
         },
         {
             key: 'energy',
-            label: 'Energiefluss',
-            note: 'nur Desktop',
+            label: t('Energy flow'),
+            note: t('desktop only'),
             node:
                 dashboard && energy ? (
                     <section className="card home__energy">
                         <div className="card__head">
-                            <h2 className="subtitle">⚡ Energie</h2>
+                            <h2 className="subtitle">⚡ {t('Energy')}</h2>
                             <button
                                 type="button"
                                 className="linkbtn"
                                 onClick={toEnergy}
                             >
-                                Details ›
+                                {t('Details')} ›
                             </button>
                         </div>
                         <FlowStatus
@@ -385,8 +386,8 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
         },
         ...model.pvForecast.map(p => ({
             key: `forecast-${p.id}`,
-            label: 'PV-Prognose',
-            note: 'nur Desktop',
+            label: t('PV forecast'),
+            note: t('desktop only'),
             node: dashboard ? (
                 <ForecastCard
                     pv={p}
@@ -401,7 +402,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
     const mainSections: SectionDef[] = [
         {
             key: 'favorites',
-            label: 'Favoriten',
+            label: t('Favorites'),
             // Ohne Favoriten nur im Bearbeiten-Modus (mit Hinweis, wie man welche anlegt)
             node:
                 favs.length || editing ? (
@@ -423,7 +424,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                             />
                         ) : (
                             <p className="hint hint--static">
-                                Noch keine Favoriten – öffne ein Gerät und markiere es mit ☆.
+                                {t('No favorites yet – open a device and mark it with ☆.')}
                             </p>
                         )}
                     </section>
@@ -431,31 +432,31 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
         },
         {
             key: 'playing',
-            label: 'Läuft gerade',
+            label: t('Now playing'),
             node: playing.length ? (
                 <PlayingCard
                     devices={playing}
                     roomName={roomName}
                 />
             ) : (
-                placeholder('Erscheint, sobald ein Player abspielt.')
+                placeholder(t('Appears as soon as a player is playing.'))
             ),
         },
         {
             key: 'lights',
-            label: 'Eingeschaltete Lichter',
+            label: t('Lights switched on'),
             node: lightsOn.length ? (
                 <LightsSection
                     lights={lightsOn}
                     onNavigate={onNavigate}
                 />
             ) : (
-                placeholder('Erscheint, sobald ein Licht an ist.')
+                placeholder(t('Appears as soon as a light is on.'))
             ),
         },
         {
             key: 'climate',
-            label: 'Klima aktiv',
+            label: t('Climate active'),
             node: climateOn.length ? (
                 <ClimateCard
                     icon={climateIcon}
@@ -463,40 +464,40 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                     roomName={roomName}
                 />
             ) : (
-                placeholder('Erscheint, sobald ein Klimagerät eingeschaltet ist.')
+                placeholder(t('Appears as soon as a climate device is switched on.'))
             ),
         },
         {
             key: 'open',
-            label: 'Offene Fenster & Türen',
+            label: t('Open windows & doors'),
             node: open.length ? (
                 <OpenCard
                     devices={open}
                     roomName={roomName}
                 />
             ) : (
-                placeholder('Erscheint, sobald ein Fenster oder eine Tür offen ist.')
+                placeholder(t('Appears as soon as a window or door is open.'))
             ),
         },
         {
             key: 'problems',
-            label: 'Störungen',
+            label: t('Faults'),
             node: problems.length ? (
                 <ProblemsCard
                     devices={problems}
                     roomName={roomName}
                 />
             ) : (
-                placeholder('Erscheint bei nicht erreichbaren oder gestörten Geräten.')
+                placeholder(t('Appears for unreachable or faulty devices.'))
             ),
         },
         {
             key: 'batteries',
-            label: 'Batterie schwach',
+            label: t('Battery low'),
             node: weakBatteries.length ? (
                 <StatusCard
                     id="home-batteries"
-                    title={`🪫 ${weakBatteries.length} ${weakBatteries.length === 1 ? 'Batterie' : 'Batterien'} schwach`}
+                    title={`🪫 ${tn(weakBatteries.length, '{n} battery low', '{n} batteries low')}`}
                 >
                     <BatteryList
                         items={weakBatteries}
@@ -505,19 +506,19 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                     />
                 </StatusCard>
             ) : (
-                placeholder('Erscheint, sobald eine Batterie schwach ist (Anzeige des Geräts oder höchstens 20 %).')
+                placeholder(t('Appears as soon as a battery is low (reported by the device or at most 20 %).'))
             ),
         },
         {
             key: 'detections',
-            label: 'Gerade erkannt (Kameras)',
+            label: t('Just detected (cameras)'),
             node: detections.length ? (
                 <RecentDetectionsCard
                     detections={detections}
                     cameras={model.cameras || []}
                 />
             ) : (
-                placeholder('Erscheint, wenn eine Kamera gerade etwas erkennt (Ereignisbild bis 10 Minuten alt).')
+                placeholder(t('Appears when a camera detects something (event picture up to 10 minutes old).'))
             ),
         },
     ];
@@ -584,14 +585,18 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                         className="hint"
                         onClick={() => onNavigate('rooms/_none')}
                     >
-                        {withoutRoom} {withoutRoom === 1 ? 'Gerät' : 'Geräte'} ohne Raum – antippen zum Ansehen
+                        {tn(
+                            withoutRoom,
+                            '{n} device without room – tap to view',
+                            '{n} devices without room – tap to view',
+                        )}
                     </button>
                     {model.editable && (
                         <button
                             type="button"
                             className="iconbtn hint-row__close"
-                            aria-label="Hinweis ausblenden"
-                            title="Hinweis ausblenden"
+                            aria-label={t('Hide hint')}
+                            title={t('Hide hint')}
                             onClick={() => connection.edit({ kind: 'ui', patch: { hideNoRoomHint: true } })}
                         >
                             ✕
@@ -605,7 +610,11 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                     className="linkbtn"
                     onClick={() => connection.edit({ kind: 'ui', patch: { hideNoRoomHint: null } })}
                 >
-                    Hinweis „{withoutRoom} {withoutRoom === 1 ? 'Gerät' : 'Geräte'} ohne Raum“ wieder anzeigen
+                    {tn(
+                        withoutRoom,
+                        'Show the hint “{n} device without room” again',
+                        'Show the hint “{n} devices without room” again',
+                    )}
                 </button>
             )}
         </>
@@ -614,10 +623,12 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
     return (
         <>
             <div className="titlebar titlebar--split">
-                <h1 className="title">Zuhause</h1>
+                <h1 className="title">{t('My home')}</h1>
                 <EditButton />
             </div>
-            <EditBanner text="Bereiche und Favoriten am Griff ⠿ ziehen, Bereiche aus- oder einblenden, Kachel antippen zum Anpassen" />
+            <EditBanner
+                text={t('Drag sections and favorites by the handle ⠿, hide or show sections, tap a tile to adjust it')}
+            />
             <EditTip />
             {dashboard ? (
                 // Desktop: Kennzahlen als Leiste, darunter ein Raster mit frei wählbarer Breite je Karte
@@ -634,7 +645,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                         className="csecs home__desk"
                         sections={deskSections}
                     />
-                    {allQuiet && <p className="empty">Alles ruhig – keine Lichter an, alles geschlossen.</p>}
+                    {allQuiet && <p className="empty">{t('All quiet – no lights on, everything closed.')}</p>}
                     {hint}
                 </div>
             ) : (
@@ -652,18 +663,13 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                             className="csecs home__sections"
                             sections={mainOrdered}
                         />
-                        {allQuiet && <p className="empty">Alles ruhig – keine Lichter an, alles geschlossen.</p>}
+                        {allQuiet && <p className="empty">{t('All quiet – no lights on, everything closed.')}</p>}
                     </div>
                     <div className="home__hint">{hint}</div>
                 </div>
             )}
         </>
     );
-}
-
-/** Anzahl mit Einzahl/Mehrzahl: "1 Licht", "6 Lichter" */
-function count(n: number, one: string, many: string): string {
-    return `${n} ${n === 1 ? one : many}`;
 }
 
 /** Raum und Zustand als Kurzinfo: "offen · Küche" */
@@ -687,21 +693,21 @@ function LightsSection({
     return (
         <StatusCard
             id="home-lights"
-            title={`💡 ${count(lights.length, 'Licht', 'Lichter')} an`}
+            title={`💡 ${tn(lights.length, '{n} light on', '{n} lights on')}`}
             action={
                 groups.length > 1
-                    ? { label: 'Alle aus', onClick: () => switchLights(lights, false, states) }
+                    ? { label: t('All off'), onClick: () => switchLights(lights, false, states) }
                     : undefined
             }
             rows={groups.map(g => ({
                 key: g.roomId ?? '_none',
                 icon: 'light',
                 name: g.name,
-                detail: g.devices.length === 1 ? g.devices[0].name : `${g.devices.length} an`,
+                detail: g.devices.length === 1 ? g.devices[0].name : t('{n} on', { n: g.devices.length }),
                 onOpen: () => onNavigate(`rooms/${g.roomId ? encodeURIComponent(g.roomId) : '_none'}`),
                 action: {
-                    label: 'Aus',
-                    ariaLabel: `${g.name}: ${g.devices.length === 1 ? 'Licht' : 'alle Lichter'} ausschalten`,
+                    label: t('Off'),
+                    ariaLabel: `${g.name}: ${g.devices.length === 1 ? t('switch the light off') : t('switch all lights off')}`,
                     onClick: () => switchLights(g.devices, false, states, g.name),
                 },
             }))}
@@ -713,7 +719,7 @@ function LightsSection({
 function turnOff(device: SvDevice, ref: SvStateRef, value: boolean, undo: boolean | undefined): void {
     connection.setState(ref.id, value);
     showToast(
-        `${device.name} ${value ? 'pausiert' : 'ausgeschaltet'}`,
+        `${device.name} ${value ? t('paused') : t('switched off')}`,
         undo === undefined ? undefined : () => connection.setState(ref.id, undo),
     );
 }
@@ -739,8 +745,8 @@ function ClimateCard({
     return (
         <StatusCard
             id="home-climate"
-            title={`${icon} ${count(devices.length, 'Klimagerät', 'Klimageräte')} an`}
-            action={devices.length > 1 ? { label: 'Alle aus', onClick: () => devices.forEach(off) } : undefined}
+            title={`${icon} ${tn(devices.length, '{n} climate device on', '{n} climate devices on')}`}
+            action={devices.length > 1 ? { label: t('All off'), onClick: () => devices.forEach(off) } : undefined}
             rows={devices.map(d => ({
                 key: d.id,
                 icon: iconForType(d.type),
@@ -748,7 +754,7 @@ function ClimateCard({
                 detail: detailWithRoom(acSummary(d, states), roomName(d.roomId)),
                 onOpen: () => openDetail(d.id),
                 action: switchState(d)
-                    ? { label: 'Aus', ariaLabel: `${d.name} ausschalten`, onClick: () => off(d) }
+                    ? { label: t('Off'), ariaLabel: t('Switch {name} off', { name: d.name }), onClick: () => off(d) }
                     : undefined,
             }))}
         />
@@ -768,14 +774,17 @@ function OpenCard({
     return (
         <StatusCard
             id="home-open"
-            title={`🪟 ${devices.length} offen`}
+            title={`🪟 ${t('{n} open', { n: devices.length })}`}
             rows={devices.map(d => {
                 const value = valueState(d);
                 return {
                     key: d.id,
                     icon: iconForType(d.type),
                     name: d.name,
-                    detail: detailWithRoom(value ? formatValue(value, states[value.id]) : 'offen', roomName(d.roomId)),
+                    detail: detailWithRoom(
+                        value ? formatValue(value, states[value.id]) : t('open'),
+                        roomName(d.roomId),
+                    ),
                     onOpen: () => openDetail(d.id),
                 };
             })}
@@ -799,7 +808,7 @@ function PlayingCard({
     return (
         <StatusCard
             id="home-playing"
-            title={`🎵 ${count(devices.length, 'Player spielt', 'Player spielen')}`}
+            title={`🎵 ${tn(devices.length, '{n} player playing', '{n} players playing')}`}
             rows={devices.map(d => {
                 const ref = pauseRef(d);
                 return {
@@ -810,8 +819,8 @@ function PlayingCard({
                     onOpen: () => openDetail(d.id),
                     action: ref
                         ? {
-                              label: 'Pause',
-                              ariaLabel: `${d.name} pausieren`,
+                              label: t('Pause'),
+                              ariaLabel: t('Pause {name}', { name: d.name }),
                               onClick: () =>
                                   ref.name === 'PAUSE'
                                       ? turnOff(d, ref, true, undefined)
@@ -837,7 +846,7 @@ function ProblemsCard({
     return (
         <StatusCard
             id="home-problems"
-            title={`⚠️ ${count(devices.length, 'Störung', 'Störungen')}`}
+            title={`⚠️ ${tn(devices.length, '{n} fault', '{n} faults')}`}
             rows={devices.map(d => ({
                 key: d.id,
                 icon: iconForType(d.type),

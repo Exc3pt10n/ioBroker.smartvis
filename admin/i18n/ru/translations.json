@@ -3,11 +3,15 @@
     "IP address": "IP-адрес",
     "Port": "Порт",
     "Automatic discovery": "Автоматическое обнаружение",
-    "Language for device names": "Язык названий устройств",
     "Rediscovery after object change (seconds)": "Повторное обнаружение после изменения объектов (секунды)",
     "Ignored adapters (comma-separated)": "Игнорируемые адаптеры (через запятую)",
     "These adapters are skipped during discovery": "Эти адаптеры не учитываются при обнаружении",
     "User interface": "Интерфейс",
     "Allow edit mode": "Разрешить режим редактирования",
-    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "Переименование, скрытие, перемещение и избранное в приложении. Пока нет входа в систему, любой в сети может сохранять изменения."
+    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "Переименование, скрытие, перемещение и избранное в приложении. Пока нет входа в систему, любой в сети может сохранять изменения.",
+    "Language": "Язык",
+    "User interface and generated device names": "Интерфейс и создаваемые названия устройств",
+    "System language": "Язык системы",
+    "Deutsch": "Deutsch",
+    "English": "English"
 }

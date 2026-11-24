@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import type { SvEdit } from '../../../src/shared/protocol';
 import { connection } from '../connection';
@@ -152,8 +153,8 @@ export function DragHandle({ id, label }: { id: string; label: string }): React.
         <span
             className="draghandle"
             role="img"
-            aria-label={`${label} ziehen zum Verschieben`}
-            title="Ziehen zum Verschieben"
+            aria-label={t('Drag {name} to move it', { name: label })}
+            title={t('Drag to move')}
             onPointerDown={e => sort.start(id, e)}
         >
             <svg

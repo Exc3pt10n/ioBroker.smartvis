@@ -3,11 +3,15 @@
     "IP address": "IP 地址",
     "Port": "端口",
     "Automatic discovery": "自动发现",
-    "Language for device names": "设备名称语言",
     "Rediscovery after object change (seconds)": "对象变更后重新发现（秒）",
     "Ignored adapters (comma-separated)": "忽略的适配器（逗号分隔）",
     "These adapters are skipped during discovery": "发现设备时跳过这些适配器",
     "User interface": "界面",
     "Allow edit mode": "允许编辑模式",
-    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "在应用中重命名、隐藏、移动和设置收藏。在没有登录功能之前，网络中的任何人都可以保存自定义设置。"
+    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "在应用中重命名、隐藏、移动和设置收藏。在没有登录功能之前，网络中的任何人都可以保存自定义设置。",
+    "Language": "语言",
+    "User interface and generated device names": "界面和生成的设备名称",
+    "System language": "系统语言",
+    "Deutsch": "Deutsch",
+    "English": "English"
 }

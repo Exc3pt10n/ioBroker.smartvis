@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import { useState } from 'react';
 import type { SvSceneGroup } from '../../../src/shared/protocol';
 import { connection, useConnection } from '../connection';
@@ -33,12 +34,12 @@ export function ScenePanel({
         window.setTimeout(() => setFired(current => (current === id ? undefined : current)), 2000);
     };
 
-    const title = `🎨 Szenen${groups.length === 1 ? ` · ${group.name}` : ''}`;
+    const title = `🎨 ${t('Scenes')}${groups.length === 1 ? ` · ${group.name}` : ''}`;
     const running = activeScene(groups, states);
     const runningLabel = running && (
         <span
             className="scenes__running"
-            title="Gerade aktive Szene"
+            title={t('Currently active scene')}
         >
             ▶ {running.name}
             {groups.length > 1 ? ` · ${running.group.name}` : ''}
@@ -51,7 +52,7 @@ export function ScenePanel({
                 <div
                     className="chips chips--small scenes__groups"
                     role="tablist"
-                    aria-label="Gruppe"
+                    aria-label={t('Group')}
                 >
                     {groups.map(g => (
                         <button
@@ -80,10 +81,10 @@ export function ScenePanel({
                             title={
                                 s.smart
                                     ? active
-                                        ? 'Smart Scene läuft – antippen beendet sie'
-                                        : 'Smart Scene – passt sich selbst an (z. B. über den Tag)'
+                                        ? t('Smart scene running – tap to end it')
+                                        : t('Smart scene – adapts by itself (e.g. over the day)')
                                     : active
-                                      ? 'Diese Szene ist gerade aktiv'
+                                      ? t('This scene is currently active')
                                       : undefined
                             }
                             // Eine laufende Smart Scene (Schalter) lässt sich mit erneutem Antippen beenden
@@ -91,7 +92,7 @@ export function ScenePanel({
                         >
                             {fired === s.state.id ? '✓ ' : s.smart ? '✨ ' : ''}
                             {s.name}
-                            {active && <span className="scene__state">aktiv</span>}
+                            {active && <span className="scene__state">{t('active')}</span>}
                         </button>
                     );
                 })}
@@ -131,7 +132,7 @@ export function ScenePanel({
     return (
         <section
             className="scenes"
-            aria-label="Szenen"
+            aria-label={t('Scenes')}
         >
             <h2 className="subtitle">
                 {title}

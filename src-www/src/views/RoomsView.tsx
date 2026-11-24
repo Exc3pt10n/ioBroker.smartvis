@@ -1,3 +1,4 @@
+import { locale, t, tn } from '../../../src/shared/i18n';
 import { useState } from 'react';
 import type { SvRoom } from '../../../src/shared/protocol';
 import { EditBanner, EditButton, MoveButtons } from '../components/EditButton';
@@ -17,7 +18,7 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
     const [editRoom, setEditRoom] = useState<SvRoom | null>(null);
     const [creating, setCreating] = useState(false);
     if (!model) {
-        return <p className="empty">Lade Räume …</p>;
+        return <p className="empty">{t('Loading rooms …')}</p>;
     }
     const devices = visibleDevices(model, editing);
     // Sichtbare Geräte aller Räume: Lichtgruppen zählen nicht doppelt, wenn ihre Lampen woanders stehen
@@ -43,10 +44,10 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
     return (
         <>
             <div className="titlebar titlebar--split">
-                <h1 className="title">Räume</h1>
+                <h1 className="title">{t('Rooms')}</h1>
                 <EditButton />
             </div>
-            <EditBanner text="Raum antippen zum Umbenennen oder Ausblenden · am Griff ⠿ ziehen oder mit ← → sortieren" />
+            <EditBanner text={t('Tap a room to rename or hide it · drag it by the handle ⠿ or sort it with ← →')} />
             <SortableGrid
                 className="grid grid--rooms"
                 items={rooms}
@@ -91,9 +92,9 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
                                     >
                                         ❔
                                     </span>
-                                    <span className="room__name">Ohne Raum</span>
+                                    <span className="room__name">{t('Without room')}</span>
                                     <span className="room__meta">
-                                        {withoutRoom.length} {withoutRoom.length === 1 ? 'Gerät' : 'Geräte'}
+                                        {tn(withoutRoom.length, '{n} device', '{n} devices')}
                                     </span>
                                 </button>
                             </div>
@@ -104,7 +105,7 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
                                 className="room room--add"
                                 onClick={() => setCreating(true)}
                             >
-                                ＋ Raum anlegen
+                                ＋ {t('Create room')}
                             </button>
                         )}
                     </>
@@ -116,7 +117,7 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
                         id="zones-title"
                         className="subtitle"
                     >
-                        🔆 Zonen
+                        🔆 {t('Zones')}
                         <span className="group__count">{zones.length}</span>
                     </h2>
                     <div className="grid grid--rooms">
@@ -149,7 +150,7 @@ export function RoomsView({ onNavigate }: { onNavigate: (path: string) => void }
 }
 
 function fmt(v: number, digits: number): string {
-    return v.toLocaleString('de-DE', { maximumFractionDigits: digits });
+    return v.toLocaleString(locale(), { maximumFractionDigits: digits });
 }
 
 function RoomCard({
@@ -189,27 +190,37 @@ function RoomCard({
         lit && {
             key: 'lights',
             text: `💡 ${status.lights.length}`,
-            label: `${status.lights.length} ${status.lights.length === 1 ? 'Licht' : 'Lichter'} an`,
+            label: tn(status.lights.length, '{n} light on', '{n} lights on'),
         },
-        status.open > 0 && { key: 'open', text: `🪟 ${status.open}`, label: `${status.open} offen`, warn: true },
-        !!scene && { key: 'scene', text: `🎨 ${scene}`, label: `Szene „${scene}“ aktiv`, wide: true },
-        status.climate && { key: 'climate', text: status.climate, label: 'Klima läuft' },
-        status.playing > 0 && { key: 'media', text: '🎵', label: 'Musik läuft' },
+        status.open > 0 && {
+            key: 'open',
+            text: `🪟 ${status.open}`,
+            label: t('{n} open', { n: status.open }),
+            warn: true,
+        },
+        !!scene && {
+            key: 'scene',
+            text: `🎨 ${scene}`,
+            label: t('Scene “{name}” active', { name: scene }),
+            wide: true,
+        },
+        status.climate && { key: 'climate', text: status.climate, label: t('Climate running') },
+        status.playing > 0 && { key: 'media', text: '🎵', label: t('Music playing') },
         status.blindMin !== undefined && {
             key: 'blind',
             text: `▤ ${Math.round(status.blindMin)} %`,
-            label: `Rollladen ${Math.round(status.blindMin)} % offen`,
+            label: t('Blind {percent} % open', { percent: Math.round(status.blindMin) }),
         },
         weakBatteries > 0 && {
             key: 'battery',
             text: `🪫 ${weakBatteries}`,
-            label: `${weakBatteries} ${weakBatteries === 1 ? 'Batterie' : 'Batterien'} schwach`,
+            label: tn(weakBatteries, '{n} battery low', '{n} batteries low'),
             warn: true,
         },
         status.problems > 0 && {
             key: 'problems',
             text: `⚠️ ${status.problems}`,
-            label: `${status.problems} ${status.problems === 1 ? 'Störung' : 'Störungen'}`,
+            label: tn(status.problems, '{n} fault', '{n} faults'),
             warn: true,
         },
     ];
@@ -258,28 +269,28 @@ function RoomCard({
                 {/* Immer dieselbe Fußzeile: Anzahl Geräte (und Kameras) – einheitlich auf allen Karten */}
                 <span className="room__meta">
                     {[
-                        count > 0 && `${count} ${count === 1 ? 'Gerät' : 'Geräte'}`,
-                        cameras > 0 && `${cameras} ${cameras === 1 ? 'Kamera' : 'Kameras'}`,
+                        count > 0 && tn(count, '{n} device', '{n} devices'),
+                        cameras > 0 && tn(cameras, '{n} camera', '{n} cameras'),
                     ]
                         .filter(Boolean)
-                        .join(' · ') || 'Keine Geräte'}
-                    {editing && room.source === 'name' ? ' · aus Gerätenamen erkannt' : ''}
-                    {editing && room.source === 'custom' ? ' · selbst angelegt' : ''}
+                        .join(' · ') || t('No devices')}
+                    {editing && room.source === 'name' ? ` · ${t('detected from device names')}` : ''}
+                    {editing && room.source === 'custom' ? ` · ${t('created by you')}` : ''}
                 </span>
             </button>
             {lit && !editing && (
                 <button
                     type="button"
                     className="room__off"
-                    aria-label={`${room.name}: alle Lichter ausschalten`}
-                    title="Alle Lichter ausschalten"
+                    aria-label={`${room.name}: ${t('switch all lights off')}`}
+                    title={t('Switch all lights off')}
                     onClick={() => switchLights(status.lights, false, connection.getSnapshot().states, room.name)}
                 >
                     <Icon
                         name="light"
                         size={14}
                     />{' '}
-                    aus
+                    {t('off')}
                 </button>
             )}
             {editing && (

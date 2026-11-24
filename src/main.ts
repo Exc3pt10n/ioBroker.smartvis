@@ -16,6 +16,8 @@ import {
 } from './lib/clientOverrides';
 import { applyEdit, applyOverrides } from './lib/overrides';
 import { SmartVisServer } from './lib/server';
+import { rediscoverDelayMs } from './lib/timers';
+import { type SvLanguage, setLanguage, t, toLanguage } from './shared/i18n';
 import type {
     SvClientAction,
     SvEdit,
@@ -43,6 +45,8 @@ class SmartVis extends utils.Adapter {
     private states: Record<string, SvStateValue | null> = {};
     private subscribed = new Set<string>();
     private rediscoverTimer?: ioBroker.Timeout;
+    /** Sprache der Oberfläche und der erzeugten Namen */
+    private uiLanguage: SvLanguage = 'en';
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({ ...options, name: 'smartvis' });
@@ -53,6 +57,8 @@ class SmartVis extends utils.Adapter {
     }
 
     private async onReady(): Promise<void> {
+        this.uiLanguage = await this.resolveLanguage();
+        setLanguage(this.uiLanguage);
         await this.loadOverrides();
         await this.removeEventFiles();
         this.snapshots = new CameraSnapshots(
@@ -94,11 +100,14 @@ class SmartVis extends utils.Adapter {
                 file: path => this.readCameraFile(path),
                 diagnose: () => {
                     if (!this.discovery) {
-                        throw new Error('Die Erkennung läuft noch');
+                        throw new Error(t('Discovery is still running'));
                     }
-                    return buildDiagnosis(this.discovery, this.config.language || 'de');
+                    return buildDiagnosis(this.discovery, this.uiLanguage);
                 },
-                onClientCountChange: count => void this.setState('info.clients', count, true),
+                onClientCountChange: count =>
+                    void this.setState('info.clients', count, true).catch(e =>
+                        this.log.warn(`Client count could not be set: ${(e as Error).message}`),
+                    ),
                 log: this.log,
             },
             this,
@@ -107,12 +116,12 @@ class SmartVis extends utils.Adapter {
         try {
             await this.server.start();
             this.log.info(
-                `SmartVis läuft auf http://${this.config.bind || '0.0.0.0'}:${this.config.port}${
-                    this.config.allowEdit === false ? ' (Bearbeiten deaktiviert)' : ''
+                `SmartVis is running on http://${this.config.bind || '0.0.0.0'}:${this.config.port}${
+                    this.config.allowEdit === false ? ' (edit mode disabled)' : ''
                 }`,
             );
         } catch (e) {
-            this.log.error(`Webserver konnte nicht gestartet werden: ${(e as Error).message}`);
+            this.log.error(`Web server could not be started: ${(e as Error).message}`);
             this.terminate?.(utils.EXIT_CODES.ADAPTER_REQUESTED_TERMINATION);
             return;
         }
@@ -121,12 +130,25 @@ class SmartVis extends utils.Adapter {
         await this.subscribeForeignObjectsAsync('*');
     }
 
+    /** Eingestellte Sprache, ohne Einstellung die Systemsprache von ioBroker (Deutsch oder sonst Englisch) */
+    private async resolveLanguage(): Promise<SvLanguage> {
+        if (this.config.language === 'de' || this.config.language === 'en') {
+            return this.config.language;
+        }
+        try {
+            const config = await this.getForeignObjectAsync('system.config');
+            return toLanguage((config?.common as { language?: string } | undefined)?.language);
+        } catch {
+            return 'en';
+        }
+    }
+
     private async runDiscovery(): Promise<void> {
         const started = Date.now();
         const objects = await this.loadObjects();
 
         this.discovery = discover(objects, {
-            language: this.config.language || 'de',
+            language: this.uiLanguage,
             ignoreAdapters: [this.name, ...(this.config.ignoreAdapters || '').split(',')],
         });
 
@@ -136,7 +158,7 @@ class SmartVis extends utils.Adapter {
         const { devices, rooms } = this.discovery.model;
         const withoutRoom = devices.filter(d => !d.roomId).length;
         this.log.info(
-            `Erkennung: ${devices.length} Geräte, ${rooms.length} Räume, ${withoutRoom} ohne Raum (${Date.now() - started} ms)`,
+            `Discovery: ${devices.length} devices, ${rooms.length} rooms, ${withoutRoom} without room (${Date.now() - started} ms)`,
         );
         await this.setStateAsync('info.devices', devices.length, true);
         this.updateModel(true);
@@ -165,7 +187,12 @@ class SmartVis extends utils.Adapter {
             const snapshot = this.snapshots?.snapshot(c.id);
             return snapshot ? { ...c, snapshot } : c;
         });
-        return { ...model, ...(cameras && { cameras }), client: clientInfo(this.store, clientId) };
+        return {
+            ...model,
+            ...(cameras && { cameras }),
+            language: this.uiLanguage,
+            client: clientInfo(this.store, clientId),
+        };
     }
 
     private async loadOverrides(): Promise<void> {
@@ -180,10 +207,10 @@ class SmartVis extends utils.Adapter {
                 const { file } = await this.readFileAsync(this.namespace, OVERRIDES_FILE);
                 this.store = parseStore(file);
                 const n = Object.keys(this.store.clients).length;
-                this.log.info(`Anpassungen geladen (${n} ${n === 1 ? 'Gerät' : 'Geräte'})`);
+                this.log.info(`Customizations loaded (${n} ${n === 1 ? 'client' : 'clients'})`);
             }
         } catch (e) {
-            this.log.warn(`Anpassungen konnten nicht gelesen werden: ${(e as Error).message}`);
+            this.log.warn(`Customizations could not be read: ${(e as Error).message}`);
         }
     }
 
@@ -202,8 +229,8 @@ class SmartVis extends utils.Adapter {
         try {
             await this.writeFileAsync(this.namespace, OVERRIDES_FILE, JSON.stringify(next, null, 2));
         } catch (e) {
-            this.log.error(`Anpassungen konnten nicht gespeichert werden: ${(e as Error).message}`);
-            throw new Error('Anpassung konnte nicht gespeichert werden');
+            this.log.error(`Customizations could not be saved: ${(e as Error).message}`);
+            throw new Error(t('The change could not be saved'));
         }
         this.store = next;
     }
@@ -219,7 +246,7 @@ class SmartVis extends utils.Adapter {
             this.store = next;
         }
         if (!known) {
-            this.log.info(`Neues Gerät angemeldet: ${next.clients[clientId].name}`);
+            this.log.info(`New client registered: ${next.clients[clientId].name}`);
             // Geräteliste der anderen Clients aktualisieren
             this.server?.publishModels(false);
         }
@@ -227,7 +254,7 @@ class SmartVis extends utils.Adapter {
 
     private async applyAndSave(clientId: string | undefined, edit: SvEdit): Promise<void> {
         if (this.config.allowEdit === false) {
-            throw new Error('Bearbeiten ist in den Adapter-Einstellungen deaktiviert');
+            throw new Error(t('Editing is disabled in the adapter settings'));
         }
         const next = withOverrides(this.store, clientId, applyEdit(overridesFor(this.store, clientId), edit));
         await this.save(next);
@@ -237,10 +264,10 @@ class SmartVis extends utils.Adapter {
 
     private async clientAction(clientId: string | undefined, request: SvClientAction): Promise<void> {
         if (this.config.allowEdit === false) {
-            throw new Error('Bearbeiten ist in den Adapter-Einstellungen deaktiviert');
+            throw new Error(t('Editing is disabled in the adapter settings'));
         }
         await this.save(applyClientAction(this.store, clientId, request));
-        this.log.info(`Anpassungen: ${request.action}${clientId ? ` (${this.store.clients[clientId]?.name})` : ''}`);
+        this.log.info(`Customizations: ${request.action}${clientId ? ` (${this.store.clients[clientId]?.name})` : ''}`);
         this.server?.publishModels(false);
     }
 
@@ -266,7 +293,7 @@ class SmartVis extends utils.Adapter {
             try {
                 Object.assign(result, await this.getForeignObjectsAsync(pattern, type as 'state'));
             } catch (e) {
-                this.log.warn(`Objekte vom Typ ${type} konnten nicht gelesen werden: ${(e as Error).message}`);
+                this.log.warn(`Objects of type ${type} could not be read: ${(e as Error).message}`);
             }
         }
         return result;
@@ -320,7 +347,7 @@ class SmartVis extends utils.Adapter {
         }
         await this.delFileAsync(this.namespace, dir).catch(() => undefined);
         if (dir === 'events' && removed) {
-            this.log.info(`${removed} gespeicherte Dateien des früheren Kamera-Ereignisprotokolls entfernt`);
+            this.log.info(`Removed ${removed} stored files of the former camera event log`);
         }
         return removed;
     }
@@ -329,13 +356,13 @@ class SmartVis extends utils.Adapter {
     private async readHistory(id: string, range: SvHistoryRange): Promise<[number, number][]> {
         const instance = this.discovery?.historyIds.get(id);
         if (!instance) {
-            throw new Error(`Kein Verlauf für ${id}`);
+            throw new Error(t('No history for {id}', { id }));
         }
         const options = historyOptions(range) as { step: number; end: number };
         const response = (await this.sendToAsync(instance, 'getHistory', { id, options }, { timeout: 20_000 })) as
             { result?: unknown; error?: string } | undefined;
         if (!response) {
-            throw new Error(`${instance} antwortet nicht`);
+            throw new Error(t('{instance} does not respond', { instance }));
         }
         if (response.error) {
             throw new Error(String(response.error));
@@ -371,7 +398,7 @@ class SmartVis extends utils.Adapter {
 
     private async writeState(id: string, val: ioBrokerValue): Promise<void> {
         if (!this.discovery?.writableIds.has(id)) {
-            throw new Error(`State ${id} ist nicht freigegeben`);
+            throw new Error(t('State {id} is not released', { id }));
         }
         await this.setForeignStateAsync(id, invertNumber(val, this.inverted().get(id)), false);
     }
@@ -395,10 +422,10 @@ class SmartVis extends utils.Adapter {
         if (this.rediscoverTimer) {
             this.clearTimeout(this.rediscoverTimer);
         }
-        const delay = (Number(this.config.rediscoverDelay) || 10) * 1000;
+        const delay = rediscoverDelayMs(this.config.rediscoverDelay);
         this.rediscoverTimer = this.setTimeout(() => {
             this.rediscoverTimer = undefined;
-            this.runDiscovery().catch(e => this.log.error(`Erkennung fehlgeschlagen: ${(e as Error).message}`));
+            this.runDiscovery().catch(e => this.log.error(`Discovery failed: ${(e as Error).message}`));
         }, delay);
     }
 

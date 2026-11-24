@@ -1,10 +1,11 @@
+import { getLanguage } from '../../src/shared/i18n';
 import type { SvDevice, SvModel, SvScene, SvSceneGroup, SvStateValue } from '../../src/shared/protocol';
 
 /** Szenengruppen, zu denen ein Gerät gehört – größte Gruppe (meist der Raum) zuerst */
 export function scenesForDevice(model: SvModel, deviceId: string): SvSceneGroup[] {
     return (model.scenes || [])
         .filter(g => g.devices.includes(deviceId))
-        .sort((a, b) => b.devices.length - a.devices.length || a.name.localeCompare(b.name, 'de'));
+        .sort((a, b) => b.devices.length - a.devices.length || a.name.localeCompare(b.name, getLanguage()));
 }
 
 /**

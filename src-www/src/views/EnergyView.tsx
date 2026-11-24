@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import { useState } from 'react';
 import { useCardColumns, useMediaQuery } from '../media';
 import type { SvStateRef } from '../../../src/shared/protocol';
@@ -20,13 +21,13 @@ export function EnergyView(): React.JSX.Element {
     const [focus, setFocus] = useState<{ key: string; n: number }>();
     const phone = useMediaQuery('(max-width: 599px)');
     if (!model) {
-        return <p className="empty">Lade …</p>;
+        return <p className="empty">{t('Loading …')}</p>;
     }
     if (!model.energy.length && !model.wallboxes.length && !model.pvForecast.length) {
         return (
             <>
-                <h1 className="title">Energie</h1>
-                <p className="empty">Kein unterstütztes Energiesystem gefunden.</p>
+                <h1 className="title">{t('Energy')}</h1>
+                <p className="empty">{t('No supported energy system found.')}</p>
             </>
         );
     }
@@ -42,29 +43,29 @@ export function EnergyView(): React.JSX.Element {
         has(f?.pv)
             ? {
                   key: 'power',
-                  label: 'Leistung',
+                  label: t('Power'),
                   lineLabel: 'PV',
                   ref: f.pv,
                   color: pvColor,
                   zeroBased: true,
-                  extra: has(f?.home) ? [{ label: 'Verbrauch', ref: f.home, color: homeColor }] : [],
+                  extra: has(f?.home) ? [{ label: t('Consumption'), ref: f.home, color: homeColor }] : [],
               }
-            : has(f?.home) && { key: 'power', label: 'Verbrauch', ref: f.home, color: homeColor, zeroBased: true },
+            : has(f?.home) && { key: 'power', label: t('Consumption'), ref: f.home, color: homeColor, zeroBased: true },
         has(f?.gridImport)
             ? {
                   key: 'grid',
-                  label: 'Netz',
-                  lineLabel: 'Bezug',
+                  label: t('Grid'),
+                  lineLabel: t('Import'),
                   ref: f.gridImport,
                   color: 'var(--chart-grid-import)',
                   zeroBased: true,
                   extra: has(f?.gridExport)
-                      ? [{ label: 'Einspeisung', ref: f.gridExport, color: 'var(--chart-grid-export)' }]
+                      ? [{ label: t('Grid export'), ref: f.gridExport, color: 'var(--chart-grid-export)' }]
                       : [],
               }
             : has(f?.gridExport) && {
                   key: 'grid',
-                  label: 'Netz',
+                  label: t('Grid'),
                   ref: f.gridExport,
                   color: 'var(--chart-grid-export)',
                   zeroBased: true,
@@ -72,27 +73,27 @@ export function EnergyView(): React.JSX.Element {
         has(main?.battery?.soc)
             ? {
                   key: 'battery',
-                  label: 'Batterie',
+                  label: t('Battery'),
                   ref: main.battery.soc,
                   color: 'var(--chart-battery)',
                   zeroBased: true,
               }
             : has(f?.batteryCharge) && {
                   key: 'battery',
-                  label: 'Batterie',
-                  lineLabel: 'Laden',
+                  label: t('Battery'),
+                  lineLabel: t('Charging'),
                   ref: f.batteryCharge,
                   color: 'var(--chart-battery)',
                   zeroBased: true,
                   extra: has(f?.batteryDischarge)
-                      ? [{ label: 'Entladen', ref: f.batteryDischarge, color: 'var(--chart-grid-import)' }]
+                      ? [{ label: t('Discharging'), ref: f.batteryDischarge, color: 'var(--chart-grid-import)' }]
                       : [],
               },
         ...model.wallboxes.map(w =>
             has(w.surplus)
                 ? {
                       key: `s-${w.id}`,
-                      label: model.wallboxes.length > 1 ? `Überschuss ${w.name}` : 'Überschuss',
+                      label: model.wallboxes.length > 1 ? `${t('Surplus')} ${w.name}` : t('Surplus'),
                       ref: w.surplus,
                       color: pvColor,
                   }
@@ -127,13 +128,15 @@ export function EnergyView(): React.JSX.Element {
             return [
                 {
                     key: `flow-${system.id}`,
-                    label: `Energiefluss${suffix}`,
+                    label: `${t('Energy flow')}${suffix}`,
                     weight: 5,
                     node: (
                         <section className="card energy__flow">
-                            <h2 className="subtitle">⚡ {multi ? system.name : 'Energiefluss'}</h2>
+                            <h2 className="subtitle">⚡ {multi ? system.name : t('Energy flow')}</h2>
                             {offline && (
-                                <div className="banner banner--offline">{system.name}: keine Verbindung zum Gerät</div>
+                                <div className="banner banner--offline">
+                                    {system.name}: {t('no connection to the device')}
+                                </div>
                             )}
                             <FlowStatus
                                 flow={flow}
@@ -148,13 +151,13 @@ export function EnergyView(): React.JSX.Element {
                 },
                 {
                     key: `totals-${system.id}`,
-                    label: `Energiezähler${suffix}`,
+                    label: `${t('Energy counters')}${suffix}`,
                     weight: 4,
                     node: (
                         <PhoneCollapse
                             id={`totals-${system.id}`}
                             phone={phone}
-                            title={`📊 Energiezähler${suffix}`}
+                            title={`📊 ${t('Energy counters')}${suffix}`}
                         >
                             <EnergyTotals
                                 system={system}
@@ -167,13 +170,13 @@ export function EnergyView(): React.JSX.Element {
         }),
         ...model.wallboxes.map(wb => ({
             key: `wallbox-${wb.id}`,
-            label: model.wallboxes.length > 1 ? `Wallbox ${wb.name}` : 'Wallbox',
+            label: model.wallboxes.length > 1 ? `${t('Wallbox')} ${wb.name}` : t('Wallbox'),
             weight: 3.5,
             node: <WallboxCard wallbox={wb} />,
         })),
         {
             key: 'history',
-            label: 'Verlauf',
+            label: t('History'),
             // Zeitreihen profitieren von Breite: auf dem Desktop über beide Spalten
             wide: true,
             node:
@@ -181,7 +184,7 @@ export function EnergyView(): React.JSX.Element {
                     <PhoneCollapse
                         id="history"
                         phone={phone}
-                        title="📈 Verlauf"
+                        title={`📈 ${t('History')}`}
                     >
                         <HistoryPanel
                             series={energyHistory}
@@ -192,7 +195,7 @@ export function EnergyView(): React.JSX.Element {
         },
         ...model.pvForecast.map(pv => ({
             key: `forecast-${pv.id}`,
-            label: 'PV-Prognose',
+            label: t('PV forecast'),
             // Tageskurve: auf dem Desktop über die volle Breite wie der Verlauf
             wide: true,
             node: (
@@ -221,10 +224,10 @@ export function EnergyView(): React.JSX.Element {
     return (
         <>
             <div className="titlebar titlebar--split">
-                <h1 className="title">Energie</h1>
+                <h1 className="title">{t('Energy')}</h1>
                 <EditButton />
             </div>
-            <EditBanner text="Bereiche am Griff ⠿ ziehen oder mit ↑ ↓ sortieren und aus- oder einblenden" />
+            <EditBanner text={t('Drag sections by the handle ⠿ or sort them with ↑ ↓, and hide or show them')} />
             <CustomSections
                 view="energy"
                 columns={columns}
@@ -268,7 +271,7 @@ function PhoneCollapse({
                         rerender(n => n + 1);
                     }}
                 >
-                    {title.replace(/^\S+\s/, '')} einklappen
+                    {t('Collapse {name}', { name: title.replace(/^\S+\s/, '') })}
                     <span
                         className="collapse-open__chevron"
                         aria-hidden="true"

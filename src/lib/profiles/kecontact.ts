@@ -1,3 +1,4 @@
+import { t } from '../../shared/i18n';
 import type { SvStateRef, SvWallbox, SvWallboxSetting } from '../../shared/protocol';
 import { ref, type AdapterProfile, type ObjectMap } from './types';
 
@@ -16,7 +17,7 @@ import { ref, type AdapterProfile, type ObjectMap } from './types';
  * automatic.calcPhases) – die App macht es ebenso. Sitzungsenergie wird deshalb nicht angezeigt.
  */
 /**
- * Einstellungen der Ladeautomatik (automatic.*) mit deutschen Bezeichnungen.
+ * Einstellungen der Ladeautomatik (automatic.*), Bezeichnungen englisch und übersetzt.
  * Bewusst nicht enthalten: Rohbefehle (start/stop/display/output/unlock/report/setenergy/currentTimer …),
  * der von der Automatik geregelte Ladestrom und automatic.stateVehicleSoC (Konfiguration, Datenpunkt-Name).
  */
@@ -24,21 +25,21 @@ function settings(objects: ObjectMap, instance: string): SvWallboxSetting[] {
     const defs: Omit<SvWallboxSetting, 'state'>[] = [
         {
             key: 'automatic.1p3pCharging',
-            group: 'Ladeautomatik',
-            label: 'Phasen beim Laden',
-            hint: 'Nur mit Phasenumschaltung (z. B. X2-Ausgang)',
+            group: 'Charging automation',
+            label: 'Phases while charging',
+            hint: 'Only with phase switching (e.g. X2 output)',
             kind: 'select',
             options: [
-                { value: 0, label: 'Automatisch nach Überschuss' },
-                { value: 1, label: 'Nur 1-phasig' },
-                { value: 3, label: 'Nur 3-phasig' },
+                { value: 0, label: 'Automatic by surplus' },
+                { value: 1, label: '1-phase only' },
+                { value: 3, label: '3-phase only' },
             ],
         },
         {
             key: 'automatic.addPower',
-            group: 'Ladeautomatik',
-            label: 'Zusätzlicher Netzbezug',
-            hint: 'Erlaubter Netzbezug, damit das Laden schon früher startet',
+            group: 'Charging automation',
+            label: 'Additional grid import',
+            hint: 'Allowed grid import so that charging starts earlier',
             kind: 'number',
             unit: 'W',
             min: 0,
@@ -47,44 +48,44 @@ function settings(objects: ObjectMap, instance: string): SvWallboxSetting[] {
         },
         {
             key: 'automatic.maxGridPower',
-            group: 'Ladeautomatik',
-            label: 'Maximaler Netzbezug',
+            group: 'Charging automation',
+            label: 'Maximum grid import',
             kind: 'number',
             unit: 'W',
             min: 0,
             max: 50000,
             step: 100,
-            zeroLabel: 'Einstellung des Adapters',
+            zeroLabel: 'Adapter setting',
         },
         {
             key: 'automatic.limitCurrent',
-            group: 'Ladeautomatik',
-            label: 'Ladestrom begrenzen',
+            group: 'Charging automation',
+            label: 'Limit charging current',
             kind: 'number',
             unit: 'A',
             scale: 0.001,
             min: 0,
             max: 32,
             step: 1,
-            zeroLabel: 'keine Begrenzung',
+            zeroLabel: 'no limit',
         },
         {
             key: 'automatic.limitCurrent1p',
-            group: 'Ladeautomatik',
-            label: 'Ladestrom begrenzen (1-phasig)',
+            group: 'Charging automation',
+            label: 'Limit charging current (1-phase)',
             kind: 'number',
             unit: 'A',
             scale: 0.001,
             min: 0,
             max: 32,
             step: 1,
-            zeroLabel: 'wie oben',
+            zeroLabel: 'as above',
         },
         {
             key: 'automatic.calcPhases',
-            group: 'Ladeautomatik',
-            label: 'Phasen für Leistungsschätzung',
-            hint: 'Deutschland-Edition ohne Energiezähler',
+            group: 'Charging automation',
+            label: 'Phases for power estimate',
+            hint: 'Germany edition without energy meter',
             kind: 'number',
             min: 1,
             max: 3,
@@ -92,21 +93,21 @@ function settings(objects: ObjectMap, instance: string): SvWallboxSetting[] {
         },
         {
             key: 'automatic.batteryStorageStrategy',
-            group: 'Batteriespeicher',
-            label: 'Strategie',
+            group: 'Battery storage',
+            label: 'Strategy',
             kind: 'select',
             options: [
-                { value: 0, label: 'Einstellung des Adapters' },
-                { value: 1, label: 'Speicher nicht nutzen (Vorrang Auto)' },
-                { value: 2, label: 'Speicher nicht nutzen (Vorrang Speicher)' },
-                { value: 3, label: 'Speicher für Mindest-Ladestrom nutzen' },
-                { value: 4, label: 'Speicher voll für das Auto nutzen' },
+                { value: 0, label: 'Adapter setting' },
+                { value: 1, label: 'Do not use storage (car first)' },
+                { value: 2, label: 'Do not use storage (storage first)' },
+                { value: 3, label: 'Use storage for minimum charging current' },
+                { value: 4, label: 'Use storage fully for the car' },
             ],
         },
         {
             key: 'automatic.batterySoCForCharging',
-            group: 'Batteriespeicher',
-            label: 'Speicher fürs Auto ab Ladezustand',
+            group: 'Battery storage',
+            label: 'Storage for the car from state of charge',
             kind: 'number',
             unit: '%',
             min: 0,
@@ -115,33 +116,33 @@ function settings(objects: ObjectMap, instance: string): SvWallboxSetting[] {
         },
         {
             key: 'automatic.targetSoC',
-            group: 'Ziel-Ladung',
-            label: 'Ohne PV-Automatik laden bis',
-            hint: 'Lädt mit voller Leistung bis zu diesem Fahrzeug-Ladezustand',
+            group: 'Target charging',
+            label: 'Charge without PV automation up to',
+            hint: 'Charges at full power up to this vehicle state of charge',
             kind: 'number',
             unit: '%',
             min: 0,
             max: 100,
             step: 5,
-            zeroLabel: 'aus',
+            zeroLabel: 'off',
             needsVehicleSoC: true,
         },
         {
             key: 'automatic.maxSoC',
-            group: 'Ziel-Ladung',
-            label: 'Laden beenden bei',
+            group: 'Target charging',
+            label: 'Stop charging at',
             kind: 'number',
             unit: '%',
             min: 0,
             max: 100,
             step: 5,
-            zeroLabel: 'aus',
+            zeroLabel: 'off',
             needsVehicleSoC: true,
         },
         {
             key: 'automatic.resetTargetSoC',
-            group: 'Ziel-Ladung',
-            label: 'Ziel nach Erreichen zurücksetzen',
+            group: 'Target charging',
+            label: 'Reset target when reached',
             kind: 'switch',
             needsVehicleSoC: true,
         },
@@ -150,7 +151,15 @@ function settings(objects: ObjectMap, instance: string): SvWallboxSetting[] {
     for (const def of defs) {
         const state = ref(objects, `${instance}.${def.key}`, def.label);
         if (state?.write) {
-            result.push({ ...def, state });
+            result.push({
+                ...def,
+                group: t(def.group),
+                label: t(def.label),
+                ...(def.hint && { hint: t(def.hint) }),
+                ...(def.zeroLabel && { zeroLabel: t(def.zeroLabel) }),
+                ...(def.options && { options: def.options.map(o => ({ ...o, label: t(o.label) })) }),
+                state,
+            });
         }
     }
     return result;
@@ -165,7 +174,7 @@ export const kecontactProfile: AdapterProfile = {
     claimsInstance: true,
     detect(instance, objects) {
         const id = (s: string): string => `${instance}.${s}`;
-        const power = ref(objects, id('p'), 'Ladeleistung');
+        const power = ref(objects, id('p'), 'Charging power');
         const status = ref(objects, id('state'), 'Status');
         if (!power || !status) {
             return null;
@@ -185,19 +194,19 @@ export const kecontactProfile: AdapterProfile = {
                 4: 'error',
                 5: 'interrupted',
             },
-            plug: ref(objects, id('plug'), 'Stecker'),
+            plug: ref(objects, id('plug'), 'Plug'),
             vehiclePluggedValues: [5, 7],
             // nur lesen: der Ladestrom wird von der PV-Automatik des Adapters geregelt
-            current: readOnly(ref(objects, id('currentUser'), 'Ladestrom')),
-            currentMax: ref(objects, id('currentHardware'), 'Maximaler Ladestrom'),
-            phases: ref(objects, id('statistics.chargingPhases'), 'Phasen'),
-            configuredPhases: readOnly(ref(objects, id('automatic.calcPhases'), 'Phasen (Einstellung)')),
-            surplus: ref(objects, id('statistics.surplus'), 'PV-Überschuss'),
+            current: readOnly(ref(objects, id('currentUser'), 'Charging current')),
+            currentMax: ref(objects, id('currentHardware'), 'Maximum charging current'),
+            phases: ref(objects, id('statistics.chargingPhases'), 'Phases'),
+            configuredPhases: readOnly(ref(objects, id('automatic.calcPhases'), 'Phases (setting)')),
+            surplus: ref(objects, id('statistics.surplus'), 'PV surplus'),
             settings: settings(objects, instance),
-            vehicleSoCSource: readOnly(ref(objects, id('automatic.stateVehicleSoC'), 'SoC-Datenpunkt')),
-            pvAutomatic: ref(objects, id('automatic.photovoltaics'), 'PV-Überschussladen'),
-            pause: ref(objects, id('automatic.pauseWallbox'), 'Pausieren'),
-            connected: ref(objects, id('info.connection'), 'Verbunden'),
+            vehicleSoCSource: readOnly(ref(objects, id('automatic.stateVehicleSoC'), 'SoC data point')),
+            pvAutomatic: ref(objects, id('automatic.photovoltaics'), 'PV surplus charging'),
+            pause: ref(objects, id('automatic.pauseWallbox'), 'Pause'),
+            connected: ref(objects, id('info.connection'), 'Connected'),
         };
         return { wallbox };
     },

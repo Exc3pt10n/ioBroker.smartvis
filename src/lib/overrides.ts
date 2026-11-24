@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n';
 import {
     CARD_WIDTHS,
     type SvCardWidth,
@@ -200,7 +201,7 @@ export function applyEdit(current: SvOverrides, edit: SvEdit): SvOverrides {
         case 'createRoom': {
             const name = cleanName(edit.name);
             if (!name) {
-                throw new Error('Raumname fehlt');
+                throw new Error(t('Room name missing'));
             }
             let id = `custom.${slug(name) || 'raum'}`;
             for (let n = 2; o.rooms[id]; n++) {
@@ -214,7 +215,7 @@ export function applyEdit(current: SvOverrides, edit: SvEdit): SvOverrides {
         }
         case 'deleteRoom': {
             if (!o.rooms[edit.id]?.custom) {
-                throw new Error('Nur selbst angelegte Räume können gelöscht werden');
+                throw new Error(t('Only rooms you created yourself can be deleted'));
             }
             delete o.rooms[edit.id];
             // Geräte, die dorthin verschoben waren, kehren in ihren erkannten Raum zurück
@@ -238,7 +239,7 @@ export function applyEdit(current: SvOverrides, edit: SvEdit): SvOverrides {
         }
         case 'view': {
             if (typeof edit.view !== 'string' || !VIEW_KEY.test(edit.view)) {
-                throw new Error('Unbekannte Ansicht');
+                throw new Error(t('Unknown view'));
             }
             const views = { ...o.ui?.views };
             const layout: SvViewLayout = { ...views[edit.view] };
@@ -254,10 +255,10 @@ export function applyEdit(current: SvOverrides, edit: SvEdit): SvOverrides {
             if (edit.width) {
                 const { key, width } = edit.width;
                 if (typeof key !== 'string' || !key || key.length > 200) {
-                    throw new Error('Ungültiger Bereich');
+                    throw new Error(t('Invalid section'));
                 }
                 if (width !== null && !CARD_WIDTHS.includes(width)) {
-                    throw new Error('Ungültige Breite');
+                    throw new Error(t('Invalid width'));
                 }
                 const widths = { ...layout.widths };
                 if (width === null) {
@@ -272,7 +273,7 @@ export function applyEdit(current: SvOverrides, edit: SvEdit): SvOverrides {
             break;
         }
         default:
-            throw new Error('Unbekannte Änderung');
+            throw new Error(t('Unknown change'));
     }
     return prune(o);
 }

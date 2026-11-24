@@ -1,3 +1,4 @@
+import { t, tn } from '../../../src/shared/i18n';
 import { ROOM_ICON_CHOICES, roomDevices, roomIcon } from '../rooms';
 import { useState } from 'react';
 import type { SvDevice, SvEdit, SvRoom } from '../../../src/shared/protocol';
@@ -37,7 +38,7 @@ function NameField({
                 className="field__label"
                 htmlFor="edit-name"
             >
-                Name
+                {t('Name')}
             </label>
             <input
                 id="edit-name"
@@ -59,7 +60,7 @@ function NameField({
                         onSave(null);
                     }}
                 >
-                    Zurücksetzen auf „{original}“
+                    {t('Reset to “{name}”', { name: original })}
                 </button>
             )}
         </div>
@@ -82,7 +83,7 @@ export function EditDeviceSheet({
     const patch = (p: DevicePatch): void => connection.edit({ kind: 'device', id: device.id, patch: p });
     const detectedRoom = device.originalRoomId !== undefined ? device.originalRoomId : device.roomId;
     const roomName = (id: string | null | undefined): string =>
-        id ? (model.rooms.find(r => r.id === id)?.name ?? id) : 'Ohne Raum';
+        id ? (model.rooms.find(r => r.id === id)?.name ?? id) : t('Without room');
     const customized = device.originalName || device.originalRoomId !== undefined || device.hidden || device.favorite;
 
     return (
@@ -103,7 +104,7 @@ export function EditDeviceSheet({
                         className="field__label"
                         htmlFor="edit-room"
                     >
-                        Raum
+                        {t('Room')}
                     </label>
                     <select
                         id="edit-room"
@@ -130,11 +131,11 @@ export function EditDeviceSheet({
                                     value={r.id}
                                 >
                                     {r.name}
-                                    {r.hidden ? ' (ausgeblendet)' : ''}
+                                    {r.hidden ? ` (${t('hidden')})` : ''}
                                 </option>
                             ))}
-                        <option value={NO_ROOM}>Ohne Raum</option>
-                        <option value={NEW_ROOM}>＋ Neuer Raum …</option>
+                        <option value={NO_ROOM}>{t('Without room')}</option>
+                        <option value={NEW_ROOM}>＋ {t('New room …')}</option>
                     </select>
                     {device.originalRoomId !== undefined && (
                         <span className="field__hint">Erkannt: {roomName(device.originalRoomId)}</span>
@@ -153,8 +154,8 @@ export function EditDeviceSheet({
                     >
                         <input
                             className="field__input"
-                            placeholder="Name des neuen Raums"
-                            aria-label="Name des neuen Raums"
+                            placeholder={t('Name of the new room')}
+                            aria-label={t('Name of the new room')}
                             value={newRoom}
                             maxLength={60}
                             autoFocus
@@ -164,19 +165,19 @@ export function EditDeviceSheet({
                             type="submit"
                             className="action action--primary"
                         >
-                            Anlegen
+                            {t('Create')}
                         </button>
                     </form>
                 )}
                 <SwitchRow
-                    label="Favorit"
-                    hint="Auf der Startseite anzeigen"
+                    label={t('Favorite')}
+                    hint={t('Show on the home page')}
                     checked={!!device.favorite}
                     onChange={v => patch({ favorite: v })}
                 />
                 <SwitchRow
-                    label="Ausblenden"
-                    hint="Nur noch im Bearbeiten-Modus sichtbar"
+                    label={t('Hide')}
+                    hint={t('Only visible in edit mode')}
                     checked={!!device.hidden}
                     onChange={v => patch({ hidden: v })}
                 />
@@ -187,7 +188,7 @@ export function EditDeviceSheet({
                     className="action action--danger"
                     onClick={() => connection.edit({ kind: 'resetDevice', id: device.id })}
                 >
-                    Alle Anpassungen zurücksetzen
+                    {t('Reset all customizations')}
                 </button>
             )}
         </Sheet>
@@ -199,14 +200,17 @@ export function EditRoomSheet({ room, onClose }: { room: SvRoom; onClose: () => 
     const current = model?.rooms.find(r => r.id === room.id) || room;
     const zone = current.kind === 'zone';
     const count = model ? roomDevices(current, model.devices).length : 0;
-    const source = { enum: 'aus ioBroker', adapter: 'aus Hue', name: 'aus Gerätenamen', custom: 'selbst angelegt' }[
-        current.source
-    ];
+    const source = {
+        enum: t('Room from ioBroker'),
+        adapter: t('Room from Hue'),
+        name: t('Room from device names'),
+        custom: t('Room created by you'),
+    }[current.source];
 
     return (
         <Sheet
             title={current.name}
-            subtitle={`${zone ? 'Zone aus Hue' : `Raum ${source}`} · ${count} ${count === 1 ? 'Gerät' : 'Geräte'}`}
+            subtitle={`${zone ? t('Zone from Hue') : source} · ${tn(count, '{n} device', '{n} devices')}`}
             onClose={onClose}
         >
             <div className="detail__controls">
@@ -217,18 +221,18 @@ export function EditRoomSheet({ room, onClose }: { room: SvRoom; onClose: () => 
                     onSave={name => connection.edit({ kind: 'room', id: current.id, patch: { name } })}
                 />
                 <SwitchRow
-                    label="Ausblenden"
-                    hint={zone ? 'Zone in der Raumliste verbergen' : 'Raum in der Raumliste verbergen'}
+                    label={t('Hide')}
+                    hint={zone ? t('Hide the zone in the room list') : t('Hide the room in the room list')}
                     checked={!!current.hidden}
                     onChange={v => connection.edit({ kind: 'room', id: current.id, patch: { hidden: v } })}
                 />
             </div>
             <div className="detail__controls icon-picker">
-                <span className="setting__text">Symbol</span>
+                <span className="setting__text">{t('Icon')}</span>
                 <div
                     className="icon-picker__grid"
                     role="radiogroup"
-                    aria-label="Symbol des Raums"
+                    aria-label={t('Icon of the room')}
                 >
                     <button
                         type="button"
@@ -237,7 +241,7 @@ export function EditRoomSheet({ room, onClose }: { room: SvRoom; onClose: () => 
                         className={`icon-picker__auto${!current.icon ? ' is-selected' : ''}`}
                         onClick={() => connection.edit({ kind: 'room', id: current.id, patch: { icon: null } })}
                     >
-                        {roomIcon({ ...current, icon: undefined })} Automatisch
+                        {roomIcon({ ...current, icon: undefined })} {t('Automatic')}
                     </button>
                     {ROOM_ICON_CHOICES.map(icon => (
                         <button
@@ -245,7 +249,7 @@ export function EditRoomSheet({ room, onClose }: { room: SvRoom; onClose: () => 
                             type="button"
                             role="radio"
                             aria-checked={current.icon === icon}
-                            aria-label={`Symbol ${icon}`}
+                            aria-label={`${t('Icon')} ${icon}`}
                             className={current.icon === icon ? 'is-selected' : ''}
                             onClick={() => connection.edit({ kind: 'room', id: current.id, patch: { icon } })}
                         >
@@ -263,9 +267,9 @@ export function EditRoomSheet({ room, onClose }: { room: SvRoom; onClose: () => 
                         onClose();
                     }}
                 >
-                    Raum löschen
+                    {t('Delete room')}
                     {count
-                        ? ` (${count} ${count === 1 ? 'Gerät kehrt' : 'Geräte kehren'} in den erkannten Raum zurück)`
+                        ? ` (${tn(count, '{n} device returns to its detected room', '{n} devices return to their detected room')})`
                         : ''}
                 </button>
             )}
@@ -277,7 +281,7 @@ export function CreateRoomSheet({ onClose }: { onClose: () => void }): React.JSX
     const [name, setName] = useState('');
     return (
         <Sheet
-            title="Neuer Raum"
+            title={t('New room')}
             onClose={onClose}
         >
             <form
@@ -295,7 +299,7 @@ export function CreateRoomSheet({ onClose }: { onClose: () => void }): React.JSX
                         className="field__label"
                         htmlFor="new-room"
                     >
-                        Name
+                        {t('Name')}
                     </label>
                     <input
                         id="new-room"
@@ -311,7 +315,7 @@ export function CreateRoomSheet({ onClose }: { onClose: () => void }): React.JSX
                     className="action action--primary"
                     disabled={!name.trim()}
                 >
-                    Anlegen
+                    {t('Create')}
                 </button>
             </form>
         </Sheet>

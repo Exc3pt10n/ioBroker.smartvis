@@ -1,3 +1,4 @@
+import { locale, t } from '../../../src/shared/i18n';
 import { useEffect, useState } from 'react';
 import type { SvWeather, SvWeatherWarning } from '../../../src/shared/protocol';
 import { useConnection } from '../connection';
@@ -23,23 +24,28 @@ import {
 /** Aufgezeichnete Wetterwerte (Station, Lichtsensoren, weitere Außensensoren) */
 function weatherHistorySeries(weather: SvWeather, extra: SvWeather[] = []): HistorySeries[] {
     const candidates: (HistorySeries | undefined)[] = [
-        weather.temperature && { key: 't', label: 'Temperatur', ref: weather.temperature },
-        weather.humidity && { key: 'h', label: 'Luftfeuchte', ref: weather.humidity, zeroBased: true },
-        weather.windSpeed && { key: 'w', label: 'Wind', ref: weather.windSpeed, zeroBased: true },
-        weather.rainToday && { key: 'r', label: 'Regen heute', ref: weather.rainToday, zeroBased: true },
+        weather.temperature && { key: 't', label: t('Temperature'), ref: weather.temperature },
+        weather.humidity && { key: 'h', label: t('Humidity'), ref: weather.humidity, zeroBased: true },
+        weather.windSpeed && { key: 'w', label: t('Wind'), ref: weather.windSpeed, zeroBased: true },
+        weather.rainToday && { key: 'r', label: t('Rain today'), ref: weather.rainToday, zeroBased: true },
         ...(weather.lightSensors || []).map(l =>
             l.current
-                ? { key: `l-${l.name}`, label: `Helligkeit ${l.name}`, ref: l.current, zeroBased: true }
+                ? { key: `l-${l.name}`, label: `${t('Brightness')} ${l.name}`, ref: l.current, zeroBased: true }
                 : undefined,
         ),
         ...extra.flatMap((x, i) => {
             // Lange Gerätenamen ("Temperatur- und Feuchtigkeitssensor") sprengen die Auswahl
-            const name = x.name.length <= 16 ? x.name : extra.length > 1 ? `Außensensor ${i + 1}` : 'Außensensor';
+            const name =
+                x.name.length <= 16
+                    ? x.name
+                    : extra.length > 1
+                      ? t('Outdoor sensor {n}', { n: i + 1 })
+                      : t('Outdoor sensor');
             return [
-                x.temperature && { key: `x-${x.id}`, label: `Temperatur ${name}`, ref: x.temperature },
+                x.temperature && { key: `x-${x.id}`, label: `${t('Temperature')} ${name}`, ref: x.temperature },
                 x.humidity && {
                     key: `xh-${x.id}`,
-                    label: `Luftfeuchte ${name}`,
+                    label: `${t('Humidity')} ${name}`,
                     ref: x.humidity,
                     zeroBased: true,
                 },
@@ -100,26 +106,26 @@ export function WeatherCard({
 
     const details: { label: string; value: string }[] = [];
     if (weather.humidity) {
-        details.push({ label: 'Luftfeuchte', value: `${fmt(s.humidity, 0)} %` });
+        details.push({ label: t('Humidity'), value: `${fmt(s.humidity, 0)} %` });
     }
     if (weather.windSpeed) {
         details.push({
-            label: s.windSpeed !== undefined ? `Wind · ${windLabel(s.windSpeed)}` : 'Wind',
+            label: s.windSpeed !== undefined ? `${t('Wind')} · ${windLabel(s.windSpeed)}` : t('Wind'),
             value: `${fmt(s.windSpeed, 0)} km/h${s.windDirection !== undefined ? ` ${compass(s.windDirection)}` : ''}`,
         });
     }
     if (weather.rainToday) {
-        details.push({ label: 'Regen heute', value: `${fmt(s.rainToday)} mm` });
+        details.push({ label: t('Rain today'), value: `${fmt(s.rainToday)} mm` });
     }
     if (weather.sunshineToday) {
         details.push({
-            label: 'Sonne heute',
+            label: t('Sun today'),
             value: s.sunshineToday !== undefined ? formatMinutes(s.sunshineToday) : '–',
         });
     }
     const pressure = weather.pressure ? Number(states[weather.pressure.id]?.val) : NaN;
     if (weather.pressure && Number.isFinite(pressure)) {
-        details.push({ label: 'Luftdruck', value: `${fmt(pressure, 0)} ${weather.pressure.unit || 'hPa'}` });
+        details.push({ label: t('Air pressure'), value: `${fmt(pressure, 0)} ${weather.pressure.unit || 'hPa'}` });
     }
 
     const panels = (weather.temperature?.history || s.light.length > 0) && (
@@ -127,7 +133,7 @@ export function WeatherCard({
             {weather.temperature?.history && (
                 <Sparkline
                     state={weather.temperature}
-                    label="Temperatur"
+                    label={t('Temperature')}
                     onOpen={() => setShowHistory(true)}
                 />
             )}
@@ -137,7 +143,7 @@ export function WeatherCard({
     const sensors = (extra || []).length > 0 && (
         <ul
             className="weather__sensors"
-            aria-label="Weitere Außensensoren"
+            aria-label={t('More outdoor sensors')}
         >
             {(extra || []).map(x => {
                 const xs = weatherSnapshot(x, states);
@@ -145,8 +151,8 @@ export function WeatherCard({
                     <li key={x.id}>
                         <span className="weather__sensor-name">{x.name}</span>
                         <span className="weather__sensor-values">
-                            <span title="Temperatur">🌡️ {fmt(xs.temperature)}°</span>
-                            {xs.humidity !== undefined && <span title="Luftfeuchte">💧 {fmt(xs.humidity, 0)} %</span>}
+                            <span title={t('Temperature')}>🌡️ {fmt(xs.temperature)}°</span>
+                            {xs.humidity !== undefined && <span title={t('Humidity')}>💧 {fmt(xs.humidity, 0)} %</span>}
                         </span>
                     </li>
                 );
@@ -159,25 +165,27 @@ export function WeatherCard({
             className="weather__history"
             onClick={() => setShowHistory(true)}
         >
-            📈 Verlauf ›
+            📈 {t('History')} ›
         </button>
     );
     const historySheet = showHistory && (
         <Sheet
-            title="Wetter-Verlauf"
+            title={t('Weather history')}
             subtitle={weather.name}
             onClose={() => setShowHistory(false)}
         >
             <HistoryPanel
                 series={historySeries}
-                title="Verlauf"
+                title={t('History')}
             />
         </Sheet>
     );
-    const tone = `weather weather--${c.label === 'Sonnig' ? 'sun' : s.raining ? 'rain' : 'neutral'}`;
+    const tone = `weather weather--${c.label === t('Sunny') ? 'sun' : s.raining ? 'rain' : 'neutral'}`;
     const warn = (!s.online || stale) && (
         <p className="weather__warn">
-            {!s.online ? 'Wetterstation nicht erreichbar' : `Letzter Messwert ${updated!.toLocaleString('de-DE')}`}
+            {!s.online
+                ? t('Weather station not reachable')
+                : t('Last reading {time}', { time: updated!.toLocaleString(locale()) })}
         </p>
     );
     const warningList = active.length > 0 && (
@@ -205,7 +213,7 @@ export function WeatherCard({
         return (
             <section
                 className={`${tone} weather--compact${open ? ' is-open' : ''}`}
-                aria-label="Aktuelles Wetter"
+                aria-label={t('Current weather')}
             >
                 <button
                     type="button"
@@ -225,7 +233,7 @@ export function WeatherCard({
                     <span className="weather__bar-text">
                         <span className="weather__bar-label">
                             {c.label}
-                            {s.windAlarm && c.label !== 'Stürmisch' ? ' · Sturmwarnung' : ''}
+                            {s.windAlarm && c.label !== t('Stormy') ? ` · ${t('Storm warning')}` : ''}
                         </span>
                         {summary.length > 0 && <span className="weather__bar-extra">{summary.join(' · ')}</span>}
                     </span>
@@ -233,7 +241,7 @@ export function WeatherCard({
                         className="chevron"
                         aria-hidden="true"
                     />
-                    <span className="sr-only">{open ? 'Details ausblenden' : 'Details anzeigen'}</span>
+                    <span className="sr-only">{open ? t('Hide details') : t('Show details')}</span>
                 </button>
                 {warningList}
                 {warn}
@@ -263,7 +271,7 @@ export function WeatherCard({
     return (
         <section
             className={tone}
-            aria-label="Aktuelles Wetter"
+            aria-label={t('Current weather')}
         >
             {warningList}
             <div className="weather__top">
@@ -280,7 +288,7 @@ export function WeatherCard({
                         </div>
                         <div className="weather__label">
                             {c.label}
-                            {s.windAlarm && c.label !== 'Stürmisch' ? ' · Sturmwarnung' : ''}
+                            {s.windAlarm && c.label !== t('Stormy') ? ` · ${t('Storm warning')}` : ''}
                         </div>
                     </div>
                 </div>
@@ -310,8 +318,8 @@ function timeText(ts: number): string {
     const today = new Date();
     const sameDay = d.toDateString() === today.toDateString();
     return sameDay
-        ? d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
-        : d.toLocaleString('de-DE', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+        ? d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' })
+        : d.toLocaleString(locale(), { weekday: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
 /** Nur Warnungen (DWD ohne Wetterstation und Wetterdienst) */
@@ -326,7 +334,7 @@ export function WarningsCard({ warnings }: { warnings: SvWeatherWarning[] }): Re
     return active.length ? (
         <section
             className="card"
-            aria-label="Wetterwarnungen"
+            aria-label={t('Weather warnings')}
         >
             <WeatherWarnings
                 warnings={active}
@@ -341,12 +349,12 @@ export function WeatherWarnings({ warnings, now }: { warnings: WarningSnapshot[]
     return (
         <ul
             className="wwarn"
-            aria-label="Wetterwarnungen"
+            aria-label={t('Weather warnings')}
         >
             {warnings.map(w => {
                 const when = [
-                    w.begin && w.begin > now ? `ab ${timeText(w.begin)}` : undefined,
-                    w.end ? `bis ${timeText(w.end)}` : undefined,
+                    w.begin && w.begin > now ? t('from {time}', { time: timeText(w.begin) }) : undefined,
+                    w.end ? t('until {time}', { time: timeText(w.end) }) : undefined,
                 ]
                     .filter(Boolean)
                     .join(' ');
@@ -376,7 +384,7 @@ function ForecastRow({ days, source }: { days: ForecastSnapshot[]; source: strin
         <div className="wforecast">
             <ol
                 className="wforecast__days"
-                aria-label={`Vorhersage (${source})`}
+                aria-label={`${t('Forecast')} (${source})`}
             >
                 {days.map(d => (
                     <li
@@ -399,14 +407,14 @@ function ForecastRow({ days, source }: { days: ForecastSnapshot[]; source: strin
                         {d.rainChance !== undefined && d.rainChance >= 10 ? (
                             <span
                                 className="wforecast__rain"
-                                title="Regenwahrscheinlichkeit"
+                                title={t('Chance of rain')}
                             >
                                 💧{fmt(d.rainChance, 0)} %
                             </span>
                         ) : d.rainChance === undefined && d.rain !== undefined && d.rain >= 0.1 ? (
                             <span
                                 className="wforecast__rain"
-                                title="Niederschlag"
+                                title={t('Precipitation')}
                             >
                                 {fmt(d.rain)} mm
                             </span>
@@ -416,7 +424,7 @@ function ForecastRow({ days, source }: { days: ForecastSnapshot[]; source: strin
                     </li>
                 ))}
             </ol>
-            <p className="wforecast__source">Vorhersage: {source}</p>
+            <p className="wforecast__source">{t('Forecast: {source}', { source })}</p>
         </div>
     );
 }
@@ -430,9 +438,9 @@ function LightBars({ light }: { light: WeatherSnapshot['light'] }): React.JSX.El
     return (
         <div
             className="weather__light"
-            aria-label="Helligkeit je Himmelsrichtung"
+            aria-label={t('Brightness per direction')}
         >
-            <span className="weather__light-title">☀️ Helligkeit</span>
+            <span className="weather__light-title">☀️ {t('Brightness')}</span>
             <dl>
                 {light.map(l => {
                     const share = l.online && max > 0 ? Math.max(0, (l.lux ?? 0) / max) : 0;
@@ -440,7 +448,7 @@ function LightBars({ light }: { light: WeatherSnapshot['light'] }): React.JSX.El
                         <div
                             key={l.name}
                             className="lightbar"
-                            title={l.average !== undefined ? `Mittelwert ${formatLux(l.average)}` : undefined}
+                            title={l.average !== undefined ? `${t('Average')} ${formatLux(l.average)}` : undefined}
                         >
                             <dt>{l.name}</dt>
                             <dd>
@@ -454,7 +462,7 @@ function LightBars({ light }: { light: WeatherSnapshot['light'] }): React.JSX.El
                                     />
                                 </span>
                                 <span className="lightbar__value">
-                                    {l.online ? formatLux(l.lux) : 'nicht erreichbar'}
+                                    {l.online ? formatLux(l.lux) : t('not reachable')}
                                 </span>
                             </dd>
                         </div>

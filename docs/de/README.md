@@ -11,7 +11,7 @@ SmartVis erkennt Geräte und Räume automatisch und zeigt sie ohne manuelles Anl
 
 > **Status:** Version 0.x – im täglichen Einsatz und vollständig nutzbar. Bis Version 1.0 können sich Einstellungen und das Speicherformat noch ändern; solche Änderungen sind im [Changelog](../../README.md#changelog) als **Breaking** markiert und werden, wo möglich, automatisch übernommen.
 > Die Erkennung ist an einer Installation mit Homematic (IP), Philips Hue (`hue` und `hue-v2`), QCells Q.HOME, KEBA, Toshiba-Klimageräten und Echo abgestimmt; für Shelly, Sonoff (Tasmota), Tuya, FRITZ!DECT, Zigbee, zigbee2mqtt und deCONZ gibt es eigene Regeln, die anhand der Objektstrukturen aus dem Quellcode dieser Adapter entwickelt und getestet sind (noch ohne Rückmeldungen echter Anlagen). Bei anderen Systemen können Geräte fehlen oder überzählig sein – sie lassen sich im Bearbeiten-Modus ausblenden. Unter **Mehr → Erkennung** zeigt SmartVis, welche Kanäle keine Kachel bekommen haben, und speichert einen anonymen Bericht (nur Adapter, Datenpunkt-Schlüssel und Rollen); als Anhang an ein Issue hilft er, die Erkennung zu verbessern.
-> Hintergrund und Konzept: [docs/KONZEPT.md](../KONZEPT.md).
+> Die Oberfläche gibt es auf Deutsch und Englisch; sie folgt der Systemsprache von ioBroker (in den Instanz-Einstellungen änderbar).
 
 ## Funktionen
 
@@ -58,7 +58,7 @@ SmartVis erkennt Geräte und Räume automatisch und zeigt sie ohne manuelles Anl
 - **Kameras** (eufy Security über [`eusec`](https://github.com/bropat/ioBroker.eusec)): Kacheln im Bereich Sicherheit und im Raum mit einem Standbild aus dem letzten Livestream (SmartVis holt es über go2rtc, solange ein Livestream läuft – die Ereignisbilder von eufy kommen seit 2026 nur noch verstreift an) und der Zeit des letzten Ereignisses; erkannte Bewegung/Person ist hervorgehoben, ausgeschaltete und Offline-Kameras sind gekennzeichnet. Die Detailansicht zeigt das Bild groß und bietet Livestream (go2rtc-Seite des eusec-Adapters; der Stream wird beim Schließen beendet), Kamera an/aus, Licht, Schwenken der Innenkameras und den Sicherheitsmodus der Station. Die Standbilder speichert SmartVis unter `smartvis.0/snapshots` und liefert nur diese aus. Sirene und Neustart der Station sind bewusst nicht bedienbar
   - Livestream mit Ton: SmartVis öffnet die go2rtc-Seite mit MSE/HLS (WebRTC überträgt den AAC-Ton der eufy-Kameras nicht); startet der Browser stumm, den Lautsprecher im Video antippen. eusec beendet den Stream nach der eingestellten Höchstdauer („Max camera livestream duration“, Standard 120 s) – SmartVis zeigt das an und bietet „Weiter ansehen“
   - **Einstellungen** in der Kamera-Ansicht, je Gruppe aufklappbar und auf Deutsch – nur, was die Kamera anbietet: Erkennung (Bewegung an/aus, was erkannt wird, Empfindlichkeit, Verfolgen, Haustiere, Geräusche, Diebstahlwarnung), Aufnahme (Energiemodus, Clip-Länge, Pause bis zur nächsten Aufnahme, Ton, Daueraufnahme, Qualität), Bild & Ton (Nachtsicht, Lichthelligkeit, Spiegeln, Wasserzeichen, Status-LED, Mikrofon, Lautsprecher, Lautstärke, Schwenkgeschwindigkeit) und Benachrichtigungen. Untereinstellungen erscheinen nur, wenn sie wirken (z. B. Clip-Länge nur im Energiemodus „Benutzerdefiniert“). Nicht dabei: RTSP, NAS, Sprachausgabe und Bewegungszonen
-- **Batterie-Übersicht** unter Mehr: alle batteriebetriebenen Geräte mit Ladestand bzw. „schwach“, schwache zuerst, mit Batterieart aus dem Gerätemodell (Tabelle aus der Gerätebibliothek von [Battery Notes](https://github.com/andrew-codechimp/HA-Battery-Notes), MIT-Lizenz; neu erzeugen mit `npx tsx scripts/battery-models.ts <library.json>`)
+- **Batterie-Übersicht** unter Mehr: alle batteriebetriebenen Geräte mit Ladestand bzw. „schwach“, schwache zuerst, mit Batterieart aus dem Gerätemodell (Tabelle aus der Gerätebibliothek von [Battery Notes](https://github.com/andrew-codechimp/HA-Battery-Notes), MIT-Lizenz)
 - **Diagnose der Erkennung** unter Mehr → Erkennung: erkannte Geräte je Adapter, Kanäle ohne Kachel mit Grund und Datenpunkten, anonymer Bericht zum Teilen
 - Adapterspezifische Regeln gegen Kachel-Rauschen: Homematic IP nur den ersten virtuellen Kanal je Ausgang (keine Wartungs-, Tasten-, Wochenprofil- oder Schwellwert-Kanäle), Hue ohne Sensoren, Smart Scenes, Entertainment-Bereiche und Altlasten der alten Objektstruktur, Alexa nur Player
 - Eigener Webserver mit WebSocket-API; die App erhält nur erkannte States, Schreibzugriffe nur auf freigegebene States
@@ -86,15 +86,6 @@ SmartVis erkennt Geräte und Räume automatisch und zeigt sie ohne manuelles Anl
 
 SmartVis wird über npm bzw. das ioBroker-Repository verteilt. Sobald der Adapter im Repository „latest“ ist, wird er wie jeder andere Adapter in der Admin-Oberfläche unter *Adapter* installiert; danach eine Instanz anlegen und `http://<iobroker>:8099` öffnen.
 
-**Bis dahin (Tester):** Jedes [GitHub-Release](https://github.com/Exc3pt10n/ioBroker.smartvis/releases) enthält das fertig gebaute Paket `iobroker.smartvis-<version>.tgz` – genau das Paket, das auch auf npm veröffentlicht wird. Installation über dessen Download-Adresse auf dem ioBroker-Host:
-
-```bash
-iobroker url https://github.com/Exc3pt10n/ioBroker.smartvis/releases/download/v<version>/iobroker.smartvis-<version>.tgz smartvis
-iobroker add smartvis
-```
-
-Eine Installation direkt aus dem Quellcode (`…/tarball/main` oder `…/tarball/release`) ist seit 0.16.0 nicht mehr möglich: Der Build liegt nicht im Repository (`common.nogit`).
-
 Voraussetzungen: js-controller ≥ 6.0.11, Admin ≥ 7.6.20, Node.js ≥ 22.
 
 ## Konfiguration
@@ -103,42 +94,11 @@ Voraussetzungen: js-controller ≥ 6.0.11, Admin ≥ 7.6.20, Node.js ≥ 22.
 |---|---|---|
 | IP-Adresse | `0.0.0.0` | Netzwerk-Interface des Webservers |
 | Port | `8099` | Aufruf: `http://<iobroker>:8099` |
-| Sprache | `de` | Sprache für mehrsprachige Objektnamen |
+| Sprache | Systemsprache | Oberfläche und erzeugte Gerätenamen (Deutsch oder Englisch; auch für mehrsprachige Objektnamen) |
 | Neu-Erkennung | `10` s | Wartezeit nach Objektänderungen |
 | Ignorierte Adapter | `system,admin,…,iot` | Werden bei der Erkennung übersprungen |
 | Bearbeiten-Modus erlauben | an | Anpassungen aus der App speichern |
 
 ## Entwicklung
 
-```bash
-npm install
-npm run build        # Backend (build/) + Frontend (www/)
-npm test             # Unit- und Paket-Tests
-npm run test:integration   # Adapter in einer echten js-controller-Testinstanz
-npm run lint && npm run check
-```
-
-**Frontend ohne ioBroker entwickeln:**
-
-```bash
-npm run build:www && npm run demo   # Demo-Server mit Beispielgeräten auf :8099
-npm run dev:www                     # Vite mit Hot-Reload, leitet /ws auf :8099 weiter
-```
-
-**Projektstruktur**
-
-```
-src/            Adapter (TypeScript)
-  main.ts         Lebenszyklus, Abos, Schreibzugriffe
-  lib/discovery   Geräte-/Raumerkennung (reine Funktion, testbar)
-  lib/rooms       Raumnamen-Heuristik
-  lib/profiles    Adapter-Profile für Systeme ohne Standard-Rollen (PV, Wallbox, Wetter, Klima, Szenen …)
-  lib/overrides   Anpassungen aus dem Bearbeiten-Modus; lib/clientOverrides: je Endgerät
-  lib/history     Verläufe aus sql/history/influxdb
-  lib/system      Zustand von ioBroker (Hosts, Instanzen)
-  lib/server      HTTP + WebSocket
-  shared/         Protokoll-Typen und Zeitreihen-Hilfen (von Backend und Frontend genutzt)
-src-www/        Frontend (React + Vite) → baut nach www/
-admin/          jsonConfig für die Admin-Oberfläche
-scripts/demo.ts Demo-Server ohne ioBroker
-```
+Hinweise zur Entwicklung (englisch): [DEVELOPMENT.md](../../DEVELOPMENT.md).

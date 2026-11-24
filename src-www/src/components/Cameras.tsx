@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import { useEffect, useRef, useState } from 'react';
 import type { SvCamera, SvCameraSetting, SvSecurityStation } from '../../../src/shared/protocol';
 import { cameraInfo, eventTime, liveStreamUrl, shortEventTime, stationAlarm } from '../cameras';
@@ -25,7 +26,7 @@ export function CameraImage({
             <div
                 className={`${className} camera__placeholder`}
                 role="img"
-                aria-label={`${alt}: kein Bild`}
+                aria-label={`${alt}: ${t('no picture')}`}
             >
                 📷
             </div>
@@ -69,7 +70,9 @@ export function CameraTile({ camera, onOpen }: { camera: SvCamera; onOpen: () =>
                 {info.imageTs && !info.disabled && (
                     <span
                         className="camera__time"
-                        title={`${camera.pictureUsable ? 'Bild von' : 'Letztes Ereignis'} ${eventTime(info.imageTs)}`}
+                        title={t(camera.pictureUsable ? 'Picture from {time}' : 'Last event {time}', {
+                            time: eventTime(info.imageTs),
+                        })}
                     >
                         {shortEventTime(info.imageTs)}
                     </span>
@@ -183,7 +186,7 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
     return (
         <Sheet
             title={camera.name}
-            subtitle={[room, 'Kamera'].filter(Boolean).join(' · ')}
+            subtitle={[room, t('Camera')].filter(Boolean).join(' · ')}
             onClose={onClose}
         >
             <div className="camera__detail">
@@ -193,11 +196,11 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                             <iframe
                                 className="camera__frame"
                                 src={liveStreamUrl(info.liveUrl)}
-                                title={`Livestream ${camera.name}`}
+                                title={`${t('Livestream')} ${camera.name}`}
                                 allow="autoplay; fullscreen"
                             />
                             <p className="detail__note">
-                                Kein Ton? Den Lautsprecher im Video antippen – der Browser startet Videos stumm.
+                                {t('No sound? Tap the speaker in the video – the browser starts videos muted.')}
                             </p>
                             <a
                                 className="linkbtn"
@@ -205,22 +208,24 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                                 target="_blank"
                                 rel="noreferrer"
                             >
-                                Livestream in neuem Fenster öffnen ↗
+                                {t('Open livestream in a new window')} ↗
                             </a>
                         </div>
                     ) : (
                         <div className="camera__big camera__placeholder camera__waiting">
                             {ended ? (
                                 <span>
-                                    Livestream beendet
+                                    {t('Livestream ended')}
                                     <small>
                                         {camera.adapter === 'eusec'
-                                            ? 'eusec begrenzt die Dauer (Einstellung „Max camera livestream duration“, Standard 120 s)'
-                                            : 'Der Adapter begrenzt die Dauer, um den Akku zu schonen (Standard 120 s)'}
+                                            ? t(
+                                                  'eusec limits the duration (setting “Max camera livestream duration”, default 120 s)',
+                                              )
+                                            : t('The adapter limits the duration to save the battery (default 120 s)')}
                                     </small>
                                 </span>
                             ) : (
-                                'Stream wird gestartet …'
+                                t('Starting stream …')
                             )}
                         </div>
                     )
@@ -230,8 +235,8 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                         src={info.disabled ? undefined : info.image}
                         alt={
                             camera.snapshot
-                                ? `Standbild aus dem Livestream ${camera.name}`
-                                : `Letztes Bild ${camera.name}`
+                                ? t('Still image from the livestream of {name}', { name: camera.name })
+                                : t('Last picture of {name}', { name: camera.name })
                         }
                     />
                 )}
@@ -239,19 +244,23 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                     {info.status
                         ? info.status
                         : info.events.length
-                          ? `Gerade erkannt: ${info.events.join(', ')}`
+                          ? t('Just detected: {events}', { events: info.events.join(', ') })
                           : info.imageTs
-                            ? `${camera.pictureUsable ? 'Bild von' : 'Letztes Ereignis'} ${eventTime(info.imageTs)}`
+                            ? t(camera.pictureUsable ? 'Picture from {time}' : 'Last event {time}', {
+                                  time: eventTime(info.imageTs),
+                              })
                             : camera.pictureUsable
-                              ? 'Noch kein Bild'
-                              : 'Noch kein Ereignis'}
+                              ? t('No picture yet')
+                              : t('No event yet')}
                     {info.battery !== undefined ? ` · 🔋 ${Math.round(info.battery)} %` : ''}
                 </p>
                 {!live && !info.disabled && camera.liveStart && !camera.pictureUsable && (
                     <p className="detail__note">
                         {info.snapshotTs
-                            ? `Bild aus dem Livestream ${eventTime(info.snapshotTs)}`
-                            : 'Noch kein Bild: Beim nächsten Livestream speichert SmartVis ein Standbild für die Kachel.'}
+                            ? t('Picture from the livestream {time}', { time: eventTime(info.snapshotTs) })
+                            : t(
+                                  'No picture yet: SmartVis saves a still image for the tile during the next livestream.',
+                              )}
                     </p>
                 )}
                 <div className="detail__controls">
@@ -262,17 +271,17 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                                 className="action"
                                 onClick={() => {
                                     connection.setState(camera.pictureRefresh!.id, true);
-                                    showToast(`${camera.name}: aktuelles Bild wird aufgenommen …`);
+                                    showToast(`${camera.name}: ${t('taking current picture …')}`);
                                 }}
                             >
                                 <Icon
                                     name="camera"
                                     size={18}
                                 />{' '}
-                                Aktuelles Bild
+                                {t('Current picture')}
                             </button>
                             {info.battery !== undefined && (
-                                <p className="detail__note">Weckt die Akku-Kamera – sparsam verwenden.</p>
+                                <p className="detail__note">{t('Wakes the battery camera – use sparingly.')}</p>
                             )}
                         </div>
                     )}
@@ -286,20 +295,20 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                                 name={live && !ended ? 'stop' : 'play'}
                                 size={18}
                             />{' '}
-                            {ended ? 'Weiter ansehen' : live ? 'Livestream beenden' : 'Livestream'}
+                            {ended ? t('Keep watching') : live ? t('Stop livestream') : t('Livestream')}
                         </button>
                     )}
                     {ptz && !info.disabled && (
                         <div
                             className="camera__ptz"
                             role="group"
-                            aria-label="Kamera schwenken"
+                            aria-label={t('Pan camera')}
                         >
                             <button
                                 type="button"
                                 className="csec__btn camera__ptz-up"
                                 disabled={!camera.tiltUp}
-                                aria-label="Nach oben"
+                                aria-label={t('Tilt up')}
                                 onClick={() => press(camera.tiltUp)}
                             >
                                 ▲
@@ -308,7 +317,7 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                                 type="button"
                                 className="csec__btn camera__ptz-left"
                                 disabled={!camera.panLeft}
-                                aria-label="Nach links"
+                                aria-label={t('Pan left')}
                                 onClick={() => press(camera.panLeft)}
                             >
                                 ◀
@@ -317,7 +326,7 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                                 type="button"
                                 className="csec__btn camera__ptz-right"
                                 disabled={!camera.panRight}
-                                aria-label="Nach rechts"
+                                aria-label={t('Pan right')}
                                 onClick={() => press(camera.panRight)}
                             >
                                 ▶
@@ -326,7 +335,7 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                                 type="button"
                                 className="csec__btn camera__ptz-down"
                                 disabled={!camera.tiltDown}
-                                aria-label="Nach unten"
+                                aria-label={t('Tilt down')}
                                 onClick={() => press(camera.tiltDown)}
                             >
                                 ▼
@@ -336,14 +345,14 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                     {camera.enabled?.write && (
                         <Toggle
                             state={camera.enabled}
-                            label="Kamera eingeschaltet"
-                            hint="Aus = Privatmodus, keine Aufnahmen"
+                            label={t('Camera switched on')}
+                            hint={t('Off = privacy mode, no recordings')}
                         />
                     )}
                     {camera.light?.write && !info.disabled && (
                         <Toggle
                             state={camera.light}
-                            label="Licht"
+                            label={t('Light')}
                         />
                     )}
                     {station?.guardMode && <StationRow station={station} />}
@@ -355,10 +364,10 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
 }
 
 const SETTING_GROUPS: { key: SvCameraSetting['group']; label: string }[] = [
-    { key: 'detection', label: 'Erkennung' },
-    { key: 'recording', label: 'Aufnahme' },
-    { key: 'picture', label: 'Bild & Ton' },
-    { key: 'notifications', label: 'Benachrichtigungen' },
+    { key: 'detection', label: t('Detection') },
+    { key: 'recording', label: t('Recording') },
+    { key: 'picture', label: t('Picture & sound') },
+    { key: 'notifications', label: t('Notifications') },
 ];
 
 /** Einheiten der eusec-Datenpunkte lesbar ("sec" → "s") */
@@ -386,7 +395,7 @@ function CameraSettings({ settings }: { settings: SvCameraSetting[] }): React.JS
     };
     return (
         <div className="camera__settings">
-            <h3 className="info__subtitle">Einstellungen</h3>
+            <h3 className="info__subtitle">{t('Settings')}</h3>
             {SETTING_GROUPS.map(g => {
                 const list = settings.filter(s => s.group === g.key && active(s));
                 if (!list.length) {
@@ -475,9 +484,9 @@ export function RecentDetectionsCard({
     return (
         <section
             className="card"
-            aria-label="Gerade erkannt"
+            aria-label={t('Just detected')}
         >
-            <h2 className="subtitle">📷 Gerade erkannt</h2>
+            <h2 className="subtitle">📷 {t('Just detected')}</h2>
             <div className="cameras">
                 {list.map(d => (
                     <CameraTile

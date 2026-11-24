@@ -1,3 +1,4 @@
+import { locale, t } from '../../src/shared/i18n';
 import type { SvForecastDay, SvStateRef, SvStateValue, SvWeather, SvWeatherWarning } from '../../src/shared/protocol';
 
 type States = Record<string, SvStateValue | null>;
@@ -226,10 +227,10 @@ export function forecastSnapshot(w: SvWeather, states: States, now = new Date())
             offset: d.offset,
             label:
                 d.offset === 0
-                    ? 'Heute'
+                    ? t('Today')
                     : d.offset === 1
-                      ? 'Morgen'
-                      : date.toLocaleDateString('de-DE', { weekday: 'short' }).replace('.', ''),
+                      ? t('Tomorrow')
+                      : date.toLocaleDateString(locale(), { weekday: 'short' }).replace('.', ''),
             min: celsius(d.tempMin, states),
             max: celsius(d.tempMax, states),
             condition: serviceCondition(d, w.codeScheme, states),
@@ -288,51 +289,52 @@ export function activeWarnings(warnings: SvWeatherWarning[], states: States, now
 export function condition(s: WeatherSnapshot): Condition {
     if (s.raining) {
         return s.temperature !== undefined && s.temperature <= 1
-            ? { icon: '🌨️', label: 'Schneefall' }
-            : { icon: '🌧️', label: 'Regen' };
+            ? { icon: '🌨️', label: t('Snowfall') }
+            : { icon: '🌧️', label: t('Rain') };
     }
     if (s.windAlarm) {
-        return { icon: '💨', label: 'Stürmisch' };
+        return { icon: '💨', label: t('Stormy') };
     }
     if (s.sunshine) {
-        return { icon: '☀️', label: 'Sonnig' };
+        return { icon: '☀️', label: t('Sunny') };
     }
     // Hellster Lichtsensor (Lux) ist aussagekräftiger als der Helligkeitswert der Station
     const lux = s.light.map(l => l.lux).filter((v): v is number => v !== undefined);
     const brightness = lux.length ? Math.max(...lux) : s.illumination;
     if (brightness !== undefined && brightness < 10) {
-        return { icon: '🌙', label: 'Dunkel' };
+        return { icon: '🌙', label: t('Dark') };
     }
     if (brightness !== undefined) {
-        return { icon: '⛅', label: 'Bewölkt' };
+        return { icon: '⛅', label: t('Cloudy') };
     }
-    return { icon: '🌡️', label: 'Außen' };
+    return { icon: '🌡️', label: t('Outside') };
 }
 
-const COMPASS = ['N', 'NO', 'O', 'SO', 'S', 'SW', 'W', 'NW'];
+/** Himmelsrichtungen englisch (N, NE, E …), übersetzt in compass() */
+const COMPASS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 
 export function compass(deg: number): string {
-    return COMPASS[Math.round((((deg % 360) + 360) % 360) / 45) % 8];
+    return t(COMPASS[Math.round((((deg % 360) + 360) % 360) / 45) % 8]);
 }
 
 /** Windstärke in Worten (Beaufort, vereinfacht) */
 export function windLabel(kmh: number): string {
     if (kmh < 2) {
-        return 'windstill';
+        return t('calm');
     }
     if (kmh < 12) {
-        return 'leicht';
+        return t('light');
     }
     if (kmh < 29) {
-        return 'mäßig';
+        return t('moderate');
     }
     if (kmh < 50) {
-        return 'frisch';
+        return t('fresh');
     }
     if (kmh < 75) {
-        return 'stürmisch';
+        return t('stormy');
     }
-    return 'Sturm';
+    return t('Storm');
 }
 
 export function formatMinutes(min: number): string {
@@ -342,9 +344,9 @@ export function formatMinutes(min: number): string {
 
 /** Helligkeit: 12.400 lx bzw. 85 lx */
 export function formatLux(lux: number | undefined): string {
-    return lux === undefined ? '–' : `${Math.round(lux).toLocaleString('de-DE')} lx`;
+    return lux === undefined ? '–' : `${Math.round(lux).toLocaleString(locale())} lx`;
 }
 
 export function fmt(v: number | undefined, digits = 1): string {
-    return v === undefined ? '–' : v.toLocaleString('de-DE', { maximumFractionDigits: digits });
+    return v === undefined ? '–' : v.toLocaleString(locale(), { maximumFractionDigits: digits });
 }

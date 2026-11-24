@@ -1,3 +1,4 @@
+import { t } from '../../src/shared/i18n';
 import { useEffect, useState } from 'react';
 import type { SvDevice, SvModel, SvSecurityStation, SvStateValue } from '../../src/shared/protocol';
 import { cameraInfo } from './cameras';
@@ -9,12 +10,12 @@ type States = Record<string, SvStateValue | null>;
 export type SecurityMode = 'home' | 'away' | 'off';
 
 /** Beschriftungen der Modi (wie vom Profil übersetzt) */
-const MODE_LABELS: Record<SecurityMode, string> = { home: 'Zuhause', away: 'Abwesend', off: 'Deaktiviert' };
+const MODE_LABELS: Record<SecurityMode, string> = { home: t('At home'), away: t('Away'), off: t('Disarmed') };
 
 export const MODE_CHOICES: { mode: SecurityMode; label: string; icon: string }[] = [
-    { mode: 'home', label: 'Zuhause', icon: 'home' },
-    { mode: 'away', label: 'Abwesend', icon: 'walk' },
-    { mode: 'off', label: 'Aus', icon: 'power' },
+    { mode: 'home', label: t('At home'), icon: 'home' },
+    { mode: 'away', label: t('Away'), icon: 'walk' },
+    { mode: 'off', label: t('Off'), icon: 'power' },
 ];
 
 /** Stationen, deren Modus SmartVis setzen darf */
@@ -53,7 +54,7 @@ export function securityMode(
         const val = s.guardMode ? states[s.guardMode.id]?.val : undefined;
         return { mode: undefined, label: s.guardMode?.states?.[String(val)] ?? '–' };
     }
-    return { mode: 'mixed', label: 'Gemischt' };
+    return { mode: 'mixed', label: t('Mixed') };
 }
 
 /** Modus an alle Stationen senden, die ihn kennen */
@@ -75,7 +76,7 @@ export const MOTION_TYPES = ['motion'];
 export function activeAlarms(model: SvModel, states: States, devices: SvDevice[]): string[] {
     const stations = (model.securityStations || []).filter(s => s.alarm && states[s.alarm.id]?.val === true);
     const detectors = devices.filter(d => ALARM_TYPES.includes(d.type) && isActive(d, states));
-    return [...stations.map(s => `Alarm ${s.name}`), ...detectors.map(d => d.name)];
+    return [...stations.map(s => t('Alarm {name}', { name: s.name })), ...detectors.map(d => d.name)];
 }
 
 /** Jüngste Kamera-Erkennung (laufend oder Ereignisbild jünger als maxAgeMs) */

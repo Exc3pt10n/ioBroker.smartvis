@@ -1,3 +1,5 @@
+import type { SvLanguage } from './i18n';
+
 /**
  * Gemeinsame Typen für Backend (Adapter) und Frontend (PWA).
  * Änderungen hier betreffen beide Seiten – PROTOCOL_VERSION erhöhen, wenn inkompatibel.
@@ -661,6 +663,8 @@ export interface SvModel {
     system?: SvSystemStatus;
     /** Zeitpunkt der letzten Erkennung (ms) */
     generatedAt: number;
+    /** Sprache der Oberfläche (Einstellung der Instanz, sonst Systemsprache von ioBroker) */
+    language?: SvLanguage;
     /** Darf die App Anpassungen speichern? */
     editable: boolean;
     /** Anzeige-Einstellungen aus den Anpassungen */

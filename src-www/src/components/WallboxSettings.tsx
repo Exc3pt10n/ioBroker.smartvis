@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import { useState } from 'react';
 import type { SvWallbox, SvWallboxSetting } from '../../../src/shared/protocol';
 import { connection, useConnection } from '../connection';
@@ -56,7 +57,7 @@ function NumberSetting({ setting }: { setting: SvWallboxSetting }): React.JSX.El
             <div className="stepper">
                 <button
                     type="button"
-                    aria-label={`${setting.label} verringern`}
+                    aria-label={t('Decrease {name}', { name: setting.label })}
                     onClick={() => commit((current ?? 0) - step)}
                     disabled={current !== undefined && setting.min !== undefined && current <= setting.min}
                 >
@@ -77,7 +78,7 @@ function NumberSetting({ setting }: { setting: SvWallboxSetting }): React.JSX.El
                 {setting.unit && <span className="stepper__unit">{setting.unit}</span>}
                 <button
                     type="button"
-                    aria-label={`${setting.label} erhöhen`}
+                    aria-label={t('Increase {name}', { name: setting.label })}
                     onClick={() => commit((current ?? 0) + step)}
                     disabled={current !== undefined && setting.max !== undefined && current >= setting.max}
                 >
@@ -144,7 +145,7 @@ export function WallboxSettings({ wallbox }: { wallbox: SvWallbox }): React.JSX.
                 className="wb-settings__open"
                 onClick={() => setOpen(true)}
             >
-                <span>⚙️ Ladeeinstellungen</span>
+                <span>⚙️ {t('Charging settings')}</span>
                 <span
                     className="wb-settings__more"
                     aria-hidden="true"
@@ -154,7 +155,7 @@ export function WallboxSettings({ wallbox }: { wallbox: SvWallbox }): React.JSX.
             </button>
             {open && (
                 <Sheet
-                    title="Ladeeinstellungen"
+                    title={t('Charging settings')}
                     subtitle={wallbox.name}
                     onClose={() => setOpen(false)}
                 >
@@ -170,12 +171,12 @@ export function WallboxSettings({ wallbox }: { wallbox: SvWallbox }): React.JSX.
                                     <h3 className="subtitle">{group}</h3>
                                     {needsSoC && !hasVehicleSoC && (
                                         <div className="detail__note">
-                                            Wirkt erst, wenn der Ladezustand des Fahrzeugs bekannt ist.{' '}
+                                            {t('Only takes effect when the state of charge of the vehicle is known.')}{' '}
                                             <details className="wb-settings__why">
-                                                <summary>Mehr erfahren</summary>
-                                                Im kecontact-Adapter muss dafür ein Datenpunkt mit dem Ladezustand des
-                                                Fahrzeugs eingetragen sein (Einstellung „automatic.stateVehicleSoC“), z.
-                                                B. aus dem Adapter des Autoherstellers.
+                                                <summary>{t('Learn more')}</summary>
+                                                {t(
+                                                    'A data point with the state of charge of the vehicle must be entered in the kecontact adapter (setting “automatic.stateVehicleSoC”), e.g. from the adapter of the car manufacturer.',
+                                                )}
                                             </details>
                                         </div>
                                     )}

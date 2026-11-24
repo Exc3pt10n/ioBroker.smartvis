@@ -1,3 +1,4 @@
+import { t } from '../../shared/i18n';
 import type {
     SvAutoShutter,
     SvShutterArea,
@@ -42,9 +43,9 @@ interface ShutterNative {
 }
 
 const AREAS: { key: SvShutterArea; label: string; suffix: string; trigger: keyof ShutterNative }[] = [
-    { key: 'living', label: 'Wohnbereich', suffix: 'Living', trigger: 'triggerAutoLiving' },
-    { key: 'sleep', label: 'Schlafbereich', suffix: 'Sleep', trigger: 'triggerAutoSleep' },
-    { key: 'children', label: 'Kinderbereich', suffix: 'Children', trigger: 'triggerAutoChildren' },
+    { key: 'living', label: 'Living area', suffix: 'Living', trigger: 'triggerAutoLiving' },
+    { key: 'sleep', label: 'Sleeping area', suffix: 'Sleep', trigger: 'triggerAutoSleep' },
+    { key: 'children', label: 'Children area', suffix: 'Children', trigger: 'triggerAutoChildren' },
 ];
 
 /** "living-auto" → living; "astro", "off" … → undefined */
@@ -99,9 +100,9 @@ export const shuttercontrolProfile: AdapterProfile = {
                 heightUp: num(e.heightUp, 100),
                 heightDown: num(e.heightDown, 0),
                 enabled: e.enabled !== false,
-                autoUp: ref(objects, id(`shutters.autoUp.${key}`), 'Automatisch öffnen'),
-                autoDown: ref(objects, id(`shutters.autoDown.${key}`), 'Automatisch schließen'),
-                autoSun: ref(objects, id(`shutters.autoSun.${key}`), 'Sonnenschutz'),
+                autoUp: ref(objects, id(`shutters.autoUp.${key}`), 'Open automatically'),
+                autoDown: ref(objects, id(`shutters.autoDown.${key}`), 'Close automatically'),
+                autoSun: ref(objects, id(`shutters.autoSun.${key}`), 'Sun protection'),
                 autoState: ref(objects, id(`shutters.autoState.${key}`), 'Status'),
             };
         });
@@ -109,37 +110,37 @@ export const shuttercontrolProfile: AdapterProfile = {
         const usedAreas = new Set(shutters.map(s => s.area).filter(Boolean));
         const areas: SvShutterAreaInfo[] = AREAS.filter(a => usedAreas.has(a.key) || !events.length).map(a => ({
             key: a.key,
-            label: a.label,
+            label: t(a.label),
             auto: toSwitch(
                 objects,
                 id(`control.auto${a.suffix}`),
                 native[a.trigger] as string | undefined,
-                'Automatik',
+                'Automation',
             ),
-            open: ref(objects, id(`control.open${a.suffix}`), 'Öffnen'),
-            close: ref(objects, id(`control.close${a.suffix}`), 'Schließen'),
-            sunProtect: ref(objects, id(`control.sunProtect${a.suffix}`), 'Sonnenschutz'),
-            upTime: ref(objects, id(`info.upTime${a.suffix}`), 'Öffnet'),
-            downTime: ref(objects, id(`info.downTime${a.suffix}`), 'Schließt'),
+            open: ref(objects, id(`control.open${a.suffix}`), 'Open'),
+            close: ref(objects, id(`control.close${a.suffix}`), 'Close'),
+            sunProtect: ref(objects, id(`control.sunProtect${a.suffix}`), 'Sun protection'),
+            upTime: ref(objects, id(`info.upTime${a.suffix}`), 'Opens'),
+            downTime: ref(objects, id(`info.downTime${a.suffix}`), 'Closes'),
         }));
 
         const shutterControl: SvShutterControl = {
             id: instance,
-            name: 'Rollladen-Automatik',
+            name: t('Blind automation'),
             adapter: 'shuttercontrol',
-            openAll: ref(objects, id('control.openAll'), 'Alle öffnen'),
-            closeAll: ref(objects, id('control.closeAll'), 'Alle schließen'),
-            sunProtectAll: ref(objects, id('control.sunProtect'), 'Sonnenschutz'),
-            autoAll: ref(objects, id('control.autoAll'), 'Alle auf Automatik'),
-            holiday: toSwitch(objects, id('control.Holiday'), native.HolidayDP, 'Urlaub / Wochenendzeiten'),
-            schoolfree: toSwitch(objects, id('control.schoolfree'), native.schoolfreeDP, 'Schulfrei'),
+            openAll: ref(objects, id('control.openAll'), 'Open all'),
+            closeAll: ref(objects, id('control.closeAll'), 'Close all'),
+            sunProtectAll: ref(objects, id('control.sunProtect'), 'Sun protection'),
+            autoAll: ref(objects, id('control.autoAll'), 'All to automation'),
+            holiday: toSwitch(objects, id('control.Holiday'), native.HolidayDP, 'Holiday / weekend times'),
+            schoolfree: toSwitch(objects, id('control.schoolfree'), native.schoolfreeDP, 'School holiday'),
             areas,
             shutters,
             sun: {
-                sunrise: ref(objects, id('info.Sunrise'), 'Sonnenaufgang'),
-                sunset: ref(objects, id('info.Sunset'), 'Sonnenuntergang'),
-                elevation: ref(objects, id('info.Elevation'), 'Sonnenhöhe'),
-                azimuth: ref(objects, id('info.Azimut'), 'Sonnenrichtung'),
+                sunrise: ref(objects, id('info.Sunrise'), 'Sunrise'),
+                sunset: ref(objects, id('info.Sunset'), 'Sunset'),
+                elevation: ref(objects, id('info.Elevation'), 'Sun elevation'),
+                azimuth: ref(objects, id('info.Azimut'), 'Sun azimuth'),
             },
         };
         return { shutterControl };
