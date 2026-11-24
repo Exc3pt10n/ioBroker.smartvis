@@ -78,6 +78,11 @@ Project structure: `src/` adapter (TypeScript; discovery, adapter profiles, over
     ### **WORK IN PROGRESS**
 -->
 
+### 0.16.1 (2026-11-24)
+
+- (Exc3pt10n) Release notes in the instance only list versions that are available on npm
+- (Exc3pt10n) Version tags now start their own workflow run, as required by the ioBroker repository checker
+
 ### 0.16.0 (2026-11-24)
 
 - (Exc3pt10n) Prepared for distribution via npm and the ioBroker repository: the adapter is now shipped pre-built (no build on the ioBroker host anymore). **Breaking** for testers who installed from GitHub source: installing from `…/tarball/main` or `…/tarball/release` is no longer possible; use the `.tgz` attached to each GitHub release until SmartVis is available in the repository
