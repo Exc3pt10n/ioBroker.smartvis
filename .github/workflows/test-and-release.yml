@@ -31,8 +31,22 @@ permissions:
     contents: read
 
 jobs:
-    # Alle Prüfungen und das Release (zentraler Workflow); Pflicht-Check im Branch-Schutz: "check-and-lint / ci-result"
+    # Standard-Prüfung von ioBroker: Typprüfung, Lint und Paket-Tests (npm run test:package)
     check-and-lint:
+        if: contains(github.event.head_commit.message, '[skip ci]') == false
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        steps:
+            - uses: ioBroker/testing-action-check@v2
+              with:
+                  node-version: 22.x
+                  type-checking: true
+                  lint: true
+
+    # Zentraler Workflow: Build, Tests auf Node 22/24, Integrations- und Installationstest, npm audit, release-guard
+    # und nach einem Merge auf main das Release (Tag, GitHub-Release mit .tgz).
+    # Pflicht-Checks im Branch-Schutz: "adapter / ci-result" und "check-and-lint"
+    adapter:
         uses: Exc3pt10n/ioBroker-workflows/.github/workflows/adapter.yml@v1
         # Schreibrecht braucht nur der Release-Job (Tag, GitHub-Release)
         permissions:
@@ -55,7 +69,7 @@ jobs:
             # Ohne diesen Eintrag verlangt der release-guard bei reinen Frontend-Änderungen keine neue Version.
             extra-runtime-paths: 'src/ src-www/'
 
-    # Unit- und Integrationstests mit der offiziellen ioBroker-Action (zusätzlich zu check-and-lint)
+    # Unit- und Integrationstests mit der offiziellen ioBroker-Action
     adapter-tests:
         needs: check-and-lint
         if: contains(github.event.head_commit.message, '[skip ci]') == false
@@ -76,11 +90,11 @@ jobs:
 
     # Nach einem Release: das Paket vom GitHub-Release auf npm veröffentlichen (Trusted Publishing, kein Token)
     deploy:
-        needs: [check-and-lint, adapter-tests]
-        if: needs.check-and-lint.outputs.released == 'true'
+        needs: [check-and-lint, adapter, adapter-tests]
+        if: needs.adapter.outputs.released == 'true'
         uses: Exc3pt10n/ioBroker-workflows/.github/workflows/npm-publish.yml@v1
         permissions:
             contents: read
             id-token: write
         with:
-            version: ${{ needs.check-and-lint.outputs.version }}
+            version: ${{ needs.adapter.outputs.version }}
