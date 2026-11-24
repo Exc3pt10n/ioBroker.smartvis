@@ -70,9 +70,11 @@ npx @iobroker/repochecker https://github.com/Exc3pt10n/ioBroker.smartvis <branch
 
 ## Automatische Tests (GitHub Actions)
 
-`.github/workflows/test-and-release.yml` hat den Aufbau des ioBroker-Standards: `check-and-lint` ruft den zentralen
-Workflow auf, `adapter-tests` führt Unit- und Integrationstests mit der offiziellen ioBroker-Action aus (Node 22/24/26
-auf Linux, Windows und macOS), `deploy` veröffentlicht nach einem Release auf npm. Er läuft für Pull Requests,
+`.github/workflows/test-and-release.yml` hat den Aufbau des ioBroker-Standards (vom Reviewer verlangt):
+`check-and-lint` nutzt `ioBroker/testing-action-check@v2` (Typprüfung, Lint, Paket-Tests), `adapter` ruft den
+zentralen Workflow auf (Build, Tests, Integrations- und Installationstest, audit, release-guard, Release),
+`adapter-tests` führt Unit- und Integrationstests mit der offiziellen ioBroker-Action aus (Node 22/24/26 auf Linux,
+Windows und macOS), `deploy` veröffentlicht nach einem Release auf npm. Er läuft für Pull Requests,
 Pushes auf `main` und wöchentlich:
 
 - Pull Requests und `main`: Lint, Typprüfung, Build, Unit- und Paket-Tests auf Node 22 und 24,
@@ -80,7 +82,8 @@ Pushes auf `main` und wöchentlich:
   `npm audit` der Laufzeit-Abhängigkeiten und bei Pull Requests der `release-guard`
 - wöchentlich: volle Matrix Linux und Windows, Node 22, 24 und 26
 
-Pflicht-Check im Branch-Schutz von `main` ist `check-and-lint / ci-result` (zusätzlich empfohlen: `adapter-tests`). Den früheren Branch `release` pflegt der
+Pflicht-Checks im Branch-Schutz von `main` sind `adapter / ci-result` und `check-and-lint` (zusätzlich empfohlen:
+`adapter-tests`). Den früheren Branch `release` pflegt der
 Workflow nicht mehr (`release-branch: ''`); er bleibt auf dem letzten Stand vor der Umstellung auf npm stehen.
 
 Änderungen an den Checks oder am Release gehören in das zentrale Repo, nicht in diesen Adapter. Wird die
