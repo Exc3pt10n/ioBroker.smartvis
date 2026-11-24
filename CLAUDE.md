@@ -56,7 +56,7 @@ SmartVis wird über npm und das ioBroker-Repository verteilt (Parameter `npm-pac
 
 - Es gibt **kein** `prepare`-Skript: Nutzer bekommen das fertig gebaute Paket, der Build läuft nur in der CI.
 - `common.nogit` ist in `io-package.json` gesetzt (der Build liegt nicht im Repository).
-- `@iobroker/testing` bleibt auf dem aktuellen Stand (6.x), `admin` als globale Abhängigkeit mindestens 7.6.17.
+- `@iobroker/testing` bleibt auf dem aktuellen Stand (6.x), `admin` als globale Abhängigkeit mindestens 7.6.20.
 - Alles, was der Build braucht, steht in `devDependencies`.
 - Für Tester ohne npm-Version: das `.tgz` am jeweiligen GitHub-Release
   (`iobroker url https://github.com/Exc3pt10n/ioBroker.smartvis/releases/download/vX.Y.Z/iobroker.smartvis-X.Y.Z.tgz smartvis`).

@@ -37,7 +37,7 @@ SmartVis detects devices and rooms automatically and shows them as an installabl
 
 Install SmartVis like any other adapter from the ioBroker Admin interface (*Adapters*), then create an instance and open `http://<iobroker>:8099`. On the phone, use "Add to home screen" to install the app.
 
-Requirements: js-controller ≥ 6.0.11, Admin ≥ 7.6.17, Node.js ≥ 22.
+Requirements: js-controller ≥ 6.0.11, Admin ≥ 7.6.20, Node.js ≥ 22.
 
 There is **no login** yet: use SmartVis only in your home network or via VPN. Edit mode can be disabled in the instance settings.
 

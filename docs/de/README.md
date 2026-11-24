@@ -95,7 +95,7 @@ iobroker add smartvis
 
 Eine Installation direkt aus dem Quellcode (`…/tarball/main` oder `…/tarball/release`) ist seit 0.16.0 nicht mehr möglich: Der Build liegt nicht im Repository (`common.nogit`).
 
-Voraussetzungen: js-controller ≥ 6.0.11, Admin ≥ 7.6.17, Node.js ≥ 22.
+Voraussetzungen: js-controller ≥ 6.0.11, Admin ≥ 7.6.20, Node.js ≥ 22.
 
 ## Konfiguration
 
