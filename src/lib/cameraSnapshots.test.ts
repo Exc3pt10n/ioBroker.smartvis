@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import type { SvCamera } from '../shared/protocol';
 import { CameraSnapshots, frameUrl, type FrameFetcher } from './cameraSnapshots';
+import { nodeTimers } from './timers';
 
 describe('cameraSnapshots', () => {
     it('derives the go2rtc frame url from the livestream page', () => {
@@ -42,6 +43,7 @@ describe('cameraSnapshots', () => {
             fetcher,
             () => changes++,
             () => undefined,
+            nodeTimers,
         );
         snaps.setCameras([camera]);
         return { snaps, files, changes: () => changes };
@@ -82,6 +84,7 @@ describe('cameraSnapshots', () => {
             },
             () => undefined,
             () => undefined,
+            nodeTimers,
         );
         snaps.setCameras([{ ...camera, pictureUsable: true }]);
         snaps.onState('eusec.0.cam.livestream', { val: 'http://h:1984/stream.html?src=x', ack: true, ts: 1 });

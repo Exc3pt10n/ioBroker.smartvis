@@ -1,4 +1,5 @@
 import type { SvCamera, SvStateValue } from '../shared/protocol';
+import type { Timers } from './timers';
 
 /** Zugriff auf den Dateispeicher der Instanz (im Adapter: readFile/writeFile von ioBroker) */
 export interface SnapshotStorage {
@@ -43,7 +44,7 @@ export class CameraSnapshots {
     private taken: Record<string, number> = {};
     /** State-ID der Livestream-Adresse → Kamera-ID */
     private liveIds = new Map<string, string>();
-    private timers = new Map<string, ReturnType<typeof setTimeout>>();
+    private timers = new Map<string, ioBroker.Timeout | undefined>();
 
     constructor(
         private readonly namespace: string,
@@ -51,6 +52,7 @@ export class CameraSnapshots {
         private readonly fetchFrame: FrameFetcher,
         private readonly onChange: () => void,
         private readonly log: (message: string) => void,
+        private readonly clock: Timers,
     ) {}
 
     async load(): Promise<void> {
@@ -103,9 +105,8 @@ export class CameraSnapshots {
     }
 
     private stop(cameraId: string): void {
-        const timer = this.timers.get(cameraId);
-        if (timer) {
-            clearTimeout(timer);
+        if (this.timers.has(cameraId)) {
+            this.clock.clearTimeout(this.timers.get(cameraId));
             this.timers.delete(cameraId);
         }
     }
@@ -113,7 +114,7 @@ export class CameraSnapshots {
     private schedule(cameraId: string, url: string, delay: number): void {
         this.timers.set(
             cameraId,
-            setTimeout(() => {
+            this.clock.setTimeout(() => {
                 void this.capture(cameraId, url).finally(() => {
                     // Weiter, solange der Stream läuft (stop() entfernt den Eintrag)
                     if (this.timers.has(cameraId)) {

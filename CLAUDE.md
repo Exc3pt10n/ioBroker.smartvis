@@ -20,8 +20,12 @@ Anzupassen sind jeweils:
 
 - `package.json` und `package-lock.json` (Feld `version`, im Lockfile oben und unter `packages[""]`)
 - `io-package.json`: `common.version` und ein neuer Eintrag ganz oben in `common.news`
-  (alle Sprachen: en, de, ru, pt, nl, fr, it, es, pl, uk, zh-cn; höchstens 20 Einträge behalten)
-- `README.md`: Abschnitt `### <version> (<datum>)` oben im Changelog, Einträge im Stil `- (Exc3pt10n) …`
+  (alle Sprachen: en, de, ru, pt, nl, fr, it, es, pl, uk, zh-cn; **höchstens 7 Einträge** behalten, ältere
+  einfach entfernen – der Repository-Builder kürzt sonst, der `release-guard` prüft das)
+- `README.md`: Abschnitt `### <version> (<datum>)` oben im Changelog, Einträge **auf Englisch** im Stil
+  `- (Exc3pt10n) …`. Die README muss vollständig englisch sein (ioBroker-Repochecker); ältere Changelog-Einträge
+  stehen in `CHANGELOG_OLD.md`. Die ausführliche deutsche Beschreibung liegt in `docs/de/README.md` und wird bei
+  neuen Funktionen mitgepflegt.
 
 Wird ein Pull Request erweitert, bevor er gemergt ist, bleibt es bei dieser einen Erhöhung
 (ggf. von Patch auf Minor anheben). Nach einem Merge beginnt die nächste Änderung mit einer neuen Erhöhung.
@@ -30,15 +34,15 @@ Wird ein Pull Request erweitert, bevor er gemergt ist, bleibt es bei dieser eine
 
 Releases entstehen automatisch über den zentralen Workflow aus
 [Exc3pt10n/ioBroker-workflows](https://github.com/Exc3pt10n/ioBroker-workflows) (eingebunden in
-`.github/workflows/test.yml` über `@v1`). Nach einem Merge auf `main` laufen alle Checks; nur wenn sie grün
+`.github/workflows/test-and-release.yml` über `@v1`, Dateiname wie vom ioBroker-Repochecker erwartet). Nach einem Merge auf `main` laufen alle Checks; nur wenn sie grün
 sind und die Version aus `package.json` noch keinen Tag hat, legt der Release-Job an:
 
 - den annotierten Tag `vX.Y.Z`,
 - ein GitHub-Release mit den Notes aus dem Changelog-Abschnitt der README und dem fertig gebauten
   `iobroker.smartvis-X.Y.Z.tgz` als Asset,
-- den Branch `release`, der auf den neuen Tag vorgespult wird.
+- danach veröffentlicht `npm-publish.yml` genau dieses `.tgz` auf npm (Trusted Publishing, kein Token).
 
-Tags, Releases und den Branch `release` also nie selbst anlegen oder pushen – insbesondere nicht bei einem
+Tags, Releases und npm-Versionen also nie selbst anlegen oder pushen bzw. veröffentlichen – insbesondere nicht bei einem
 Versionssprung auf einem Feature-Branch. Ist lokal versehentlich ein Tag entstanden, ihn mit
 `git tag -d vX.Y.Z` wieder löschen. Ein Merge ohne Versionssprung (z. B. nur Werkzeuge) erzeugt kein Release.
 
@@ -46,18 +50,23 @@ Der `release-guard` im Workflow prüft die Regeln oben maschinell: Ändert ein P
 (`files`/`main` aus `package.json`, `io-package.json`, `src/`, `src-www/`) oder Laufzeit-Abhängigkeiten
 (auch nur im Lockfile, z. B. durch `npm audit fix`), muss die Version erhöht und vollständig eingetragen sein.
 
-## Installation aus GitHub
+## Verteilung über npm
 
-Der Adapter wird nicht auf npm veröffentlicht. Installiert wird aus GitHub:
+SmartVis wird über npm und das ioBroker-Repository verteilt (Parameter `npm-package: true` im zentralen Workflow):
 
-- stabil: `https://github.com/Exc3pt10n/ioBroker.smartvis/tarball/release` (nur freigegebene Releases),
-- fertig gebaut: das `.tgz` am jeweiligen GitHub-Release (kein Build beim Nutzer),
-- Entwicklungsstand: `https://github.com/Exc3pt10n/ioBroker.smartvis/tarball/main`.
+- Es gibt **kein** `prepare`-Skript: Nutzer bekommen das fertig gebaute Paket, der Build läuft nur in der CI.
+- `common.nogit` ist in `io-package.json` gesetzt (der Build liegt nicht im Repository).
+- `@iobroker/testing` bleibt auf dem aktuellen Stand (6.x), `admin` als globale Abhängigkeit mindestens 7.6.17.
+- Alles, was der Build braucht, steht in `devDependencies`.
+- Für Tester ohne npm-Version: das `.tgz` am jeweiligen GitHub-Release
+  (`iobroker url https://github.com/Exc3pt10n/ioBroker.smartvis/releases/download/vX.Y.Z/iobroker.smartvis-X.Y.Z.tgz smartvis`).
+  Eine Installation aus `tarball/main` funktioniert nicht mehr.
 
-Bei der Installation aus GitHub baut npm den Adapter über das Skript `prepare` selbst (Backend und Frontend).
-Deshalb darf `common.nogit` in `io-package.json` **nicht** gesetzt werden (der `release-guard` prüft das), alles,
-was der Build braucht, muss in `devDependencies` stehen, und `@iobroker/testing` bleibt bei 5.x (6.x lehnt
-`prepare` ab).
+Vor einem Pull Request auf Funde des ioBroker-Repocheckers achten:
+
+```bash
+npx @iobroker/repochecker https://github.com/Exc3pt10n/ioBroker.smartvis <branch>
+```
 
 ## Automatische Tests (GitHub Actions)
 
@@ -65,16 +74,16 @@ was der Build braucht, muss in `devDependencies` stehen, und `@iobroker/testing`
 und wöchentlich:
 
 - Pull Requests und `main`: Lint, Typprüfung, Build, Unit- und Paket-Tests auf Node 22 und 24,
-  Integrationstest, Installationstest (Installation aus Git mit `prepare`-Build wie bei `iobroker url`),
+  Integrationstest, Installationstest (Installation des gepackten Pakets wie aus npm),
   `npm audit` der Laufzeit-Abhängigkeiten und bei Pull Requests der `release-guard`
 - wöchentlich: volle Matrix Linux und Windows, Node 22, 24 und 26
 
-Pflicht-Check im Branch-Schutz von `main` ist `adapter / ci-result`. Der Branch `release` darf nicht
-geschützt werden, sonst kann der Release-Job ihn nicht vorspulen.
+Pflicht-Check im Branch-Schutz von `main` ist `adapter / ci-result`. Den früheren Branch `release` pflegt der
+Workflow nicht mehr (`release-branch: ''`); er bleibt auf dem letzten Stand vor der Umstellung auf npm stehen.
 
 Änderungen an den Checks oder am Release gehören in das zentrale Repo, nicht in diesen Adapter. Wird die
 Node-Mindestversion geändert: `engines` in `package.json`/`package-lock.json`, README (Voraussetzungen) und
-ggf. den Parameter `node-versions` in `test.yml` gemeinsam anpassen.
+ggf. den Parameter `node-versions` in `test-and-release.yml` gemeinsam anpassen.
 
 ## Prüfen vor dem Push
 
@@ -85,7 +94,7 @@ npm run lint && npm run check && npm test && npm run build
 Den `release-guard` lokal ausführen (mit einem Klon von ioBroker-workflows daneben):
 
 ```bash
-node ../ioBroker-workflows/scripts/check-release.mjs pr --base origin/main
+node ../ioBroker-workflows/scripts/check-release.mjs pr --base origin/main --npm-package true
 ```
 
 Bei Änderungen an `src/main.ts`, an der Erkennung oder am Webserver zusätzlich:

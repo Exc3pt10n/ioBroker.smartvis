@@ -71,6 +71,7 @@ class SmartVis extends utils.Adapter {
             fetchFrame,
             () => this.server?.publishModels(false),
             message => this.log.debug(message),
+            this,
         );
         await this.snapshots.load();
         await this.runDiscovery();
@@ -100,6 +101,7 @@ class SmartVis extends utils.Adapter {
                 onClientCountChange: count => void this.setState('info.clients', count, true),
                 log: this.log,
             },
+            this,
         );
 
         try {
