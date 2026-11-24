@@ -70,8 +70,10 @@ npx @iobroker/repochecker https://github.com/Exc3pt10n/ioBroker.smartvis <branch
 
 ## Automatische Tests (GitHub Actions)
 
-`.github/workflows/test.yml` ruft den zentralen Workflow auf. Er läuft für Pull Requests, Pushes auf `main`
-und wöchentlich:
+`.github/workflows/test-and-release.yml` hat den Aufbau des ioBroker-Standards: `check-and-lint` ruft den zentralen
+Workflow auf, `adapter-tests` führt Unit- und Integrationstests mit der offiziellen ioBroker-Action aus (Node 22/24/26
+auf Linux, Windows und macOS), `deploy` veröffentlicht nach einem Release auf npm. Er läuft für Pull Requests,
+Pushes auf `main` und wöchentlich:
 
 - Pull Requests und `main`: Lint, Typprüfung, Build, Unit- und Paket-Tests auf Node 22 und 24,
   Integrationstest, Installationstest (Installation des gepackten Pakets wie aus npm),
