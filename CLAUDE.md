@@ -78,7 +78,7 @@ und wöchentlich:
   `npm audit` der Laufzeit-Abhängigkeiten und bei Pull Requests der `release-guard`
 - wöchentlich: volle Matrix Linux und Windows, Node 22, 24 und 26
 
-Pflicht-Check im Branch-Schutz von `main` ist `adapter / ci-result`. Den früheren Branch `release` pflegt der
+Pflicht-Check im Branch-Schutz von `main` ist `check-and-lint / ci-result` (zusätzlich empfohlen: `adapter-tests`). Den früheren Branch `release` pflegt der
 Workflow nicht mehr (`release-branch: ''`); er bleibt auf dem letzten Stand vor der Umstellung auf npm stehen.
 
 Änderungen an den Checks oder am Release gehören in das zentrale Repo, nicht in diesen Adapter. Wird die
