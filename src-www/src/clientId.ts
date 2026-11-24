@@ -1,3 +1,4 @@
+import { t } from '../../src/shared/i18n';
 /** Stabile Kennung dieses Endgeräts (im Browser gespeichert) für Anpassungen je Gerät */
 const KEY = 'smartvis.clientId';
 let memory: string | undefined;
@@ -32,15 +33,15 @@ export function suggestedName(ua = navigator.userAgent): string {
           ? 'iPad'
           : /Android/.test(ua)
             ? /Mobile/.test(ua)
-                ? 'Android-Handy'
-                : 'Android-Tablet'
+                ? t('Android phone')
+                : t('Android tablet')
             : /Windows/.test(ua)
               ? 'Windows'
               : /Macintosh|Mac OS X/.test(ua)
                 ? 'Mac'
                 : /Linux/.test(ua)
                   ? 'Linux'
-                  : 'Gerät';
+                  : t('Device');
     const browser = /Edg\//.test(ua)
         ? 'Edge'
         : /Firefox\//.test(ua)

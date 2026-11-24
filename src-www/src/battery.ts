@@ -1,3 +1,4 @@
+import { t } from '../../src/shared/i18n';
 import type { SvBattery, SvStateValue } from '../../src/shared/protocol';
 
 type States = Record<string, SvStateValue | null>;
@@ -30,5 +31,5 @@ export function lowBatteries(batteries: SvBattery[] | undefined, states: States)
 
 /** Ist die einzige Warnung eines Geräts die Batterie? (zählt dann nicht als Störung) */
 export function onlyBatteryWarning(warnings: string[]): boolean {
-    return warnings.length > 0 && warnings.every(w => w === 'Batterie schwach');
+    return warnings.length > 0 && warnings.every(w => w === t('Battery low'));
 }

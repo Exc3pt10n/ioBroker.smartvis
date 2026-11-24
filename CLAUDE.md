@@ -50,6 +50,15 @@ Der `release-guard` im Workflow prüft die Regeln oben maschinell: Ändert ein P
 (`files`/`main` aus `package.json`, `io-package.json`, `src/`, `src-www/`) oder Laufzeit-Abhängigkeiten
 (auch nur im Lockfile, z. B. durch `npm audit fix`), muss die Version erhöht und vollständig eingetragen sein.
 
+## Sprache und Übersetzungen
+
+- Texte im Code (Adapter und App) sind **englisch**, Log-Meldungen ebenfalls (ohne Übersetzung).
+- Sichtbare Texte immer über `t('…')` bzw. `tn(n, '{n} device', '{n} devices')` aus `src/shared/i18n.ts`; die deutsche
+  Übersetzung kommt in `src/shared/i18n/de.ts`. Der Unit-Test `i18n` schlägt fehl, wenn ein Eintrag fehlt.
+- Gleicher englischer Text = gleiche Übersetzung: bei unterschiedlicher Bedeutung einen eindeutigen englischen Text wählen.
+- Die ausführliche deutsche Beschreibung (`docs/de/README.md`) enthält keine Installation aus GitHub und keine
+  Entwickler-Befehle; diese stehen in `DEVELOPMENT.md`.
+
 ## Verteilung über npm
 
 SmartVis wird über npm und das ioBroker-Repository verteilt (Parameter `npm-package: true` im zentralen Workflow):

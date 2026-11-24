@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n';
 import type { SvHostStatus, SvInstanceStatus, SvSystemStatus } from '../shared/protocol';
 import { getName } from './names';
 import { ref, type ObjectMap } from './profiles/types';
@@ -18,17 +19,17 @@ export function systemStatus(objects: ObjectMap, lang: string): SvSystemStatus {
                 id,
                 name: common.hostname || common.name || id.split('.').pop()!,
                 controllerVersion: common.installedVersion,
-                alive: s('alive', 'Läuft'),
-                cpu: s('cpu', 'Prozessor'),
-                mem: s('mem', 'Arbeitsspeicher'),
-                memAvailable: s('memAvailable', 'Speicher frei'),
-                load: s('load', 'Last'),
-                uptime: s('uptime', 'Laufzeit'),
-                diskFree: s('diskFree', 'Festplatte frei'),
-                diskSize: s('diskSize', 'Festplatte'),
-                diskWarning: s('diskWarning', 'Warnschwelle Festplatte'),
+                alive: s('alive', 'Running'),
+                cpu: s('cpu', 'Processor'),
+                mem: s('mem', 'Memory'),
+                memAvailable: s('memAvailable', 'Free memory'),
+                load: s('load', 'Load'),
+                uptime: s('uptime', 'Uptime'),
+                diskFree: s('diskFree', 'Free disk'),
+                diskSize: s('diskSize', 'Disk'),
+                diskWarning: s('diskWarning', 'Disk warning threshold'),
                 nodeVersion: s('versions.nodeCurrent', 'Node.js') || s('nodeVersion', 'Node.js'),
-                nodeNewest: s('versions.nodeNewest', 'Node.js aktuell'),
+                nodeNewest: s('versions.nodeNewest', 'Node.js current'),
             });
             continue;
         }
@@ -44,9 +45,9 @@ export function systemStatus(objects: ObjectMap, lang: string): SvSystemStatus {
                 mode: common.mode,
                 enabled: common.enabled === true,
                 host: common.host,
-                alive: ref(objects, `${id}.alive`, 'Läuft'),
-                connected: ref(objects, `${id}.connected`, 'Mit Host verbunden'),
-                connection: ref(objects, `${instance}.info.connection`, 'Verbunden'),
+                alive: ref(objects, `${id}.alive`, t('Running')),
+                connected: ref(objects, `${id}.connected`, t('Connected to host')),
+                connection: ref(objects, `${instance}.info.connection`, t('Connected')),
             });
         }
     }

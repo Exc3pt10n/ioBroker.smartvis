@@ -1,3 +1,4 @@
+import { getLanguage } from '../../src/shared/i18n';
 import { createContext, useContext } from 'react';
 import type { SvDevice, SvModel, SvRoom } from '../../src/shared/protocol';
 
@@ -28,7 +29,7 @@ export function favorites(model: SvModel, editing: boolean): SvDevice[] {
         .sort(
             (a, b) =>
                 (a.favoriteOrder ?? Number.MAX_SAFE_INTEGER) - (b.favoriteOrder ?? Number.MAX_SAFE_INTEGER) ||
-                a.name.localeCompare(b.name, 'de'),
+                a.name.localeCompare(b.name, getLanguage()),
         );
 }
 

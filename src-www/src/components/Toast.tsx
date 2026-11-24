@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import { useEffect, useSyncExternalStore } from 'react';
 
 /** Kurze Rückmeldung unten am Bildschirm, optional mit "Rückgängig" */
@@ -62,7 +63,7 @@ export function Toast(): React.JSX.Element | null {
                         hide(toast.id);
                     }}
                 >
-                    Rückgängig
+                    {t('Undo')}
                 </button>
             )}
         </div>

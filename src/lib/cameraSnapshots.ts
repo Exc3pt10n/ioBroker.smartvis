@@ -129,7 +129,7 @@ export class CameraSnapshots {
     async capture(cameraId: string, url: string): Promise<boolean> {
         const frame = await this.fetchFrame(url).catch(() => null);
         if (!frame || !frame.type.startsWith('image/') || frame.data.length < MIN_BYTES) {
-            this.log(`Kein Standbild vom Livestream für ${cameraId}`);
+            this.log(`No still image from the livestream of ${cameraId}`);
             return false;
         }
         try {
@@ -137,7 +137,7 @@ export class CameraSnapshots {
             this.taken = { ...this.taken, [cameraId]: Date.now() };
             await this.storage.write(this.namespace, INDEX, JSON.stringify(this.taken));
         } catch (e) {
-            this.log(`Standbild für ${cameraId} nicht gespeichert: ${(e as Error).message}`);
+            this.log(`Still image of ${cameraId} not saved: ${(e as Error).message}`);
             return false;
         }
         this.onChange();

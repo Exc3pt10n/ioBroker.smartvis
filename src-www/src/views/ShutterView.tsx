@@ -1,3 +1,4 @@
+import { t, tn } from '../../../src/shared/i18n';
 import { createContext, useContext, useState } from 'react';
 import { useCardColumns } from '../media';
 import type { SvAutoShutter, SvShutterControl } from '../../../src/shared/protocol';
@@ -26,31 +27,31 @@ export function ShutterView(): React.JSX.Element {
     const columns = useCardColumns();
     const [onlyDeviating, setOnlyDeviating] = useState(deviatingOnly);
     if (!model) {
-        return <p className="empty">Lade …</p>;
+        return <p className="empty">{t('Loading …')}</p>;
     }
     if (!model.shutterControl.length) {
         return (
             <>
-                <h1 className="title">Beschattung</h1>
-                <p className="empty">Keine Rollladen-Automatik (shuttercontrol) gefunden.</p>
+                <h1 className="title">{t('Shading')}</h1>
+                <p className="empty">{t('No blind automation (shuttercontrol) found.')}</p>
             </>
         );
     }
     return (
         <>
             <div className="titlebar titlebar--split">
-                <h1 className="title">Beschattung</h1>
+                <h1 className="title">{t('Shading')}</h1>
                 <EditButton />
             </div>
-            <EditBanner text="Bereiche am Griff ⠿ ziehen oder mit ↑ ↓ sortieren und aus- oder einblenden" />
+            <EditBanner text={t('Drag sections by the handle ⠿ or sort them with ↑ ↓, and hide or show them')} />
             <div
                 className="segmented shutter-filter"
                 role="radiogroup"
-                aria-label="Rollläden anzeigen"
+                aria-label={t('Show blinds')}
             >
                 {[
-                    { value: false, label: 'Alle' },
-                    { value: true, label: 'Nur abweichende' },
+                    { value: false, label: t('All') },
+                    { value: true, label: t('Only deviating') },
                 ].map(o => (
                     <button
                         key={o.label}
@@ -83,8 +84,8 @@ export function ShutterView(): React.JSX.Element {
 function shutterSections(sc: SvShutterControl, multi: boolean): SectionDef[] {
     const p = multi ? `${sc.id}:` : '';
     const sections: SectionDef[] = [
-        { key: `${p}controls`, label: 'Alle Rollläden', node: <ControlsCard sc={sc} /> },
-        { key: `${p}sun`, label: 'Sonne', node: <SunCard sc={sc} /> },
+        { key: `${p}controls`, label: t('All blinds'), node: <ControlsCard sc={sc} /> },
+        { key: `${p}sun`, label: t('Sun'), node: <SunCard sc={sc} /> },
         ...sc.areas.map(area => ({
             key: `${p}area-${area.key}`,
             label: area.label,
@@ -97,7 +98,7 @@ function shutterSections(sc: SvShutterControl, multi: boolean): SectionDef[] {
         })),
     ];
     if (sc.shutters.some(s => !s.area)) {
-        sections.push({ key: `${p}other`, label: 'Weitere', node: <OtherCard sc={sc} /> });
+        sections.push({ key: `${p}other`, label: t('Other'), node: <OtherCard sc={sc} /> });
     }
     return sections;
 }
@@ -108,22 +109,22 @@ function ControlsCard({ sc }: { sc: SvShutterControl }): React.JSX.Element {
             <div className="actions">
                 <ActionButton
                     state={sc.openAll}
-                    label="Alle öffnen"
+                    label={t('Open all')}
                     icon="up"
                 />
                 <ActionButton
                     state={sc.closeAll}
-                    label="Alle schließen"
+                    label={t('Close all')}
                     icon="down"
                 />
                 <ActionButton
                     state={sc.sunProtectAll}
-                    label="Sonnenschutz"
+                    label={t('Sun protection')}
                     icon="sunProtect"
                 />
                 <ActionButton
                     state={sc.autoAll}
-                    label="Alle auf Automatik"
+                    label={t('All to automation')}
                     icon="auto"
                     variant="primary"
                 />
@@ -131,15 +132,15 @@ function ControlsCard({ sc }: { sc: SvShutterControl }): React.JSX.Element {
             {sc.holiday && (
                 <Toggle
                     state={sc.holiday}
-                    label="Urlaub / Wochenendzeiten"
-                    hint="Fährt zu den Wochenend-Zeiten"
+                    label={t('Holiday / weekend times')}
+                    hint={t('Moves at the weekend times')}
                 />
             )}
             {sc.schoolfree && (
                 <Toggle
                     state={sc.schoolfree}
-                    label="Schulfrei"
-                    hint="Kinderbereich öffnet zu den Wochenend-Zeiten"
+                    label={t('School holiday')}
+                    hint={t('Children area opens at the weekend times')}
                 />
             )}
         </section>
@@ -152,22 +153,22 @@ function SunCard({ sc }: { sc: SvShutterControl }): React.JSX.Element {
     const azimuth = Number(text(states, sc.sun.azimuth?.id));
     return (
         <section className="card">
-            <h2 className="subtitle">Sonne</h2>
+            <h2 className="subtitle">{t('Sun')}</h2>
             <dl className="sun">
                 <div>
-                    <dt>Aufgang</dt>
+                    <dt>{t('Sunrise')}</dt>
                     <dd>{timeText(states, sc.sun.sunrise?.id) ?? '–'}</dd>
                 </div>
                 <div>
-                    <dt>Untergang</dt>
+                    <dt>{t('Sunset')}</dt>
                     <dd>{timeText(states, sc.sun.sunset?.id) ?? '–'}</dd>
                 </div>
                 <div>
-                    <dt>Höhe</dt>
+                    <dt>{t('Elevation')}</dt>
                     <dd>{Number.isFinite(elevation) ? `${Math.round(elevation)}°` : '–'}</dd>
                 </div>
                 <div>
-                    <dt>Richtung</dt>
+                    <dt>{t('Direction')}</dt>
                     <dd>{Number.isFinite(azimuth) ? `${Math.round(azimuth)}°` : '–'}</dd>
                 </div>
             </dl>
@@ -204,8 +205,8 @@ function AreaCard({ sc, area }: { sc: SvShutterControl; area: SvShutterControl['
                     <span className="area__title">
                         <span className="subtitle">{area.label}</span>
                         <span className="area__summary">
-                            {shutters.length} {shutters.length === 1 ? 'Rollladen' : 'Rollläden'}
-                            {closed ? ` · ${closed} zu` : ''}
+                            {tn(shutters.length, '{n} blind', '{n} blinds')}
+                            {closed ? ` · ${t('{n} closed', { n: closed })}` : ''}
                         </span>
                     </span>
                     <span className="area__times">
@@ -220,23 +221,23 @@ function AreaCard({ sc, area }: { sc: SvShutterControl; area: SvShutterControl['
             {area.auto && (
                 <Toggle
                     state={area.auto}
-                    label="Automatik"
+                    label={t('Automation')}
                 />
             )}
             <div className="actions actions--small">
                 <ActionButton
                     state={area.open}
-                    label="Öffnen"
+                    label={t('Open')}
                     icon="up"
                 />
                 <ActionButton
                     state={area.close}
-                    label="Schließen"
+                    label={t('Close')}
                     icon="down"
                 />
                 <ActionButton
                     state={area.sunProtect}
-                    label="Sonnenschutz"
+                    label={t('Sun protection')}
                     icon="sunProtect"
                 />
             </div>
@@ -256,7 +257,7 @@ function ShutterList({ shutters: all }: { shutters: SvAutoShutter[] }): React.JS
     const shutters = onlyDeviating ? all.filter(s => isDeviating(s, states)) : all;
     const hasFlags = shutters.some(s => s.autoUp || s.autoDown || s.autoSun);
     if (!shutters.length) {
-        return <p className="detail__note shutter-list__empty">Alle offen, Automatik überall an.</p>;
+        return <p className="detail__note shutter-list__empty">{t('All open, automation on everywhere.')}</p>;
     }
     return (
         <>
@@ -276,7 +277,7 @@ function ShutterList({ shutters: all }: { shutters: SvAutoShutter[] }): React.JS
                     aria-expanded={flags}
                     onClick={() => setFlags(!flags)}
                 >
-                    {flags ? 'Fertig' : 'Automatik je Rollladen anpassen'}
+                    {flags ? t('Done') : t('Adjust automation per blind')}
                 </button>
             )}
         </>
@@ -286,7 +287,7 @@ function ShutterList({ shutters: all }: { shutters: SvAutoShutter[] }): React.JS
 function OtherCard({ sc }: { sc: SvShutterControl }): React.JSX.Element {
     return (
         <section className="card">
-            <h2 className="subtitle">Weitere</h2>
+            <h2 className="subtitle">{t('Other')}</h2>
             <ShutterList shutters={sc.shutters.filter(s => !s.area)} />
         </section>
     );
@@ -297,9 +298,9 @@ function ShutterRow({ shutter, showFlags }: { shutter: SvAutoShutter; showFlags:
     const level = shutter.level ? Number(states[shutter.level.id]?.val) : NaN;
     const info = autoStateInfo(shutter.autoState ? states[shutter.autoState.id]?.val : undefined);
     const flags: { ref: typeof shutter.autoUp; label: string }[] = [
-        { ref: shutter.autoUp, label: 'Auf' },
-        { ref: shutter.autoDown, label: 'Ab' },
-        { ref: shutter.autoSun, label: 'Sonne' },
+        { ref: shutter.autoUp, label: t('Up') },
+        { ref: shutter.autoDown, label: t('Down') },
+        { ref: shutter.autoSun, label: t('Sun') },
     ];
     // Ausgeschaltete Automatiken als Hinweis (Abweichung vom Normalfall)
     const off = flags.filter(f => f.ref && states[f.ref.id]?.val === false).map(f => f.label);
@@ -312,7 +313,10 @@ function ShutterRow({ shutter, showFlags }: { shutter: SvAutoShutter; showFlags:
                     {Number.isFinite(level) ? `${Math.round(level)} %` : '–'}
                     {info ? ` · ${info.icon} ${info.label}` : ''}
                     {!showFlags && off.length > 0 && (
-                        <span className="shutter__off"> · ohne Automatik {off.join('/')}</span>
+                        <span className="shutter__off">
+                            {' '}
+                            · {t('without automation')} {off.join('/')}
+                        </span>
                     )}
                 </div>
                 {showFlags && (
@@ -326,7 +330,7 @@ function ShutterRow({ shutter, showFlags }: { shutter: SvAutoShutter; showFlags:
                                         role="switch"
                                         aria-checked={states[f.ref.id]?.val === true}
                                         className={`flag${states[f.ref.id]?.val === true ? ' flag--on' : ''}`}
-                                        title={`Automatik ${f.label}`}
+                                        title={`${t('Automation')} ${f.label}`}
                                         onClick={() =>
                                             connection.setState(f.ref!.id, !(states[f.ref!.id]?.val === true))
                                         }
@@ -343,7 +347,7 @@ function ShutterRow({ shutter, showFlags }: { shutter: SvAutoShutter; showFlags:
                     <button
                         type="button"
                         className="iconbtn"
-                        aria-label={`${shutter.name} öffnen`}
+                        aria-label={t('Open {name}', { name: shutter.name })}
                         onClick={() => connection.setState(shutter.level!.id, shutter.heightUp)}
                     >
                         ▲
@@ -351,7 +355,7 @@ function ShutterRow({ shutter, showFlags }: { shutter: SvAutoShutter; showFlags:
                     <button
                         type="button"
                         className="iconbtn"
-                        aria-label={`${shutter.name} schließen`}
+                        aria-label={t('Close {name}', { name: shutter.name })}
                         onClick={() => connection.setState(shutter.level!.id, shutter.heightDown)}
                     >
                         ▼

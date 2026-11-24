@@ -1,3 +1,4 @@
+import { t, tn } from '../../../src/shared/i18n';
 import { useEffect, useRef, useState } from 'react';
 import type { SvHistoryRange, SvStateRef } from '../../../src/shared/protocol';
 import { connection } from '../connection';
@@ -19,9 +20,9 @@ export interface HistorySeries {
 }
 
 const RANGES: { key: SvHistoryRange; label: string }[] = [
-    { key: '6h', label: '6 Std.' },
-    { key: '24h', label: '24 Std.' },
-    { key: '7d', label: '7 Tage' },
+    { key: '6h', label: t('{n} h', { n: 6 }) },
+    { key: '24h', label: t('{n} h', { n: 24 }) },
+    { key: '7d', label: tn(7, '{n} day', '{n} days') },
 ];
 
 type Load =
@@ -33,7 +34,7 @@ type Load =
 /** Verlauf mit Auswahl der Größe (eine Serie je Diagramm) und des Zeitraums */
 export function HistoryPanel({
     series,
-    title = 'Verlauf',
+    title = t('History'),
     focus,
 }: {
     series: HistorySeries[];
@@ -112,7 +113,7 @@ export function HistoryPanel({
             return '–';
         }
         const avg = timeWeightedAverage(pts, load.status === 'ok' ? load.end : undefined) ?? 0;
-        return `Ø ${formatNumber(avg, unit)} · Max. ${formatNumber(Math.max(...pts.map(p => p[1])), unit)}`;
+        return `Ø ${formatNumber(avg, unit)} · ${t('Max.')} ${formatNumber(Math.max(...pts.map(p => p[1])), unit)}`;
     };
     const select = (next: Partial<{ key: string; range: SvHistoryRange }>): void => {
         setLoad({ status: 'loading' });
@@ -136,7 +137,7 @@ export function HistoryPanel({
                     <div
                         className="segmented segmented--full history__series"
                         role="tablist"
-                        aria-label="Ansicht"
+                        aria-label={t('View')}
                     >
                         {series.map(s => (
                             <button
@@ -155,7 +156,7 @@ export function HistoryPanel({
                     <div
                         className="chips chips--small history__series"
                         role="tablist"
-                        aria-label="Größe"
+                        aria-label={t('Quantity')}
                     >
                         {series.map(s => (
                             <button
@@ -174,7 +175,7 @@ export function HistoryPanel({
             <div
                 className="segmented"
                 role="tablist"
-                aria-label="Zeitraum"
+                aria-label={t('Period')}
             >
                 {RANGES.map(r => (
                     <button
@@ -194,18 +195,18 @@ export function HistoryPanel({
                     className="history__loading"
                     aria-busy="true"
                 >
-                    Lade Verlauf …
+                    {t('Loading history …')}
                 </div>
             )}
             {load.status === 'error' && (
-                <p className="history__error">Verlauf konnte nicht geladen werden: {load.message}</p>
+                <p className="history__error">{t('History could not be loaded: {error}', { error: load.message })}</p>
             )}
             {load.status === 'ok' && (
                 <>
                     {stats && others.length === 0 && (
                         <p className="history__stats">
-                            Min. {formatNumber(stats.min, unit)} · Ø {formatNumber(stats.avg, unit)} · Max.{' '}
-                            {formatNumber(stats.max, unit)}
+                            {t('Min.')} {formatNumber(stats.min, unit)} · Ø {formatNumber(stats.avg, unit)} ·{' '}
+                            {t('Max.')} {formatNumber(stats.max, unit)}
                         </p>
                     )}
                     {others.length > 0 && (
@@ -229,7 +230,7 @@ export function HistoryPanel({
                         end={load.end}
                         unit={unit}
                         range={range}
-                        label={`${current.label}, Verlauf ${RANGES.find(r => r.key === range)?.label}`}
+                        label={`${current.label}, ${t('History')} ${RANGES.find(r => r.key === range)?.label}`}
                         color={current.color}
                         zeroBased={current.zeroBased}
                         lineLabel={current.lineLabel ?? current.label}

@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n';
 import { createReadStream, existsSync, statSync } from 'node:fs';
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { extname, join, normalize, resolve, sep } from 'node:path';
@@ -86,7 +87,12 @@ export class SmartVisServer {
 
     async start(): Promise<void> {
         this.http = createServer((req, res) => this.serveStatic(req, res));
-        this.wss = new WebSocketServer({ server: this.http, path: '/ws' });
+        this.wss = new WebSocketServer({
+            server: this.http,
+            path: '/ws',
+            // Schutz vor Cross-Site-WebSocket-Hijacking: fremde Webseiten im Browser dürfen sich nicht verbinden
+            verifyClient: ({ req }: { req: IncomingMessage }) => isSameOrigin(req),
+        });
         this.wss.on('connection', ws => this.onConnection(ws));
 
         await new Promise<void>((resolvePromise, reject) => {
@@ -171,7 +177,7 @@ export class SmartVisServer {
                 // Eigene Antwort mit reqId, damit die App sie der Anfrage zuordnen kann
                 try {
                     if (!this.handlers.history) {
-                        throw new Error('Verläufe sind nicht verfügbar');
+                        throw new Error(t('History is not available'));
                     }
                     const points = await this.handlers.history(String(msg.id), msg.range);
                     send(ws, { t: 'history', reqId: msg.reqId, points });
@@ -183,7 +189,7 @@ export class SmartVisServer {
             if (msg.t === 'diagnose') {
                 try {
                     if (!this.handlers.diagnose) {
-                        throw new Error('Diagnose ist nicht verfügbar');
+                        throw new Error(t('Diagnosis is not available'));
                     }
                     send(ws, { t: 'diagnose', reqId: msg.reqId, report: this.handlers.diagnose() });
                 } catch (e) {
@@ -200,7 +206,7 @@ export class SmartVisServer {
                     await this.handlers.hello?.(msg.clientId, msg.name);
                     this.startSession(ws, msg.clientId);
                 } catch (e) {
-                    this.handlers.log.warn(`Anmeldung fehlgeschlagen: ${(e as Error).message}`);
+                    this.handlers.log.warn(`Client registration failed: ${(e as Error).message}`);
                     this.startSession(ws, undefined);
                 }
                 return;
@@ -211,12 +217,12 @@ export class SmartVisServer {
                     await this.handlers.setState(msg.id, msg.val);
                 } else if (msg.t === 'edit') {
                     if (!this.handlers.edit) {
-                        throw new Error('Bearbeiten ist nicht verfügbar');
+                        throw new Error(t('Editing is not available'));
                     }
                     await this.handlers.edit(clientId, msg.edit);
                 } else if (msg.t === 'client') {
                     if (!this.handlers.client) {
-                        throw new Error('Bearbeiten ist nicht verfügbar');
+                        throw new Error(t('Editing is not available'));
                     }
                     await this.handlers.client(clientId, msg.request);
                 }
@@ -305,6 +311,22 @@ export class SmartVisServer {
             },
             () => res.writeHead(404).end(),
         );
+    }
+}
+
+/**
+ * Browser senden bei WebSocket-Verbindungen immer den Origin-Header. Er muss zum Host passen, unter dem SmartVis
+ * aufgerufen wurde; Verbindungen ohne Origin (keine Browser, z. B. Tests oder Werkzeuge) sind erlaubt.
+ */
+export function isSameOrigin(req: Pick<IncomingMessage, 'headers'>): boolean {
+    const origin = req.headers.origin;
+    if (!origin) {
+        return true;
+    }
+    try {
+        return new URL(origin).host.toLowerCase() === String(req.headers.host || '').toLowerCase();
+    } catch {
+        return false;
     }
 }
 

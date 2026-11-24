@@ -1,3 +1,4 @@
+import { locale, t } from '../../../src/shared/i18n';
 import { useState } from 'react';
 import type { SvDevice, SvStateRef, SvStateValue } from '../../../src/shared/protocol';
 import { HistoryPanel } from '../components/HistoryPanel';
@@ -17,80 +18,80 @@ type States = Record<string, SvStateValue | null>;
 const LIGHT_TYPES = ['light', 'dimmer', 'ct', 'hue', 'rgb', 'rgbSingle', 'rgbwSingle', 'cie'];
 
 const STATE_LABELS: Record<string, string> = {
-    STATE: 'Status',
-    PLAY: 'Wiedergabe',
-    PAUSE: 'Pause',
-    STOP: 'Stopp',
-    NEXT: 'Weiter',
-    PREV: 'Zurück',
-    SHUFFLE: 'Zufällig',
-    REPEAT: 'Wiederholen',
-    ARTIST: 'Interpret',
-    ALBUM: 'Album',
-    TITLE: 'Titel',
-    COVER: 'Cover',
-    DURATION: 'Dauer',
-    ELAPSED: 'Gespielt',
-    SEEK: 'Position',
-    VOLUME: 'Lautstärke',
-    VOLUME_ACTUAL: 'Lautstärke',
-    MUTE: 'Stumm',
-    CONNECTED: 'Verbunden',
-    PLAYER_NAME: 'Player',
-    ACTUAL: 'Istwert',
-    SET: 'Sollwert',
-    ON: 'Ein/Aus',
-    ON_SET: 'Ein/Aus',
-    ON_ACTUAL: 'Eingeschaltet',
-    DIMMER: 'Helligkeit',
-    BRIGHTNESS: 'Helligkeit',
-    TEMPERATURE: 'Farbtemperatur',
-    HUE: 'Farbe',
-    SATURATION: 'Sättigung',
-    HUMIDITY: 'Luftfeuchte',
-    SPEED: 'Lüfterstufe',
-    SWING: 'Lamellen',
-    SPECIAL: 'Sonderfunktion',
-    FIREPLACE: 'Kaminmodus',
-    POWER_LIMIT: 'Leistungsbegrenzung',
-    OUTDOOR: 'Außentemperatur',
-    ENERGY_YEAR: 'Verbrauch (Jahr)',
-    CLEANING: 'Selbstreinigung',
-    SECOND: 'Zweiter Wert',
-    VALVE: 'Ventil',
-    WINDOW: 'Fenster',
-    BOOST: 'Boost',
-    PARTY: 'Party-Modus',
-    POWER: 'Ein/Aus',
-    MODE: 'Modus',
-    WORKING: 'In Bewegung',
-    UNREACH: 'Nicht erreichbar',
-    LOWBAT: 'Batterie schwach',
-    BATTERY: 'Batterie',
-    MAINTAIN: 'Wartung',
-    ERROR: 'Fehler',
-    RSSI: 'Signal',
-    ELECTRIC_POWER: 'Leistung',
-    CURRENT: 'Strom',
-    VOLTAGE: 'Spannung',
-    CONSUMPTION: 'Verbrauch',
-    FREQUENCY: 'Frequenz',
-    TRANSITION_TIME: 'Übergangszeit',
-    EFFECT: 'Effekt',
-    ON_TIME: 'Einschaltdauer',
+    STATE: t('Status'),
+    PLAY: t('Playback'),
+    PAUSE: t('Pause'),
+    STOP: t('Stop'),
+    NEXT: t('Next'),
+    PREV: t('Previous'),
+    SHUFFLE: t('Shuffle'),
+    REPEAT: t('Repeat'),
+    ARTIST: t('Artist'),
+    ALBUM: t('Album'),
+    TITLE: t('Title'),
+    COVER: t('Cover'),
+    DURATION: t('Duration'),
+    ELAPSED: t('Elapsed'),
+    SEEK: t('Position'),
+    VOLUME: t('Volume'),
+    VOLUME_ACTUAL: t('Volume'),
+    MUTE: t('Mute'),
+    CONNECTED: t('Connected'),
+    PLAYER_NAME: t('Player'),
+    ACTUAL: t('Actual value'),
+    SET: t('Setpoint'),
+    ON: t('On/off'),
+    ON_SET: t('On/off'),
+    ON_ACTUAL: t('Switched on'),
+    DIMMER: t('Brightness'),
+    BRIGHTNESS: t('Brightness'),
+    TEMPERATURE: t('Color temperature'),
+    HUE: t('Color'),
+    SATURATION: t('Saturation'),
+    HUMIDITY: t('Humidity'),
+    SPEED: t('Fan speed'),
+    SWING: t('Louvers'),
+    SPECIAL: t('Special function'),
+    FIREPLACE: t('Fireplace mode'),
+    POWER_LIMIT: t('Power limit'),
+    OUTDOOR: t('Outdoor temperature'),
+    ENERGY_YEAR: t('Consumption (year)'),
+    CLEANING: t('Self-cleaning'),
+    SECOND: t('Second value'),
+    VALVE: t('Valve'),
+    WINDOW: t('Window'),
+    BOOST: t('Boost'),
+    PARTY: t('Party mode'),
+    POWER: t('On/off'),
+    MODE: t('Mode'),
+    WORKING: t('Moving'),
+    UNREACH: t('Not reachable'),
+    LOWBAT: t('Battery low'),
+    BATTERY: t('Battery'),
+    MAINTAIN: t('Maintenance'),
+    ERROR: t('Error'),
+    RSSI: t('Signal'),
+    ELECTRIC_POWER: t('Power'),
+    CURRENT: t('Current'),
+    VOLTAGE: t('Voltage'),
+    CONSUMPTION: t('Consumption'),
+    FREQUENCY: t('Frequency'),
+    TRANSITION_TIME: t('Transition time'),
+    EFFECT: t('Effect'),
+    ON_TIME: t('On time'),
 };
 
 /** Bezeichnung eines States; allgemeine Namen (Istwert, Zweiter Wert) anhand der Rolle präzisieren */
 function stateLabel(state: SvStateRef): string {
     const role = state.role || '';
     if (/humidity/.test(role)) {
-        return 'Luftfeuchte';
+        return t('Humidity');
     }
     if (state.name === 'OUTDOOR') {
-        return 'Außentemperatur';
+        return t('Outdoor temperature');
     }
     if (/temperature/.test(role) && (state.name === 'ACTUAL' || state.name === 'SECOND')) {
-        return 'Temperatur';
+        return t('Temperature');
     }
     return STATE_LABELS[state.name] || state.name;
 }
@@ -242,13 +243,13 @@ function MediaControls({ refs, states }: { refs: MediaRefs; states: States }): R
         }
     };
     const flags = [
-        { ref: refs.shuffle, label: '🔀 Zufällig' },
-        { ref: refs.repeat, label: '🔁 Wiederholen' },
+        { ref: refs.shuffle, label: `🔀 ${t('Shuffle')}` },
+        { ref: refs.repeat, label: `🔁 ${t('Repeat')}` },
     ].filter(f => f.ref && f.ref.type === 'boolean');
 
     return (
         <div className="detail__controls media">
-            {!connected && <div className="banner banner--offline">Player nicht verbunden</div>}
+            {!connected && <div className="banner banner--offline">{t('Player not connected')}</div>}
             <div className="media__now">
                 <div className="media__cover">
                     {coverUrl ? (
@@ -272,7 +273,7 @@ function MediaControls({ refs, states }: { refs: MediaRefs; states: States }): R
                     <div
                         className="progress__track"
                         role="meter"
-                        aria-label="Fortschritt"
+                        aria-label={t('Progress')}
                         aria-valuemin={0}
                         aria-valuemax={duration}
                         aria-valuenow={elapsed}
@@ -288,17 +289,17 @@ function MediaControls({ refs, states }: { refs: MediaRefs; states: States }): R
                     </div>
                 </div>
             ) : elapsed > 0 && playing ? (
-                <p className="detail__note">Läuft seit {clock(elapsed)} (Stream)</p>
+                <p className="detail__note">{t('Playing for {time} (stream)', { time: clock(elapsed) })}</p>
             ) : null}
             <div
                 className="media__buttons"
                 role="group"
-                aria-label="Wiedergabe steuern"
+                aria-label={t('Control playback')}
             >
                 <button
                     type="button"
                     className="media__btn"
-                    aria-label="Zurück"
+                    aria-label={t('Previous')}
                     disabled={!refs.prev}
                     onClick={() => press(refs.prev)}
                 >
@@ -307,7 +308,7 @@ function MediaControls({ refs, states }: { refs: MediaRefs; states: States }): R
                 <button
                     type="button"
                     className="media__btn media__btn--main"
-                    aria-label={playing ? 'Pause' : 'Abspielen'}
+                    aria-label={playing ? t('Pause') : t('Play')}
                     disabled={!toggleState}
                     onClick={() => press(toggleState)}
                 >
@@ -316,7 +317,7 @@ function MediaControls({ refs, states }: { refs: MediaRefs; states: States }): R
                 <button
                     type="button"
                     className="media__btn"
-                    aria-label="Weiter"
+                    aria-label={t('Next')}
                     disabled={!refs.next}
                     onClick={() => press(refs.next)}
                 >
@@ -330,14 +331,14 @@ function MediaControls({ refs, states }: { refs: MediaRefs; states: States }): R
                             type="button"
                             className="iconbtn"
                             aria-pressed={muted}
-                            aria-label={muted ? 'Ton an' : 'Stumm'}
+                            aria-label={muted ? t('Sound on') : t('Mute')}
                             onClick={() => connection.setState(refs.mute!.id, !muted)}
                         >
                             {muted ? '🔇' : '🔊'}
                         </button>
                     )}
                     <Slider
-                        label={muted ? 'Lautstärke (stumm)' : 'Lautstärke'}
+                        label={muted ? t('Volume (muted)') : t('Volume')}
                         value={num(states, refs.volumeActual) ?? num(states, refs.volume)}
                         min={refs.volume.min ?? 0}
                         max={refs.volume.max ?? 100}
@@ -456,7 +457,7 @@ export function DeviceDetail({
             <div className="detail__controls">
                 <Toggle
                     state={sw}
-                    label="Ein/Aus"
+                    label={t('On/off')}
                 />
             </div>
         ) : value ? (
@@ -464,10 +465,11 @@ export function DeviceDetail({
                 <span className="detail__status-value">{formatValue(value, states[value.id])}</span>
                 {states[value.id]?.ts ? (
                     <span className="detail__note">
-                        seit{' '}
-                        {new Date(states[value.id]!.ts).toLocaleString('de-DE', {
-                            dateStyle: 'short',
-                            timeStyle: 'short',
+                        {t('since {time}', {
+                            time: new Date(states[value.id]!.ts).toLocaleString(locale(), {
+                                dateStyle: 'short',
+                                timeStyle: 'short',
+                            }),
                         })}
                     </span>
                 ) : null}
@@ -501,7 +503,7 @@ export function DeviceDetail({
                         type="button"
                         className={`iconbtn star${device.favorite ? ' star--on' : ''}`}
                         aria-pressed={!!device.favorite}
-                        aria-label={device.favorite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}
+                        aria-label={device.favorite ? t('Remove from favorites') : t('Add to favorites')}
                         onClick={() =>
                             connection.edit({ kind: 'device', id: device.id, patch: { favorite: !device.favorite } })
                         }
@@ -520,7 +522,7 @@ export function DeviceDetail({
                     className="detail__more"
                     open={!main}
                 >
-                    <summary>Alle Werte</summary>
+                    <summary>{t('All values')}</summary>
                     <dl className="facts">
                         {rest.map(s => (
                             <StateRow
@@ -551,7 +553,7 @@ function LightControls({ refs, states }: { refs: LightRefs; states: States }): R
     const isKelvin = ctMax > 1000 || isRelative;
     const formatCt = (v: number): string =>
         isRelative
-            ? `${Math.round(((v - ctMin) / (ctMax - ctMin || 1)) * 100)} % kalt`
+            ? t('{percent} % cold', { percent: Math.round(((v - ctMin) / (ctMax - ctMin || 1)) * 100) })
             : `${Math.round((isKelvin ? v : 1_000_000 / v) / 100) * 100} K`;
 
     return (
@@ -559,12 +561,12 @@ function LightControls({ refs, states }: { refs: LightRefs; states: States }): R
             {onOff && (
                 <Toggle
                     state={onOff}
-                    label="Licht"
+                    label={t('Light')}
                 />
             )}
             {level && (
                 <Slider
-                    label="Helligkeit"
+                    label={t('Brightness')}
                     value={num(states, level)}
                     min={level.min ?? 0}
                     max={level.max ?? 100}
@@ -580,7 +582,7 @@ function LightControls({ refs, states }: { refs: LightRefs; states: States }): R
                 <div
                     className="segmented light__mode"
                     role="radiogroup"
-                    aria-label="Lichtart"
+                    aria-label={t('Light mode')}
                 >
                     {(['white', 'color'] as const).map(m => (
                         <button
@@ -591,14 +593,14 @@ function LightControls({ refs, states }: { refs: LightRefs; states: States }): R
                             className={mode === m ? 'segmented--active' : ''}
                             onClick={() => setMode(m)}
                         >
-                            {m === 'white' ? 'Weiß' : 'Farbe'}
+                            {m === 'white' ? t('White') : t('Color')}
                         </button>
                     ))}
                 </div>
             )}
             {ct && (!hasColor || mode === 'white') && (
                 <Slider
-                    label="Farbtemperatur"
+                    label={t('Color temperature')}
                     value={num(states, ct)}
                     min={ctMin}
                     max={ctMax}
@@ -641,12 +643,12 @@ function BlindControls({
         <div className="detail__controls">
             {set && (
                 <Slider
-                    label="Position"
+                    label={t('Position')}
                     value={num(states, set)}
                     min={min}
                     max={max}
                     pending={pending(states, set)}
-                    format={v => (v <= min ? 'geschlossen' : v >= max ? 'offen' : `${Math.round(v)} %`)}
+                    format={v => (v <= min ? t('closed') : v >= max ? t('open') : `${Math.round(v)} %`)}
                     onCommit={v => connection.setState(set.id, v)}
                 />
             )}
@@ -666,16 +668,14 @@ function BlindControls({
                             name="up"
                             size={18}
                         />
-                        Auf
+                        {t('Up')}
                     </button>
                     <button
                         type="button"
                         className="action"
                         disabled={!stop && !(actual && actual.id !== set.id)}
                         title={
-                            !stop && !(actual && actual.id !== set.id)
-                                ? 'Dieser Rollladen kann nicht angehalten werden'
-                                : undefined
+                            !stop && !(actual && actual.id !== set.id) ? t('This blind cannot be stopped') : undefined
                         }
                         onClick={() => {
                             if (stop) {
@@ -692,7 +692,7 @@ function BlindControls({
                             name="stop"
                             size={18}
                         />
-                        Stopp
+                        {t('Stop')}
                     </button>
                     <button
                         type="button"
@@ -703,31 +703,34 @@ function BlindControls({
                             name="down"
                             size={18}
                         />
-                        Zu
+                        {t('Down')}
                     </button>
                 </div>
             )}
             {auto && (
                 <section className="detail__section">
-                    <h3 className="subtitle">Automatik{autoInfo ? ` · ${autoInfo.icon} ${autoInfo.label}` : ''}</h3>
+                    <h3 className="subtitle">
+                        {t('Automation')}
+                        {autoInfo ? ` · ${autoInfo.icon} ${autoInfo.label}` : ''}
+                    </h3>
                     {auto.autoUp && (
                         <Toggle
                             state={auto.autoUp}
-                            label="Automatisch öffnen"
+                            label={t('Open automatically')}
                             compact
                         />
                     )}
                     {auto.autoDown && (
                         <Toggle
                             state={auto.autoDown}
-                            label="Automatisch schließen"
+                            label={t('Close automatically')}
                             compact
                         />
                     )}
                     {auto.autoSun && (
                         <Toggle
                             state={auto.autoSun}
-                            label="Sonnenschutz"
+                            label={t('Sun protection')}
                             compact
                         />
                     )}
@@ -752,13 +755,13 @@ function ThermostatControls({ refs, states }: { refs: ThermostatRefs; states: St
     // Ganze Grad (Schrittweite 1) ohne Nachkommastelle
     const digits = step >= 1 ? 0 : 1;
     const fmt = (v: number): string =>
-        `${v.toLocaleString('de-DE', { minimumFractionDigits: digits, maximumFractionDigits: digits })} °C`;
+        `${v.toLocaleString(locale(), { minimumFractionDigits: digits, maximumFractionDigits: digits })} °C`;
 
     return (
         <div className="detail__controls">
             <div className="thermo">
                 <div>
-                    <div className="thermo__label">Raum</div>
+                    <div className="thermo__label">{t('Room')}</div>
                     <div className="thermo__value">{actual ? formatValue(actual, states[actual.id]) : '–'}</div>
                     {humidity && <div className="thermo__label">💧 {formatValue(humidity, states[humidity.id])}</div>}
                 </div>
@@ -767,13 +770,13 @@ function ThermostatControls({ refs, states }: { refs: ThermostatRefs; states: St
                         <button
                             type="button"
                             className="iconbtn"
-                            aria-label="Sollwert senken"
+                            aria-label={t('Lower setpoint')}
                             onClick={() => nudge(-step)}
                         >
                             −
                         </button>
                         <div>
-                            <div className="thermo__label">Soll</div>
+                            <div className="thermo__label">{t('Target')}</div>
                             <div className={`thermo__value${pending(states, set) ? ' slider--pending' : ''}`}>
                                 {value !== undefined ? fmt(value) : '–'}
                             </div>
@@ -781,7 +784,7 @@ function ThermostatControls({ refs, states }: { refs: ThermostatRefs; states: St
                         <button
                             type="button"
                             className="iconbtn"
-                            aria-label="Sollwert erhöhen"
+                            aria-label={t('Raise setpoint')}
                             onClick={() => nudge(step)}
                         >
                             +
@@ -791,7 +794,7 @@ function ThermostatControls({ refs, states }: { refs: ThermostatRefs; states: St
             </div>
             {set && (
                 <Slider
-                    label="Solltemperatur"
+                    label={t('Target temperature')}
                     value={value}
                     min={min}
                     max={max}
@@ -804,8 +807,8 @@ function ThermostatControls({ refs, states }: { refs: ThermostatRefs; states: St
             {boost && (
                 <Toggle
                     state={boost}
-                    label="Boost"
-                    hint="Kurzzeitig maximal heizen"
+                    label={t('Boost')}
+                    hint={t('Heat at maximum for a short time')}
                 />
             )}
         </div>
@@ -825,7 +828,7 @@ function StateRow({ state, states }: { state: SvStateRef; states: States }): Rea
                     className="action action--small"
                     onClick={() => connection.setState(state.id, true)}
                 >
-                    Auslösen
+                    {t('Trigger')}
                 </button>
             </div>
         );
@@ -859,8 +862,8 @@ function StateRow({ state, states }: { state: SvStateRef; states: States }): Rea
         text = /window|door|^sensor\.|^switch|^state$/.test(state.role || '')
             ? formatValue(state, value)
             : value.val
-              ? 'ja'
-              : 'nein';
+              ? t('yes')
+              : t('no');
     } else {
         text = formatValue(state, value);
     }
@@ -957,7 +960,7 @@ function AcFunctions({ refs, mode, states }: { refs: AcRefs; mode: string; state
                     <div
                         className={`ac__specials${states[special.id]?.ack === false ? ' slider--pending' : ''}`}
                         role="radiogroup"
-                        aria-label="Sonderfunktion"
+                        aria-label={t('Special function')}
                     >
                         {specialOptions.map(([value, label]) => {
                             const cycle = silentSteps.length > 1 && value === silentSteps[0];
@@ -986,7 +989,14 @@ function AcFunctions({ refs, mode, states }: { refs: AcRefs; mode: string; state
                                     onClick={() => connection.setState(special.id, next)}
                                     aria-label={
                                         cycle
-                                            ? `${label}: ${active ? `Stufe ${step + 1}` : 'aus'} – antippen für ${next === 'OFF' ? 'aus' : `Stufe ${silentSteps.indexOf(next) + 1}`}`
+                                            ? t('{name}: {state} – tap for {next}', {
+                                                  name: label,
+                                                  state: active ? t('level {n}', { n: step + 1 }) : t('off'),
+                                                  next:
+                                                      next === 'OFF'
+                                                          ? t('off')
+                                                          : t('level {n}', { n: silentSteps.indexOf(next) + 1 }),
+                                              })
                                             : undefined
                                     }
                                 >
@@ -1010,22 +1020,22 @@ function AcFunctions({ refs, mode, states }: { refs: AcRefs; mode: string; state
                         })}
                     </div>
                     <p className="detail__note">
-                        Immer nur eine dieser Funktionen gleichzeitig – erneut antippen schaltet sie aus
-                        {silentSteps.length > 1 ? ' („Außengerät leise“: Stufe 1 → Stufe 2 → aus)' : ''}.
-                        {blocked > 0 ? ' Ausgegraute sind in dieser Betriebsart nicht möglich.' : ''}
+                        {t('Only one of these functions at a time – tap again to switch it off')}
+                        {silentSteps.length > 1 ? ` (${t('“Outdoor unit quiet”: level 1 → level 2 → off')})` : ''}.
+                        {blocked > 0 ? ` ${t('Greyed out ones are not possible in this operating mode.')}` : ''}
                     </p>
                 </>
             )}
             {fireplace && fireOptions.length > 1 && (
                 <div className="ac__row">
                     <span className="ac__row-label">
-                        🔥 Kaminmodus
-                        {!fireAllowed && <span className="toggle__hint">nur beim Heizen</span>}
+                        🔥 {t('Fireplace mode')}
+                        {!fireAllowed && <span className="toggle__hint">{t('only when heating')}</span>}
                     </span>
                     <div
                         className="segmented ac__segment"
                         role="radiogroup"
-                        aria-label="Kaminmodus"
+                        aria-label={t('Fireplace mode')}
                     >
                         {fireOptions.map(([value, label]) => (
                             <button
@@ -1045,11 +1055,11 @@ function AcFunctions({ refs, mode, states }: { refs: AcRefs; mode: string; state
             )}
             {powerLimit && limitOptions.length > 1 && (
                 <div className="ac__row">
-                    <span className="ac__row-label">⚡ Leistung</span>
+                    <span className="ac__row-label">⚡ {t('Power')}</span>
                     <div
                         className="segmented ac__segment"
                         role="radiogroup"
-                        aria-label="Leistungsbegrenzung"
+                        aria-label={t('Power limit')}
                     >
                         {limitOptions.map(([value, label]) => (
                             <button
@@ -1083,14 +1093,14 @@ function AcControls({ refs, states }: { refs: AcRefs; states: States }): React.J
                 {power && (
                     <Toggle
                         state={power}
-                        label="Ein/Aus"
+                        label={t('On/off')}
                     />
                 )}
                 {mode?.states && (
                     <div
                         className={`segmented ac__modes${mode && states[mode.id]?.ack === false ? ' slider--pending' : ''}`}
                         role="radiogroup"
-                        aria-label="Betriebsart"
+                        aria-label={t('Operating mode')}
                     >
                         {Object.entries(mode.states).map(([value, label]) => (
                             <button
@@ -1114,9 +1124,7 @@ function AcControls({ refs, states }: { refs: AcRefs; states: States }): React.J
                         ))}
                     </div>
                 )}
-                {!on && (
-                    <p className="detail__note">Ausgeschaltet – Einstellungen werden beim Einschalten übernommen.</p>
-                )}
+                {!on && <p className="detail__note">{t('Switched off – settings are applied when switching on.')}</p>}
             </div>
             <ThermostatControls
                 refs={{ set, actual }}
@@ -1127,13 +1135,13 @@ function AcControls({ refs, states }: { refs: AcRefs; states: States }): React.J
                     {speed && (
                         <SelectState
                             state={speed}
-                            label="Lüfterstufe"
+                            label={t('Fan speed')}
                         />
                     )}
                     {swing && (
                         <SelectState
                             state={swing}
-                            label="Lamellen"
+                            label={t('Louvers')}
                         />
                     )}
                 </div>
@@ -1249,7 +1257,7 @@ function LightColor({ refs, states }: { refs: LightRefs; states: States }): Reac
             <div
                 className="swatches"
                 role="group"
-                aria-label="Farbe wählen"
+                aria-label={t('Choose color')}
             >
                 {COLOR_SWATCHES.map(c => {
                     const on = !!current && sat > 0.6 && near(h, c.h);
@@ -1268,7 +1276,7 @@ function LightColor({ refs, states }: { refs: LightRefs; states: States }): Reac
                 })}
             </div>
             <Slider
-                label="Farbton"
+                label={t('Hue')}
                 value={current ? Math.round(h) : undefined}
                 min={0}
                 max={359}
@@ -1278,7 +1286,7 @@ function LightColor({ refs, states }: { refs: LightRefs; states: States }): Reac
             />
             {(refs.sat || refs.rgb || refs.red) && (
                 <Slider
-                    label="Sättigung"
+                    label={t('Saturation')}
                     value={current ? Math.round(sat * 100) : undefined}
                     min={0}
                     max={100}

@@ -39,13 +39,13 @@ function codes(text: string | undefined): string[] {
     return [...out];
 }
 
-/** Anzeige: "2× AAA", "CR2032", "Akku" */
+/** Anzeige: "2× AAA", "CR2032", "Rechargeable" (übersetzt in der App) */
 function label(d: LibraryDevice): string | undefined {
     const type = d.battery_type.trim();
     if (type === 'MANUAL' || /^(APC|RBC)/i.test(type)) {
         return undefined; // keine Angabe bzw. USV-Akkus
     }
-    const text = type === 'Rechargeable' ? 'Akku' : type === 'Irreplaceable' ? 'fester Akku' : type;
+    const text = type === 'Irreplaceable' ? 'Built-in battery' : type;
     const n = Number(d.battery_quantity) || 1;
     return n > 1 ? `${n}× ${text}` : text;
 }

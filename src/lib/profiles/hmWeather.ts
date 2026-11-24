@@ -79,7 +79,7 @@ function lightSensors(instance: string, objects: ObjectMap, lang: string): SvLig
         if (!/^HmIP-SLO$/i.test(model)) {
             continue;
         }
-        const current = ref(objects, `${id}.1.CURRENT_ILLUMINATION`, 'Helligkeit');
+        const current = ref(objects, `${id}.1.CURRENT_ILLUMINATION`, 'Brightness');
         if (!current) {
             continue;
         }
@@ -88,8 +88,8 @@ function lightSensors(instance: string, objects: ObjectMap, lang: string): SvLig
         result.push({
             name,
             current: { ...current, unit: current.unit || 'lx' },
-            average: ref(objects, `${id}.1.AVERAGE_ILLUMINATION`, 'Mittelwert'),
-            unreach: first(objects, `${id}.0`, ['UNREACH'], 'Nicht erreichbar'),
+            average: ref(objects, `${id}.1.AVERAGE_ILLUMINATION`, 'Average'),
+            unreach: first(objects, `${id}.0`, ['UNREACH'], 'Not reachable'),
         });
     }
     // Himmelsrichtungen in natürlicher Reihenfolge, sonst alphabetisch
@@ -125,19 +125,19 @@ export const hmWeatherProfile: AdapterProfile = {
                 adapter: 'hm-rpc',
                 source: 'station',
                 model,
-                temperature: first(objects, ch, ['ACTUAL_TEMPERATURE', 'TEMPERATURE'], 'Temperatur'),
-                humidity: first(objects, ch, ['HUMIDITY'], 'Luftfeuchte'),
+                temperature: first(objects, ch, ['ACTUAL_TEMPERATURE', 'TEMPERATURE'], 'Temperature'),
+                humidity: first(objects, ch, ['HUMIDITY'], 'Humidity'),
                 windSpeed: first(objects, ch, ['WIND_SPEED'], 'Wind'),
-                windDirection: first(objects, ch, ['WIND_DIR', 'WIND_DIRECTION'], 'Windrichtung'),
-                windAlarm: first(objects, ch, ['WIND_THRESHOLD_OVERRUN'], 'Sturm'),
-                raining: first(objects, ch, ['RAINING'], 'Regen'),
-                rainToday: varRef(objects, vars.rainToday, 'Regen heute', 'mm'),
-                rainYesterday: varRef(objects, vars.rainYesterday, 'Regen gestern', 'mm'),
-                illumination: first(objects, ch, ['ILLUMINATION', 'BRIGHTNESS'], 'Helligkeit'),
-                sunshine: first(objects, ch, ['SUNSHINE_THRESHOLD_OVERRUN'], 'Sonne'),
-                sunshineToday: varRef(objects, vars.sunshineToday, 'Sonne heute', 'min'),
-                unreach: first(objects, `${id}.0`, ['UNREACH'], 'Nicht erreichbar'),
-                lowBat: first(objects, `${id}.0`, ['LOW_BAT', 'LOWBAT'], 'Batterie'),
+                windDirection: first(objects, ch, ['WIND_DIR', 'WIND_DIRECTION'], 'Wind direction'),
+                windAlarm: first(objects, ch, ['WIND_THRESHOLD_OVERRUN'], 'Storm'),
+                raining: first(objects, ch, ['RAINING'], 'Rain'),
+                rainToday: varRef(objects, vars.rainToday, 'Rain today', 'mm'),
+                rainYesterday: varRef(objects, vars.rainYesterday, 'Rain yesterday', 'mm'),
+                illumination: first(objects, ch, ['ILLUMINATION', 'BRIGHTNESS'], 'Brightness'),
+                sunshine: first(objects, ch, ['SUNSHINE_THRESHOLD_OVERRUN'], 'Sun'),
+                sunshineToday: varRef(objects, vars.sunshineToday, 'Sun today', 'min'),
+                unreach: first(objects, `${id}.0`, ['UNREACH'], 'Not reachable'),
+                lowBat: first(objects, `${id}.0`, ['LOW_BAT', 'LOWBAT'], 'Battery'),
             };
             if (weather.temperature) {
                 found.push({ weather, rank: match.rank });

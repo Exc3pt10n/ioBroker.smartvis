@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { setLanguage } from '../shared/i18n';
 import { discover } from './discovery';
 
 type Obj = ioBroker.Object;
@@ -85,6 +86,15 @@ describe('discovery', () => {
 
     it('ignores configured adapters', () => {
         expect(result.model.devices.some(d => d.adapter === 'system')).to.equal(false);
+    });
+});
+
+describe('discovery in English', () => {
+    it('names generated devices in the language of the user interface', () => {
+        setLanguage('en');
+        const english = discover(objects, { language: 'de', ignoreAdapters: ['system'] });
+        const blind = english.model.devices.find(d => d.id === 'hm-rpc.0.BL1.3');
+        expect(blind?.name).to.equal('Blind');
     });
 });
 

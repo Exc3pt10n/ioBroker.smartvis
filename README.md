@@ -10,7 +10,7 @@ SmartVis detects devices and rooms automatically and shows them as an installabl
 > **Status:** version 0.x – in daily use and fully usable. Until 1.0, settings and the storage format may still change; such changes are marked **Breaking** in the [changelog](#changelog) and are migrated automatically where possible.
 > Detection is tuned on an installation with Homematic (IP), Philips Hue (`hue` and `hue-v2`), QCells Q.HOME, KEBA, Toshiba air conditioners and Echo. Shelly, Sonoff (Tasmota), Tuya, FRITZ!DECT, Zigbee, zigbee2mqtt and deCONZ have their own rules, developed and tested against the object structures from the source code of these adapters (no feedback from real installations yet). On other systems devices may be missing or superfluous – they can be hidden in edit mode. **More → Detection** shows which channels got no tile and saves an anonymous report (adapter, data point keys and roles only); attached to an issue it helps to improve detection.
 >
-> The user interface is currently in **German**. A detailed German description is in [docs/de/README.md](docs/de/README.md), the concept in [docs/KONZEPT.md](docs/KONZEPT.md).
+> The user interface is available in **English and German** and follows the ioBroker system language (can be changed in the instance settings). A detailed German description is in [docs/de/README.md](docs/de/README.md).
 
 > **Development note:** SmartVis was built with the help of **Claude** (AI by Anthropic, via Claude Code). Most of the code was written by Claude; requirements, testing on a real installation and review of every change are done by the maintainer. Every change runs through automated tests (unit, integration and installation tests on Node 22/24) before a release is created.
 
@@ -47,29 +47,14 @@ There is **no login** yet: use SmartVis only in your home network or via VPN. Ed
 |---|---|---|
 | IP address | `0.0.0.0` | Network interface of the web server |
 | Port | `8099` | Open `http://<iobroker>:8099` |
-| Language for device names | `de` | Language of multilingual object names |
+| Language | system language | User interface and generated device names (German or English; also used for multilingual object names) |
 | Rediscovery after object change | `10` s | Delay after object changes |
 | Ignored adapters | `system,admin,…,iot` | Skipped during discovery |
 | Allow edit mode | on | Save customisations from the app |
 
 ## Development
 
-```bash
-npm install
-npm run build              # backend (build/) + frontend (www/)
-npm test                   # unit and package tests
-npm run test:integration   # adapter in a real js-controller test instance
-npm run lint && npm run check
-```
-
-Frontend without ioBroker:
-
-```bash
-npm run build:www && npm run demo   # demo server with sample devices on :8099
-npm run dev:www                     # Vite with hot reload, proxies /ws to :8099
-```
-
-Project structure: `src/` adapter (TypeScript; discovery, adapter profiles, overrides, history, web server), `src-www/` frontend (React + Vite, built to `www/`), `admin/` jsonConfig, `scripts/demo.ts` demo server without ioBroker.
+See [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## Changelog
 
@@ -77,6 +62,14 @@ Project structure: `src/` adapter (TypeScript; discovery, adapter profiles, over
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### 0.17.0 (2026-11-24)
+
+- (Exc3pt10n) User interface in English and German: texts in the app, generated device names, camera, wallbox and climate settings follow the ioBroker system language (setting "Language" in the instance, German or otherwise English); numbers and dates are formatted accordingly
+- (Exc3pt10n) Log messages, object names (`info.*`) and the package description in English; the anonymous detection report is saved as `smartvis-diagnosis-<date>.json`
+- (Exc3pt10n) Security: the WebSocket only accepts connections from pages served by SmartVis itself (`Origin` check), so other web pages cannot switch devices
+- (Exc3pt10n) The delay for rediscovery is checked in the adapter as well (1–3600 s); a failed update of `info.clients` no longer causes an unhandled rejection
+- (Exc3pt10n) Documentation: developer notes moved to `DEVELOPMENT.md`, outdated concept document removed
 
 ### 0.16.1 (2026-11-24)
 

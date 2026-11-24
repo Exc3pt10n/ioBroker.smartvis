@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import { formatPower, type FlowSnapshot } from '../energy';
 
 /** Ab dieser Leistung gilt eine Leitung als "aktiv" (Rauschen ausblenden) */
@@ -14,10 +15,10 @@ interface Node {
 // Layout: PV oben, Netz links, Haus rechts, Batterie unten, Knoten in der Mitte
 const NODES: Record<string, Node> = {
     pv: { key: 'pv', label: 'PV', x: 160, y: 46, icon: '☀️' },
-    grid: { key: 'grid', label: 'Netz', x: 46, y: 160, icon: '🔌' },
-    home: { key: 'home', label: 'Haus', x: 274, y: 160, icon: '🏠' },
-    battery: { key: 'battery', label: 'Batterie', x: 160, y: 274, icon: '🔋' },
-    car: { key: 'car', label: 'Auto', x: 274, y: 274, icon: '🚗' },
+    grid: { key: 'grid', label: t('Grid'), x: 46, y: 160, icon: '🔌' },
+    home: { key: 'home', label: t('House'), x: 274, y: 160, icon: '🏠' },
+    battery: { key: 'battery', label: t('Battery'), x: 160, y: 274, icon: '🔋' },
+    car: { key: 'car', label: t('Car'), x: 274, y: 274, icon: '🚗' },
 };
 const HUB = { x: 160, y: 160 };
 const R = 40;
@@ -56,35 +57,40 @@ export function flowSummary(
     let text: string;
     if (gi >= 50) {
         tone = 'import';
-        text = `⚡ Netzbezug ${formatPower(gi)}`;
+        text = `⚡ ${t('Grid import {power}', { power: formatPower(gi) })}`;
     } else if (ge >= 50) {
         tone = 'surplus';
-        text = `☀️ Überschuss ${formatPower(ge)} wird eingespeist`;
+        text = `☀️ ${t('Surplus {power} is fed into the grid', { power: formatPower(ge) })}`;
     } else if (charge >= 50 && (flow.pv ?? 0) >= 50) {
         tone = 'surplus';
-        text = `☀️ Überschuss lädt die Batterie`;
+        text = `☀️ ${t('Surplus charges the battery')}`;
     } else if ((flow.pv ?? 0) >= 50) {
-        text = '☀️ Solarstrom deckt den Verbrauch';
+        text = `☀️ ${t('Solar power covers the consumption')}`;
     } else if (discharge >= 50) {
-        text = '🔋 Batterie versorgt das Haus';
+        text = `🔋 ${t('Battery supplies the house')}`;
     } else {
-        text = '⚖️ Ausgeglichen';
+        text = `⚖️ ${t('Balanced')}`;
     }
     const details: string[] = [];
     if (consumption >= THRESHOLD_W) {
-        details.push(`Autarkie jetzt ${Math.round((1 - Math.min(gi, consumption) / consumption) * 100)} %`);
+        details.push(
+            t('Self-sufficiency now {percent} %', {
+                percent: Math.round((1 - Math.min(gi, consumption) / consumption) * 100),
+            }),
+        );
     }
     if (charge >= THRESHOLD_W || discharge >= THRESHOLD_W) {
         const charging = charge >= discharge;
         const time =
             remainingMin && remainingMin > 0
-                ? ` · ${charging ? 'voll' : 'leer'} in ca. ${
-                      remainingMin >= 60
-                          ? `${Math.floor(remainingMin / 60)} h ${Math.round(remainingMin % 60)} min`
-                          : `${Math.round(remainingMin)} min`
-                  }`
+                ? ` · ${t(charging ? 'full in about {time}' : 'empty in about {time}', {
+                      time:
+                          remainingMin >= 60
+                              ? `${Math.floor(remainingMin / 60)} h ${Math.round(remainingMin % 60)} min`
+                              : `${Math.round(remainingMin)} min`,
+                  })}`
                 : '';
-        details.push(`🔋 ${charging ? 'lädt' : 'entlädt'}${time}`);
+        details.push(`🔋 ${charging ? t('charging') : t('discharging')}${time}`);
     }
     return { tone, text, details };
 }
@@ -103,11 +109,11 @@ export function FlowStatus({ flow, remainingMin }: { flow: FlowSnapshot; remaini
 }
 
 const NODE_TITLES: Record<string, string> = {
-    pv: 'PV-Verlauf anzeigen',
-    grid: 'Netz-Verlauf anzeigen',
-    home: 'Verbrauchs-Verlauf anzeigen',
-    battery: 'Batterie-Verlauf anzeigen',
-    car: 'Wallbox-Verlauf anzeigen',
+    pv: t('Show PV history'),
+    grid: t('Show grid history'),
+    home: t('Show consumption history'),
+    battery: t('Show battery history'),
+    car: t('Show wallbox history'),
 };
 
 export function EnergyFlow({
@@ -128,17 +134,20 @@ export function EnergyFlow({
     const values: Record<string, { value: string; sub?: string }> = {
         car: {
             value: `${flow.carEstimated ? '≈ ' : ''}${formatPower(flow.car)}`,
-            sub: (flow.car ?? 0) >= THRESHOLD_W ? 'lädt' : undefined,
+            sub: (flow.car ?? 0) >= THRESHOLD_W ? t('charging') : undefined,
         },
         pv: { value: formatPower(flow.pv) },
         grid: {
             value: formatPower(gridPower),
-            sub: gridPower < THRESHOLD_W ? undefined : gridIn ? 'Bezug' : 'Einspeisung',
+            sub: gridPower < THRESHOLD_W ? undefined : gridIn ? t('Import') : t('Grid export'),
         },
         home: { value: formatPower(flow.home) },
         battery: {
             value: flow.soc !== undefined ? `${Math.round(flow.soc)} %` : formatPower(batPower),
-            sub: batPower < THRESHOLD_W ? undefined : `${batOut ? 'entlädt' : 'lädt'} ${formatPower(batPower)}`,
+            sub:
+                batPower < THRESHOLD_W
+                    ? undefined
+                    : `${batOut ? t('discharging') : t('charging')} ${formatPower(batPower)}`,
         },
     };
 
@@ -157,7 +166,7 @@ export function EnergyFlow({
                 viewBox="0 0 320 320"
                 className="flow"
                 role="img"
-                aria-label="Energiefluss"
+                aria-label={t('Energy flow')}
             >
                 <Line
                     node={NODES.pv}

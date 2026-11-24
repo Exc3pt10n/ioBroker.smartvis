@@ -3,5 +3,5 @@
     "compilerOptions": {
         "types": ["node", "iobroker"]
     },
-    "exclude": ["src/**/*.test.ts", "src/lib/fixtures/**"]
+    "exclude": ["src/**/*.test.ts", "src/**/*.setup.ts", "src/lib/fixtures/**"]
 }

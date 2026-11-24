@@ -1,3 +1,4 @@
+import { locale, t } from '../../src/shared/i18n';
 import type { SvEnergySystem, SvStateRef, SvStateValue, SvWallbox, SvWallboxStatus } from '../../src/shared/protocol';
 
 type States = Record<string, SvStateValue | null>;
@@ -23,7 +24,7 @@ export function formatPower(w: number | undefined): string {
         return '–';
     }
     if (w >= 1000) {
-        return `${(w / 1000).toLocaleString('de-DE', { maximumFractionDigits: 2, minimumFractionDigits: 1 })} kW`;
+        return `${(w / 1000).toLocaleString(locale(), { maximumFractionDigits: 2, minimumFractionDigits: 1 })} kW`;
     }
     return `${Math.round(w)} W`;
 }
@@ -107,22 +108,22 @@ export function wallboxSnapshot(wb: SvWallbox, states: States): WallboxSnapshot 
 
 export function wallboxLabel(s: WallboxSnapshot): string {
     if (!s.online) {
-        return 'Keine Verbindung';
+        return t('No connection');
     }
     switch (s.status) {
         case 'charging':
-            return 'Lädt';
+            return t('Is charging');
         case 'error':
-            return 'Störung';
+            return t('Fault');
         case 'interrupted':
-            return 'Unterbrochen';
+            return t('Interrupted');
         case 'starting':
-            return 'Startet';
+            return t('Starting');
         default:
             if (s.paused) {
-                return 'Pausiert';
+                return t('Paused');
             }
-            return s.plugged ? 'Fahrzeug verbunden' : 'Kein Fahrzeug';
+            return s.plugged ? t('Vehicle connected') : t('No vehicle');
     }
 }
 

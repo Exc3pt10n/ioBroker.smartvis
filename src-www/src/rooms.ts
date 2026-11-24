@@ -1,3 +1,4 @@
+import { t } from '../../src/shared/i18n';
 import type { SvDevice, SvRoom, SvStateValue } from '../../src/shared/protocol';
 import { isActive, isCoveredGroup, isPlaying, tapAction, valueState, warnings } from './device';
 
@@ -163,7 +164,7 @@ export function roomStatus(devices: SvDevice[], states: States, shownIds?: Set<s
         }
         const w = warnings(d, states);
         // Schwache Batterie zählt nicht als Störung (eigenes Kennzeichen 🪫 auf der Raumkarte)
-        if (w.length && !w.every(x => x === 'Batterie schwach')) {
+        if (w.length && !w.every(x => x === t('Battery low'))) {
             status.problems++;
         }
     }

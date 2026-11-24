@@ -1,3 +1,4 @@
+import { t } from '../../shared/i18n';
 import type { ObjectMap } from './types';
 
 /** Zustand einer Geräte-Erkennung (wie ein type-detector-Treffer, mit optionalen Beschriftungen) */
@@ -6,41 +7,41 @@ export interface DeviceControl {
     states: { name: string; id: string; indicator?: boolean; labels?: Record<string, string> }[];
 }
 
-/** Deutsche Beschriftungen der Wertelisten (Schlüssel wie im Adapter) */
+/** Beschriftungen der Wertelisten (Schlüssel wie im Adapter; englisch, übersetzt beim Erzeugen) */
 const LABELS: Record<string, Record<string, string>> = {
-    mode: { AUTO: 'Automatik', COOL: 'Kühlen', HEAT: 'Heizen', DRY: 'Entfeuchten', FAN: 'Lüften' },
+    mode: { AUTO: 'Automatic', COOL: 'Cool', HEAT: 'Heat', DRY: 'Dry', FAN: 'Fan only' },
     fanMode: {
-        AUTO: 'Automatik',
-        QUIET: 'Leise',
-        LOW: 'Stufe 1',
-        MEDIUM_LOW: 'Stufe 2',
-        MEDIUM: 'Stufe 3',
-        MEDIUM_HIGH: 'Stufe 4',
-        HIGH: 'Stufe 5',
+        AUTO: 'Automatic',
+        QUIET: 'Quiet',
+        LOW: 'Level 1',
+        MEDIUM_LOW: 'Level 2',
+        MEDIUM: 'Level 3',
+        MEDIUM_HIGH: 'Level 4',
+        HIGH: 'Level 5',
     },
     swingMode: {
-        OFF: 'Aus',
-        SWING_VERTICAL: 'Schwenken vertikal',
-        SWING_HORIZONTAL: 'Schwenken horizontal',
-        SWING_VERTICAL_AND_HORIZONTAL: 'Schwenken vertikal + horizontal',
-        FIXED_1: 'Feste Position 1',
-        FIXED_2: 'Feste Position 2',
-        FIXED_3: 'Feste Position 3',
-        FIXED_4: 'Feste Position 4',
-        FIXED_5: 'Feste Position 5',
+        OFF: 'Off',
+        SWING_VERTICAL: 'Swing vertical',
+        SWING_HORIZONTAL: 'Swing horizontal',
+        SWING_VERTICAL_AND_HORIZONTAL: 'Swing vertical + horizontal',
+        FIXED_1: 'Fixed position 1',
+        FIXED_2: 'Fixed position 2',
+        FIXED_3: 'Fixed position 3',
+        FIXED_4: 'Fixed position 4',
+        FIXED_5: 'Fixed position 5',
     },
     meritA: {
-        OFF: 'Aus',
-        SLEEP_CARE: 'Schlafmodus',
-        COMFORT: 'Komfort',
+        OFF: 'Off',
+        SLEEP_CARE: 'Sleep mode',
+        COMFORT: 'Comfort',
         HIGH_POWER: 'Hi-Power',
         ECO: 'Eco',
-        CDU_SILENT_1: 'Außengerät leise 1',
-        CDU_SILENT_2: 'Außengerät leise 2',
-        HEATING_8C: '8 °C Frostschutz',
-        FLOOR: 'Fußboden',
+        CDU_SILENT_1: 'Outdoor unit quiet 1',
+        CDU_SILENT_2: 'Outdoor unit quiet 2',
+        HEATING_8C: '8 °C frost protection',
+        FLOOR: 'Floor',
     },
-    meritB: { OFF: 'Aus', FIREPLACE_1: 'Kamin 1', FIREPLACE_2: 'Kamin 2' },
+    meritB: { OFF: 'Off', FIREPLACE_1: 'Fireplace 1', FIREPLACE_2: 'Fireplace 2' },
     powerSelection: { POWER_50: '50 %', POWER_75: '75 %', POWER_100: '100 %' },
 };
 
@@ -81,7 +82,7 @@ export function toshibaAcControl(id: string, obj: ioBroker.Object, objects: Obje
                 ? common.states
                 : undefined;
         const labels = own
-            ? Object.fromEntries(Object.entries(own).map(([k, v]) => [k, LABELS[key]?.[k] || String(v)]))
+            ? Object.fromEntries(Object.entries(own).map(([k, v]) => [k, t(LABELS[key]?.[k] || String(v))]))
             : undefined;
         states.push({ name, id: sid, ...(indicator && { indicator }), ...(labels && { labels }) });
     }

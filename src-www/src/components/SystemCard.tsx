@@ -1,3 +1,4 @@
+import { locale, t, tn } from '../../../src/shared/i18n';
 import type {
     SvHostStatus,
     SvInstanceStatus,
@@ -33,9 +34,9 @@ export function formatUptime(seconds: number | undefined): string {
     const h = Math.floor((seconds % 86400) / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     if (d > 0) {
-        return `${d} ${d === 1 ? 'Tag' : 'Tage'} ${h} Std.`;
+        return `${tn(d, '{n} day', '{n} days')} ${t('{n} h', { n: h })}`;
     }
-    return h > 0 ? `${h} Std. ${m} Min.` : `${m} Min.`;
+    return h > 0 ? `${t('{n} h', { n: h })} ${t('{n} min', { n: m })}` : t('{n} min', { n: m });
 }
 
 function formatMb(mb: number | undefined): string {
@@ -43,8 +44,8 @@ function formatMb(mb: number | undefined): string {
         return '–';
     }
     return mb >= 1024
-        ? `${(mb / 1024).toLocaleString('de-DE', { maximumFractionDigits: 1 })} GB`
-        : `${Math.round(mb).toLocaleString('de-DE')} MB`;
+        ? `${(mb / 1024).toLocaleString(locale(), { maximumFractionDigits: 1 })} GB`
+        : `${Math.round(mb).toLocaleString(locale())} MB`;
 }
 
 export type InstanceState = 'running' | 'stopped' | 'disconnected' | 'disabled' | 'scheduled';
@@ -71,11 +72,11 @@ export function instanceState(i: SvInstanceStatus, states: States): InstanceStat
 }
 
 const STATE_INFO: Record<InstanceState, { icon: string; label: string }> = {
-    running: { icon: '🟢', label: 'läuft' },
-    scheduled: { icon: '⏱️', label: 'geplant' },
-    stopped: { icon: '🔴', label: 'läuft nicht' },
-    disconnected: { icon: '🟠', label: 'keine Verbindung' },
-    disabled: { icon: '⏸️', label: 'deaktiviert' },
+    running: { icon: '🟢', label: t('running') },
+    scheduled: { icon: '⏱️', label: t('scheduled') },
+    stopped: { icon: '🔴', label: t('not running') },
+    disconnected: { icon: '🟠', label: t('no connection') },
+    disabled: { icon: '⏸️', label: t('disabled') },
 };
 
 /** Balken mit Wert; ab der Schwelle als Warnung (Farbe + ⚠️, nie Farbe allein) */
@@ -131,29 +132,31 @@ function HostStatus({ host, states }: { host: SvHostStatus; states: States }): R
                 <span className="host__name">
                     {alive === false ? '🔴' : '🟢'} {host.name}
                 </span>
-                <span className="host__meta">läuft seit {formatUptime(num(host.uptime, states))}</span>
+                <span className="host__meta">
+                    {t('running for {time}', { time: formatUptime(num(host.uptime, states)) })}
+                </span>
             </div>
             <dl className="meters">
                 {host.cpu && (
                     <Meter
-                        label="Prozessor"
+                        label={t('Processor')}
                         percent={cpu}
                         value={cpu !== undefined ? `${Math.round(cpu)} %` : '–'}
                     />
                 )}
                 {host.mem && (
                     <Meter
-                        label="Arbeitsspeicher"
+                        label={t('Memory')}
                         percent={mem}
-                        value={`${mem !== undefined ? `${Math.round(mem)} %` : '–'}${memFree !== undefined ? ` · ${formatMb(memFree)} frei` : ''}`}
+                        value={`${mem !== undefined ? `${Math.round(mem)} %` : '–'}${memFree !== undefined ? ` · ${t('{size} free', { size: formatMb(memFree) })}` : ''}`}
                     />
                 )}
                 {host.diskSize && (
                     <Meter
-                        label="Festplatte"
+                        label={t('Disk')}
                         percent={diskUsed}
                         warnAt={num(host.diskWarning, states) || 85}
-                        value={`${diskUsed !== undefined ? `${Math.round(diskUsed)} %` : '–'}${diskFree !== undefined ? ` · ${formatMb(diskFree)} frei` : ''}`}
+                        value={`${diskUsed !== undefined ? `${Math.round(diskUsed)} %` : '–'}${diskFree !== undefined ? ` · ${t('{size} free', { size: formatMb(diskFree) })}` : ''}`}
                     />
                 )}
             </dl>
@@ -162,10 +165,16 @@ function HostStatus({ host, states }: { host: SvHostStatus; states: States }): R
                 {node && (
                     <span>
                         Node.js {node}
-                        {nodeNewest && nodeNewest !== node ? ` (verfügbar: ${nodeNewest})` : ''}
+                        {nodeNewest && nodeNewest !== node
+                            ? ` (${t('available: {version}', { version: nodeNewest })})`
+                            : ''}
                     </span>
                 )}
-                {load !== undefined && <span>Last {load.toLocaleString('de-DE', { maximumFractionDigits: 2 })}</span>}
+                {load !== undefined && (
+                    <span>
+                        {t('Load')} {load.toLocaleString(locale(), { maximumFractionDigits: 2 })}
+                    </span>
+                )}
             </p>
         </div>
     );
@@ -191,11 +200,11 @@ export function SystemCard({ system, states }: { system: SvSystemStatus; states:
             ))}
             <p className={`system__summary${problems.length ? ' system__summary--warn' : ''}`}>
                 {problems.length
-                    ? `⚠️ ${problems.length} ${problems.length === 1 ? 'Instanz mit Problem' : 'Instanzen mit Problemen'}`
-                    : '✅ Alle Instanzen in Ordnung'}
+                    ? `⚠️ ${tn(problems.length, '{n} instance with a problem', '{n} instances with problems')}`
+                    : `✅ ${t('All instances OK')}`}
                 <span className="system__count">
-                    {running.length} von {active.length} aktiven laufen
-                    {disabled ? ` · ${disabled} deaktiviert` : ''}
+                    {t('{running} of {active} active running', { running: running.length, active: active.length })}
+                    {disabled ? ` · ${t('{n} disabled', { n: disabled })}` : ''}
                 </span>
             </p>
             {problems.length > 0 && (
@@ -210,7 +219,9 @@ export function SystemCard({ system, states }: { system: SvSystemStatus; states:
                 </ul>
             )}
             <details className="system__all">
-                <summary>Alle Instanzen ({rated.length})</summary>
+                <summary>
+                    {t('All instances')} ({rated.length})
+                </summary>
                 <ul className="instances">
                     {rated.map(({ instance, state }) => (
                         <InstanceRow
@@ -245,7 +256,7 @@ function InstanceRow({ instance, state }: { instance: SvInstanceStatus; state: I
             <span className="instance__state">
                 {info.label}
                 {/* Deaktivierte Instanz: SmartVis zeigt ihre Geräte nicht an */}
-                {instance.paused && <span className="instance__paused">Geräte ausgeblendet</span>}
+                {instance.paused && <span className="instance__paused">{t('devices hidden')}</span>}
             </span>
         </li>
     );

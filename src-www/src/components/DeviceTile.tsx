@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import type { SvDevice, SvStateRef, SvStateValue } from '../../../src/shared/protocol';
 import { connection, useConnection } from '../connection';
 import { formatValue, isActive, isPlaying, tapAction, valueState, warnings } from '../device';
@@ -17,9 +18,9 @@ export function mediaSummary(device: SvDevice, states: Record<string, SvStateVal
     const titleRef = device.states.find(s => s.name === 'TITLE');
     const title = titleRef ? states[titleRef.id]?.val : undefined;
     if (isPlaying(states, stateRef)) {
-        return title ? `▶ ${String(title)}` : '▶ spielt';
+        return title ? `▶ ${String(title)}` : `▶ ${t('playing')}`;
     }
-    return 'pausiert';
+    return t('paused');
 }
 
 /** Klimagerät: "Kühlen auf 22 °C" bzw. "aus · 24 °C" (Raumtemperatur) */
@@ -29,12 +30,12 @@ export function acSummary(device: SvDevice, states: Record<string, SvStateValue 
     const actual = ref('ACTUAL');
     const room = actual ? formatValue(actual, states[actual.id]) : undefined;
     if (power && states[power.id]?.val !== true) {
-        return room && room !== '–' ? `aus · ${room}` : 'aus';
+        return room && room !== '–' ? `${t('off')} · ${room}` : t('off');
     }
     const mode = ref('MODE');
     const set = ref('SET');
-    const modeText = mode ? formatValue(mode, states[mode.id]) : 'an';
-    return set ? `${modeText} auf ${formatValue(set, states[set.id])}` : modeText;
+    const modeText = mode ? formatValue(mode, states[mode.id]) : t('on');
+    return set ? t('{mode} to {value}', { mode: modeText, value: formatValue(set, states[set.id]) }) : modeText;
 }
 
 export function DeviceTile({
@@ -141,14 +142,14 @@ export function DeviceTile({
                     {device.favorite && !reorder?.kind.startsWith('favorite') ? '⭐ ' : ''}
                     {device.name}
                 </span>
-                {editing && device.hidden && <span className="badge">ausgeblendet</span>}
+                {editing && device.hidden && <span className="badge">{t('hidden')}</span>}
                 <span className="tile__value">
                     {device.type === 'media' || device.type === 'mediaPlayer'
                         ? mediaSummary(device, states)
                         : device.type === 'airCondition'
                           ? acSummary(device, states)
                           : isLight(device) && !active && states[value?.id ?? '']?.val !== undefined
-                            ? 'aus'
+                            ? t('off')
                             : formatValue(value, value ? states[value.id] : undefined)}
                     {/* Gerätetyp zeigt schon das Symbol; nur außerhalb des Raums den Raum nennen */}
                     {showRoom ? ` · ${showRoom}` : ''}
@@ -182,7 +183,7 @@ export function DeviceTile({
                 <button
                     type="button"
                     className="tile__more"
-                    aria-label={`${device.name}: Details`}
+                    aria-label={`${device.name}: ${t('Details')}`}
                     onClick={() => openDetail(device.id)}
                 >
                     <svg

@@ -1,20 +1,21 @@
+import { t } from '../../src/shared/i18n';
 import type { SvAutoShutter, SvModel, SvStateValue } from '../../src/shared/protocol';
 
 /** Status-Texte von shuttercontrol (shutters.autoState) */
 const AUTO_STATE: Record<string, { label: string; icon: string }> = {
-    up: { label: 'Geöffnet', icon: '⬆️' },
-    down: { label: 'Geschlossen', icon: '⬇️' },
-    sunProtect: { label: 'Sonnenschutz', icon: '🕶️' },
-    manu_sunProtect: { label: 'Sonnenschutz (manuell)', icon: '🕶️' },
-    OpenInSunProtect: { label: 'Fenster offen im Sonnenschutz', icon: '🪟' },
-    triggered: { label: 'Fenster offen', icon: '🪟' },
-    Manu_Mode: { label: 'Manuell', icon: '✋' },
-    none: { label: 'Kein Status', icon: '·' },
-    wind1: { label: 'Windalarm 1', icon: '💨' },
-    wind2: { label: 'Windalarm 2', icon: '💨' },
-    rain: { label: 'Regenalarm', icon: '🌧️' },
-    frost: { label: 'Frostalarm', icon: '❄️' },
-    fire: { label: 'Feueralarm', icon: '🔥' },
+    up: { label: t('Opened'), icon: '⬆️' },
+    down: { label: t('Closed'), icon: '⬇️' },
+    sunProtect: { label: t('Sun protection'), icon: '🕶️' },
+    manu_sunProtect: { label: t('Sun protection (manual)'), icon: '🕶️' },
+    OpenInSunProtect: { label: t('Window open during sun protection'), icon: '🪟' },
+    triggered: { label: t('Window open'), icon: '🪟' },
+    Manu_Mode: { label: t('Manual'), icon: '✋' },
+    none: { label: t('No status'), icon: '·' },
+    wind1: { label: t('Wind alarm 1'), icon: '💨' },
+    wind2: { label: t('Wind alarm 2'), icon: '💨' },
+    rain: { label: t('Rain alarm'), icon: '🌧️' },
+    frost: { label: t('Frost alarm'), icon: '❄️' },
+    fire: { label: t('Fire alarm'), icon: '🔥' },
 };
 
 export function autoStateInfo(

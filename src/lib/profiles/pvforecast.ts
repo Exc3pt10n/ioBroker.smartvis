@@ -1,3 +1,4 @@
+import { t } from '../../shared/i18n';
 import type { SvPvForecast, SvPvForecastValues } from '../../shared/protocol';
 import { getName } from '../names';
 import { ref, type AdapterProfile, type ObjectMap } from './types';
@@ -12,12 +13,12 @@ import { ref, type AdapterProfile, type ObjectMap } from './types';
 function values(objects: ObjectMap, base: string, name: string): SvPvForecastValues {
     return {
         name,
-        powerNow: ref(objects, `${base}.power.now`, 'Leistung jetzt'),
-        energyNow: ref(objects, `${base}.energy.now`, 'Bisher heute'),
-        energyRemaining: ref(objects, `${base}.energy.nowUntilEndOfDay`, 'Noch heute'),
-        energyToday: ref(objects, `${base}.energy.today`, 'Heute'),
-        energyTomorrow: ref(objects, `${base}.energy.tomorrow`, 'Morgen'),
-        installed: ref(objects, `${base}.power.installed`, 'Installiert'),
+        powerNow: ref(objects, `${base}.power.now`, 'Power now'),
+        energyNow: ref(objects, `${base}.energy.now`, 'So far today'),
+        energyRemaining: ref(objects, `${base}.energy.nowUntilEndOfDay`, 'Remaining today'),
+        energyToday: ref(objects, `${base}.energy.today`, 'Today'),
+        energyTomorrow: ref(objects, `${base}.energy.tomorrow`, 'Tomorrow'),
+        installed: ref(objects, `${base}.power.installed`, 'Installed'),
     };
 }
 
@@ -25,7 +26,7 @@ export const pvforecastProfile: AdapterProfile = {
     adapter: 'pvforecast',
     claimsInstance: true,
     detect(instance, objects: ObjectMap, lang) {
-        const summary = values(objects, `${instance}.summary`, 'Gesamt');
+        const summary = values(objects, `${instance}.summary`, 'Total');
         if (!summary.energyToday && !summary.powerNow) {
             return null;
         }
@@ -41,13 +42,13 @@ export const pvforecastProfile: AdapterProfile = {
 
         const pvForecast: SvPvForecast = {
             id: instance,
-            name: 'PV-Prognose',
+            name: t('PV forecast'),
             adapter: 'pvforecast',
             summary,
             // Bei nur einer Anlage ist die Aufteilung überflüssig
             plants: plants.length > 1 ? plants : [],
-            curve: ref(objects, `${instance}.summary.JSONData`, 'Verlauf'),
-            lastUpdated: ref(objects, `${instance}.summary.lastUpdated`, 'Aktualisiert'),
+            curve: ref(objects, `${instance}.summary.JSONData`, 'History'),
+            lastUpdated: ref(objects, `${instance}.summary.lastUpdated`, 'Updated'),
         };
         return { pvForecast };
     },

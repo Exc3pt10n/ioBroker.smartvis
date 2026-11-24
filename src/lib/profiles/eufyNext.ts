@@ -1,3 +1,4 @@
+import { t } from '../../shared/i18n';
 import type { SvCamera, SvCameraSetting, SvSecurityStation, SvStateRef } from '../../shared/protocol';
 import { getName } from '../names';
 import { translate } from './eusec';
@@ -5,47 +6,47 @@ import { ref, type AdapterProfile, type ObjectMap } from './types';
 
 /** Sicherheitsmodi (Bezeichnungen des eufy-SDK, Werte wie bei eusec: 0 Abwesend, 1 Zuhause, 63 Deaktiviert) */
 const ARMING_MODES: Record<string, string> = {
-    away: 'Abwesend',
-    home: 'Zuhause',
-    schedule: 'Zeitplan',
-    custom1: 'Benutzerdefiniert 1',
-    custom2: 'Benutzerdefiniert 2',
-    custom3: 'Benutzerdefiniert 3',
-    off: 'Aus',
+    away: 'Away',
+    home: 'At home',
+    schedule: 'Schedule',
+    custom1: 'Custom 1',
+    custom2: 'Custom 2',
+    custom3: 'Custom 3',
+    off: 'Off',
     geo: 'Geofencing',
-    disarmed: 'Deaktiviert',
+    disarmed: 'Disarmed',
 };
 
-/** Wertelisten des eufy-SDK auf Deutsch */
+/** Wertelisten des eufy-SDK: lesbare englische Texte (übersetzt in translate()) */
 const VALUE_LABELS: Record<string, string> = {
-    Off: 'Aus',
-    Infrared: 'Infrarot (schwarz-weiß)',
-    FullColor: 'Farbe',
-    'Full Color': 'Farbe',
-    'Timestamp + Logo': 'Zeitstempel und Logo',
-    'Text Only': 'Nur Text (schnell)',
-    'Included Thumbnail': 'Mit Vorschaubild',
-    'Text First, Then Thumbnail': 'Erst Text, dann Bild',
-    'All Sound': 'Alle Geräusche',
-    Events: 'Bei Ereignissen',
-    Continuous: 'Durchgehend',
-    'Optimal Battery Life': 'Lange Akkulaufzeit',
-    'Optimal Surveillance': 'Beste Überwachung',
-    'Customize Recording': 'Benutzerdefiniert',
-    'Balance Surveillance': 'Ausgewogen',
-    Timestamp: 'Zeitstempel',
-    TimestampAndLogo: 'Zeitstempel und Logo',
-    TextOnly: 'Nur Text (schnell)',
-    IncludedThumbnail: 'Mit Vorschaubild',
-    TextFirstThenThumbnail: 'Erst Text, dann Bild',
-    Crying: 'Weinen',
-    AllSound: 'Alle Geräusche',
+    Off: 'Off',
+    Infrared: 'Infrared (black and white)',
+    FullColor: 'Color',
+    'Full Color': 'Color',
+    'Timestamp + Logo': 'Timestamp and logo',
+    'Text Only': 'Text only (fast)',
+    'Included Thumbnail': 'With thumbnail',
+    'Text First, Then Thumbnail': 'Text first, then picture',
+    'All Sound': 'All sounds',
+    Events: 'On events',
+    Continuous: 'Continuous',
+    'Optimal Battery Life': 'Long battery life',
+    'Optimal Surveillance': 'Best surveillance',
+    'Customize Recording': 'Custom',
+    'Balance Surveillance': 'Balanced surveillance',
+    Timestamp: 'Timestamp',
+    TimestampAndLogo: 'Timestamp and logo',
+    TextOnly: 'Text only (fast)',
+    IncludedThumbnail: 'With thumbnail',
+    TextFirstThenThumbnail: 'Text first, then picture',
+    Crying: 'Crying',
+    AllSound: 'All sounds',
     'HD (720P)': 'HD (720p)',
     'Full HD (1080P)': 'Full HD (1080p)',
-    Max: 'Maximal',
-    Auto: 'Automatisch',
-    Battery: 'Akku',
-    'External Solar Panel': 'Solarpanel',
+    Max: 'Maximum',
+    Auto: 'Automatic',
+    Battery: 'Battery',
+    'External Solar Panel': 'Solar panel',
 };
 
 /**
@@ -59,58 +60,58 @@ const SETTINGS: {
     hint?: string;
     requires?: [string, boolean | number | string];
 }[] = [
-    { key: 'motion.detectionEnabled', group: 'detection', label: 'Bewegungserkennung' },
+    { key: 'motion.detectionEnabled', group: 'detection', label: 'Motion detection' },
     {
         key: 'motion.humanOnlyAtNight',
         group: 'detection',
-        label: 'Nachts nur Personen',
+        label: 'Only persons at night',
         requires: ['motion.detectionEnabled', true],
     },
     {
         key: 'motion.loiteringDetection',
         group: 'detection',
-        label: 'Herumlungern erkennen',
+        label: 'Detect loitering',
         requires: ['motion.detectionEnabled', true],
     },
-    { key: 'camera.soundDetection', group: 'detection', label: 'Geräuscherkennung' },
+    { key: 'camera.soundDetection', group: 'detection', label: 'Sound detection' },
     {
         key: 'camera.soundDetectionType',
         group: 'detection',
-        label: 'Geräusche',
+        label: 'Sounds',
         requires: ['camera.soundDetection', true],
     },
     {
         key: 'camera.antiTheftDetection',
         group: 'detection',
-        label: 'Diebstahlwarnung',
-        hint: 'Alarm, wenn die Kamera bewegt wird',
+        label: 'Anti-theft alarm',
+        hint: 'Alarm when the camera is moved',
     },
-    { key: 'battery.workingMode', group: 'recording', label: 'Energiemodus' },
+    { key: 'battery.workingMode', group: 'recording', label: 'Power mode' },
     {
         key: 'battery.recordDuration',
         group: 'recording',
-        label: 'Clip-Länge',
+        label: 'Clip length',
         requires: ['battery.workingMode', 'Customize Recording'],
     },
     {
         key: 'battery.recordInterval',
         group: 'recording',
-        label: 'Pause bis zur nächsten Aufnahme',
+        label: 'Pause until the next recording',
         requires: ['battery.workingMode', 'Customize Recording'],
     },
-    { key: 'audio.audioRecording', group: 'recording', label: 'Ton aufnehmen' },
-    { key: 'camera.recordingQuality', group: 'recording', label: 'Aufnahmequalität' },
-    { key: 'camera.streamingQuality', group: 'recording', label: 'Livestream-Qualität' },
-    { key: 'camera.nightVision', group: 'picture', label: 'Nachtsicht' },
-    { key: 'light.brightness', group: 'picture', label: 'Helligkeit Licht' },
-    { key: 'camera.imageFlipped', group: 'picture', label: 'Bild drehen', hint: 'Für über Kopf montierte Kameras' },
-    { key: 'camera.watermark', group: 'picture', label: 'Wasserzeichen' },
-    { key: 'camera.statusLed', group: 'picture', label: 'Status-LED' },
-    { key: 'audio.microphone', group: 'picture', label: 'Mikrofon' },
-    { key: 'audio.speaker', group: 'picture', label: 'Lautsprecher' },
-    { key: 'audio.volume', group: 'picture', label: 'Lautstärke', requires: ['audio.speaker', true] },
-    { key: 'ptz.rotationSpeed', group: 'picture', label: 'Schwenkgeschwindigkeit' },
-    { key: 'camera.notificationStyle', group: 'notifications', label: 'Art der Benachrichtigung' },
+    { key: 'audio.audioRecording', group: 'recording', label: 'Record audio' },
+    { key: 'camera.recordingQuality', group: 'recording', label: 'Recording quality' },
+    { key: 'camera.streamingQuality', group: 'recording', label: 'Livestream quality' },
+    { key: 'camera.nightVision', group: 'picture', label: 'Night vision' },
+    { key: 'light.brightness', group: 'picture', label: 'Light brightness' },
+    { key: 'camera.imageFlipped', group: 'picture', label: 'Rotate picture', hint: 'For cameras mounted upside down' },
+    { key: 'camera.watermark', group: 'picture', label: 'Watermark' },
+    { key: 'camera.statusLed', group: 'picture', label: 'Status LED' },
+    { key: 'audio.microphone', group: 'picture', label: 'Microphone' },
+    { key: 'audio.speaker', group: 'picture', label: 'Speaker' },
+    { key: 'audio.volume', group: 'picture', label: 'Volume', requires: ['audio.speaker', true] },
+    { key: 'ptz.rotationSpeed', group: 'picture', label: 'Pan speed' },
+    { key: 'camera.notificationStyle', group: 'notifications', label: 'Notification type' },
 ];
 
 function cameraSettings(id: string, objects: ObjectMap): SvCameraSetting[] {
@@ -138,8 +139,8 @@ function cameraSettings(id: string, objects: ObjectMap): SvCameraSetting[] {
                 : undefined;
         result.push({
             group: def.group,
-            label: def.label,
-            ...(def.hint && { hint: def.hint }),
+            label: t(def.label),
+            ...(def.hint && { hint: t(def.hint) }),
             state: r,
             ...(requires && { requires }),
         });
@@ -179,7 +180,7 @@ export const eufyNextProfile: AdapterProfile = {
             const sn = id.split('.')[depth];
             const name = getName(obj, lang) || sn;
             const s = (key: string, label: string): SvStateRef | undefined => ref(objects, `${id}.${key}`, label);
-            const guardMode = translate(s('arming.mode', 'Sicherheitsmodus'), objects, ARMING_MODES);
+            const guardMode = translate(s('arming.mode', 'Security mode'), objects, ARMING_MODES);
             if (guardMode) {
                 stations.push({
                     id,
@@ -187,10 +188,10 @@ export const eufyNextProfile: AdapterProfile = {
                     adapter: 'eufy-next',
                     guardMode,
                     alarm: event(objects, id, ['alarm'], 'Alarm'),
-                    connected: s('info.available', 'Erreichbar'),
+                    connected: s('info.available', 'Reachable'),
                 });
             }
-            const picture = s('snapshot.url', 'Ereignisbild');
+            const picture = s('snapshot.url', 'Event picture');
             if (!objects[`${id}.camera`] && !picture) {
                 continue;
             }
@@ -203,26 +204,26 @@ export const eufyNextProfile: AdapterProfile = {
                 model: typeof native.model === 'string' && native.model ? native.model : undefined,
                 picture,
                 pictureUsable: !!picture,
-                pictureRefresh: s('snapshot.refreshLive', 'Aktuelles Bild aufnehmen'),
-                motion: event(objects, id, ['motion'], 'Bewegung'),
+                pictureRefresh: s('snapshot.refreshLive', 'Take current picture'),
+                motion: event(objects, id, ['motion'], 'Motion'),
                 person: event(objects, id, ['personDetected', 'strangerDetected'], 'Person'),
-                pet: event(objects, id, ['petDetection', 'dogDetected'], 'Haustier'),
-                sound: event(objects, id, ['soundDetected'], 'Geräusch'),
-                crying: event(objects, id, ['cryingDetected'], 'Weinen'),
-                ring: event(objects, id, ['doorbellPress'], 'Klingel'),
-                vehicle: event(objects, id, ['vehicleDetected'], 'Fahrzeug'),
-                enabled: s('camera.enabled', 'Kamera an'),
-                status: s('info.available', 'Erreichbar'),
-                battery: s('battery.level', 'Akku'),
-                light: s('light.isOn', 'Licht'),
+                pet: event(objects, id, ['petDetection', 'dogDetected'], 'Pet'),
+                sound: event(objects, id, ['soundDetected'], 'Sound'),
+                crying: event(objects, id, ['cryingDetected'], 'Crying'),
+                ring: event(objects, id, ['doorbellPress'], 'Doorbell'),
+                vehicle: event(objects, id, ['vehicleDetected'], 'Vehicle'),
+                enabled: s('camera.enabled', 'Camera on'),
+                status: s('info.available', 'Reachable'),
+                battery: s('battery.level', 'Battery'),
+                light: s('light.isOn', 'Light'),
                 // Livestream (ab eufy-next 0.2.0): go2rtc-Seite in livestream.url, nur solange der Stream läuft
-                liveStart: s('livestream.start', 'Stream starten'),
-                liveStop: s('livestream.stop', 'Stream beenden'),
+                liveStart: s('livestream.start', 'Start stream'),
+                liveStop: s('livestream.stop', 'Stop stream'),
                 liveUrl: s('livestream.url', 'Livestream'),
-                panLeft: s('ptz.left', 'Nach links'),
-                panRight: s('ptz.right', 'Nach rechts'),
-                tiltUp: s('ptz.up', 'Nach oben'),
-                tiltDown: s('ptz.down', 'Nach unten'),
+                panLeft: s('ptz.left', 'Pan left'),
+                panRight: s('ptz.right', 'Pan right'),
+                tiltUp: s('ptz.up', 'Tilt up'),
+                tiltDown: s('ptz.down', 'Tilt down'),
                 ...(guardMode && { stationId: id }),
                 settings: cameraSettings(id, objects),
             });

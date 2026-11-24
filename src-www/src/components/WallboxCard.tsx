@@ -1,3 +1,4 @@
+import { locale, t } from '../../../src/shared/i18n';
 import type { SvWallbox } from '../../../src/shared/protocol';
 import { useConnection } from '../connection';
 import { Toggle } from './Toggle';
@@ -5,7 +6,7 @@ import { WallboxSettings } from './WallboxSettings';
 import { formatPower, wallboxLabel, wallboxSnapshot } from '../energy';
 
 function fmtA(v: number): string {
-    return `${v.toLocaleString('de-DE', { maximumFractionDigits: 1 })} A`;
+    return `${v.toLocaleString(locale(), { maximumFractionDigits: 1 })} A`;
 }
 
 export function WallboxCard({ wallbox }: { wallbox: SvWallbox }): React.JSX.Element {
@@ -30,14 +31,14 @@ export function WallboxCard({ wallbox }: { wallbox: SvWallbox }): React.JSX.Elem
                         className="wallbox__power"
                         title={
                             s.estimated
-                                ? 'Geschätzt aus Ladestrom × 230 V × Phasen (Wallbox ohne Energiezähler)'
+                                ? t('Estimated from charging current × 230 V × phases (wallbox without energy meter)')
                                 : undefined
                         }
                     >
                         {s.estimated ? '≈ ' : ''}
                         {formatPower(s.power)}
                         {/* Ohne Energiezähler nur geschätzt – sichtbar sagen statt nur per "≈" */}
-                        {s.estimated && <span className="wallbox__estimated">geschätzt</span>}
+                        {s.estimated && <span className="wallbox__estimated">{t('estimated')}</span>}
                     </div>
                 )}
             </div>
@@ -52,7 +53,8 @@ export function WallboxCard({ wallbox }: { wallbox: SvWallbox }): React.JSX.Elem
                                   : `−${formatPower(-s.surplusW)}`}
                         </span>
                         <span className="stat__label">
-                            PV-Überschuss{s.surplusW !== undefined && s.surplusW <= 0 ? ' · keiner' : ''}
+                            {t('PV surplus')}
+                            {s.surplusW !== undefined && s.surplusW <= 0 ? ` · ${t('none')}` : ''}
                         </span>
                     </div>
                 )}
@@ -60,8 +62,10 @@ export function WallboxCard({ wallbox }: { wallbox: SvWallbox }): React.JSX.Elem
                     <div className="stat">
                         <span className="stat__value">{s.limitA !== undefined ? fmtA(s.limitA) : '–'}</span>
                         <span className="stat__label">
-                            Ladelimit
-                            {s.limitW !== undefined ? ` · ≈ ${formatPower(s.limitW)} (${s.phases}-phasig)` : ''}
+                            {t('Charging limit')}
+                            {s.limitW !== undefined
+                                ? ` · ≈ ${formatPower(s.limitW)} (${t('{n}-phase', { n: s.phases ?? '' })})`
+                                : ''}
                             {s.maxA !== undefined ? ` · max. ${fmtA(s.maxA)}` : ''}
                         </span>
                     </div>
@@ -71,14 +75,14 @@ export function WallboxCard({ wallbox }: { wallbox: SvWallbox }): React.JSX.Elem
                 {wallbox.pvAutomatic && (
                     <Toggle
                         state={wallbox.pvAutomatic}
-                        label="PV-Überschussladen"
-                        hint={s.pvAutomatic ? 'Lädt nur mit Solarüberschuss' : 'Lädt mit voller Leistung'}
+                        label={t('PV surplus charging')}
+                        hint={s.pvAutomatic ? t('Charges with solar surplus only') : t('Charges at full power')}
                     />
                 )}
                 {wallbox.pause && (
                     <Toggle
                         state={wallbox.pause}
-                        label="Laden pausieren"
+                        label={t('Pause charging')}
                     />
                 )}
             </div>

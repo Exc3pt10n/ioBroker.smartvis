@@ -1,3 +1,4 @@
+import { getLanguage, t } from '../../../src/shared/i18n';
 import type { SvDevice } from '../../../src/shared/protocol';
 import { CameraGrid, StationRow } from '../components/Cameras';
 import { CustomSections, type SectionDef } from '../components/CustomSections';
@@ -50,7 +51,7 @@ export function SecurityView(): React.JSX.Element {
     const { model, states } = useConnection();
     const { editing } = useEditing();
     if (!model) {
-        return <p className="empty">Lade …</p>;
+        return <p className="empty">{t('Loading …')}</p>;
     }
     const devices = visibleDevices(model, false);
     const cameras = model.cameras || [];
@@ -60,7 +61,8 @@ export function SecurityView(): React.JSX.Element {
     const alarms = activeAlarms(model, states, devices);
     const roomName = (id: string | null): string => model.rooms.find(r => r.id === id)?.name ?? '';
     const byRoom = (a: SvDevice, b: SvDevice): number =>
-        roomName(a.roomId).localeCompare(roomName(b.roomId), 'de') || a.name.localeCompare(b.name, 'de');
+        roomName(a.roomId).localeCompare(roomName(b.roomId), getLanguage()) ||
+        a.name.localeCompare(b.name, getLanguage());
     const detectors = devices.filter(d => ALARM_TYPES.includes(d.type)).sort(byRoom);
     const openings = devices.filter(d => OPENING_TYPES.includes(d.type)).sort(byRoom);
     const motions = devices.filter(d => MOTION_TYPES.includes(d.type)).sort(byRoom);
@@ -71,17 +73,17 @@ export function SecurityView(): React.JSX.Element {
     const sections: SectionDef[] = [
         {
             key: 'mode',
-            label: 'Sicherheitsmodus',
+            label: t('Security mode'),
             node: stations.length ? (
                 <section
                     className="card"
-                    aria-label="Sicherheitsmodus"
+                    aria-label={t('Security mode')}
                 >
-                    <h2 className="subtitle">🛡️ Sicherheitsmodus</h2>
+                    <h2 className="subtitle">🛡️ {t('Security mode')}</h2>
                     <div
                         className="segmented security__modes"
                         role="radiogroup"
-                        aria-label="Sicherheitsmodus aller Stationen"
+                        aria-label={t('Security mode of all stations')}
                     >
                         {MODE_CHOICES.map(c => (
                             <button
@@ -102,14 +104,14 @@ export function SecurityView(): React.JSX.Element {
                     </div>
                     <p className="detail__note">
                         {mode.mode === 'mixed'
-                            ? 'Die Stationen sind unterschiedlich eingestellt.'
+                            ? t('The stations are set differently.')
                             : mode.mode
-                              ? `Alle ${stations.length > 1 ? `${stations.length} Stationen` : 'Kameras'}: ${mode.label}`
-                              : `Aktuell: ${mode.label}`}
+                              ? `${stations.length > 1 ? t('All {n} stations', { n: stations.length }) : t('All cameras')}: ${mode.label}`
+                              : t('Currently: {mode}', { mode: mode.label })}
                     </p>
                     {allStations.length > 1 && (
                         <details className="info__details">
-                            <summary>Je Station einstellen</summary>
+                            <summary>{t('Set per station')}</summary>
                             {allStations.map(s => (
                                 <StationRow
                                     key={s.id}
@@ -123,7 +125,7 @@ export function SecurityView(): React.JSX.Element {
         },
         {
             key: 'cameras',
-            label: 'Kameras',
+            label: t('Cameras'),
             node: cameras.length ? (
                 <section
                     className="group"
@@ -133,7 +135,7 @@ export function SecurityView(): React.JSX.Element {
                         id="sec-cameras"
                         className="subtitle"
                     >
-                        📷 Kameras <span className="group__count">{cameras.length}</span>
+                        📷 {t('Cameras')} <span className="group__count">{cameras.length}</span>
                     </h2>
                     <CameraGrid cameras={cameras} />
                 </section>
@@ -141,7 +143,7 @@ export function SecurityView(): React.JSX.Element {
         },
         {
             key: 'detectors',
-            label: 'Melder',
+            label: t('Detectors'),
             node: detectors.length ? (
                 <section
                     className="group"
@@ -151,7 +153,7 @@ export function SecurityView(): React.JSX.Element {
                         id="sec-detectors"
                         className="subtitle"
                     >
-                        🔥 Melder <span className="group__count">{detectors.length}</span>
+                        🔥 {t('Detectors')} <span className="group__count">{detectors.length}</span>
                     </h2>
                     <Tiles
                         devices={detectors}
@@ -160,12 +162,12 @@ export function SecurityView(): React.JSX.Element {
                     />
                 </section>
             ) : (
-                placeholder('Rauch-, Wasser- und CO-Melder erscheinen hier, sobald welche erkannt sind.')
+                placeholder(t('Smoke, water and CO detectors appear here as soon as some are detected.'))
             ),
         },
         {
             key: 'openings',
-            label: 'Fenster & Türen',
+            label: t('Windows & doors'),
             node: openings.length ? (
                 <section
                     className="group"
@@ -175,8 +177,10 @@ export function SecurityView(): React.JSX.Element {
                         id="sec-openings"
                         className="subtitle"
                     >
-                        🚪 Fenster & Türen{' '}
-                        <span className="group__count">{openCount ? `${openCount} offen` : 'alle zu'}</span>
+                        🚪 {t('Windows & doors')}{' '}
+                        <span className="group__count">
+                            {openCount ? t('{n} open', { n: openCount }) : t('all closed')}
+                        </span>
                     </h2>
                     <Tiles
                         devices={openings}
@@ -188,7 +192,7 @@ export function SecurityView(): React.JSX.Element {
         },
         {
             key: 'motion',
-            label: 'Bewegungsmelder',
+            label: t('Motion sensors'),
             node: motions.length ? (
                 <section
                     className="group"
@@ -198,7 +202,7 @@ export function SecurityView(): React.JSX.Element {
                         id="sec-motion"
                         className="subtitle"
                     >
-                        🏃 Bewegungsmelder <span className="group__count">{motions.length}</span>
+                        🏃 {t('Motion sensors')} <span className="group__count">{motions.length}</span>
                     </h2>
                     <Tiles
                         devices={motions}
@@ -213,10 +217,10 @@ export function SecurityView(): React.JSX.Element {
     return (
         <>
             <div className="titlebar titlebar--split">
-                <h1 className="title">Sicherheit</h1>
+                <h1 className="title">{t('Security')}</h1>
                 <EditButton />
             </div>
-            <EditBanner text="Bereiche am Griff ⠿ ziehen oder mit ↑ ↓ sortieren und aus- oder einblenden" />
+            <EditBanner text={t('Drag sections by the handle ⠿ or sort them with ↑ ↓, and hide or show them')} />
             {alarms.length > 0 && (
                 <p
                     className="camera__alarm"

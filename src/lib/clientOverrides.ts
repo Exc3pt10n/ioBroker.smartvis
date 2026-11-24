@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n';
 import type { SvClientAction, SvClientInfo, SvOverrideStore, SvOverrides } from '../shared/protocol';
 import { emptyOverrides, parseOverrides } from './overrides';
 
@@ -55,7 +56,7 @@ export function parseStore(raw: string | Buffer | undefined | null): SvOverrideS
             continue;
         }
         store.clients[id] = {
-            name: cleanName(entry.name, 'Gerät'),
+            name: cleanName(entry.name, t('Device')),
             created: Number(entry.created) || 0,
             lastSeen: Number(entry.lastSeen) || 0,
             overrides: parseOverrides(JSON.stringify(entry.overrides ?? {})),
@@ -78,7 +79,7 @@ export function registerClient(store: SvOverrideStore, id: string, name: unknown
     const existing = next.clients[id];
     next.clients[id] = existing
         ? { ...existing, lastSeen: now }
-        : { name: cleanName(name, 'Gerät'), created: now, lastSeen: now, overrides: copy(store.shared) };
+        : { name: cleanName(name, t('Device')), created: now, lastSeen: now, overrides: copy(store.shared) };
     // Begrenzen: die am längsten nicht gesehenen Geräte fallen weg (nie das gerade angemeldete)
     const ids = Object.keys(next.clients);
     if (ids.length > MAX_CLIENTS) {
@@ -115,7 +116,7 @@ export function applyClientAction(
     switch (request.action) {
         case 'rename':
             if (!own || !clientId) {
-                throw new Error('Dieses Gerät ist nicht angemeldet');
+                throw new Error(t('This device is not registered'));
             }
             return {
                 ...store,
@@ -135,23 +136,23 @@ export function applyClientAction(
         case 'copyFrom': {
             const source = store.clients[request.id];
             if (!source) {
-                throw new Error('Gerät nicht gefunden');
+                throw new Error(t('Device not found'));
             }
             return withOverrides(store, clientId, copy(source.overrides));
         }
         case 'remove': {
             if (request.id === clientId) {
-                throw new Error('Das eigene Gerät kann nicht entfernt werden');
+                throw new Error(t('This device cannot remove itself'));
             }
             if (!store.clients[request.id]) {
-                throw new Error('Gerät nicht gefunden');
+                throw new Error(t('Device not found'));
             }
             const clients = { ...store.clients };
             delete clients[request.id];
             return { ...store, clients };
         }
         default:
-            throw new Error('Unbekannte Aktion');
+            throw new Error(t('Unknown action'));
     }
 }
 

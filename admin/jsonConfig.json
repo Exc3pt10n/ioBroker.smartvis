@@ -36,8 +36,13 @@
         },
         "language": {
             "type": "select",
-            "label": "Language for device names",
+            "label": "Language",
+            "help": "User interface and generated device names",
             "options": [
+                {
+                    "label": "System language",
+                    "value": ""
+                },
                 {
                     "label": "Deutsch",
                     "value": "de"

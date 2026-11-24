@@ -1,3 +1,4 @@
+import { t } from '../shared/i18n';
 import type { SvBattery, SvDevice, SvStateRef } from '../shared/protocol';
 import { BATTERY_MODELS } from './batteryModels';
 import { getName } from './names';
@@ -50,21 +51,22 @@ const MODEL_FIELDS = ['TYPE', 'model', 'modelId', 'modelid', 'modelID', 'product
  */
 export function batteryType(obj: ioBroker.Object | undefined, adapter: string): string | undefined {
     if (adapter === 'eusec') {
-        return 'fester Akku';
+        return t('Built-in battery');
     }
     const native = (obj?.native || {}) as Record<string, unknown>;
     const common = (obj?.common || {}) as Record<string, unknown>;
     // eufy-next: Kameras (Gerätefamilie "camera") haben einen fest eingebauten Akku – vor der Tabelle,
     // damit alle Kameras gleich heißen (die Bibliothek nennt manche Varianten nur "Akku")
     if (adapter === 'eufy-next' && native.codec === 'camera') {
-        return 'fester Akku';
+        return t('Built-in battery');
     }
     // ioBroker.zigbee: Modell als common.type (z. B. "lumi.sensor_magnet.aq2")
     const candidates = [...MODEL_FIELDS.map(f => native[f]), common.type];
     for (const c of candidates) {
         const type = typeof c === 'string' && c ? BATTERY_MODELS[c.trim().toUpperCase()] : undefined;
         if (type) {
-            return type;
+            // Tabelle englisch (Battery Notes): "Rechargeable", "Built-in battery", "Solar" … übersetzen
+            return type.replace(/Built-in battery|Rechargeable|Solar|Manual/, word => t(word));
         }
     }
     return undefined;

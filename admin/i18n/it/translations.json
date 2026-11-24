@@ -3,11 +3,15 @@
     "IP address": "Indirizzo IP",
     "Port": "Porta",
     "Automatic discovery": "Rilevamento automatico",
-    "Language for device names": "Lingua dei nomi dei dispositivi",
     "Rediscovery after object change (seconds)": "Nuovo rilevamento dopo modifica degli oggetti (secondi)",
     "Ignored adapters (comma-separated)": "Adattatori ignorati (separati da virgola)",
     "These adapters are skipped during discovery": "Questi adattatori vengono ignorati durante il rilevamento",
     "User interface": "Interfaccia",
     "Allow edit mode": "Consenti modalità modifica",
-    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "Rinominare, nascondere, spostare e segnare i preferiti nell'app. Finché non c'è un login, chiunque nella rete può salvare personalizzazioni."
+    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "Rinominare, nascondere, spostare e segnare i preferiti nell'app. Finché non c'è un login, chiunque nella rete può salvare personalizzazioni.",
+    "Language": "Lingua",
+    "User interface and generated device names": "Interfaccia e nomi dei dispositivi generati",
+    "System language": "Lingua di sistema",
+    "Deutsch": "Deutsch",
+    "English": "English"
 }

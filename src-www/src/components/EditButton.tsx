@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import { useState } from 'react';
 import { useConnection } from '../connection';
 import { useEditing } from '../editing';
@@ -17,11 +18,11 @@ export function EditButton(): React.JSX.Element | null {
             className={`editbtn${editing ? ' editbtn--active' : ' editbtn--icon'}`}
             onClick={() => setEditing(!editing)}
             aria-pressed={editing}
-            aria-label={editing ? undefined : 'Bearbeiten'}
-            title={editing ? undefined : 'Anordnen, umbenennen, ausblenden'}
+            aria-label={editing ? undefined : t('Edit')}
+            title={editing ? undefined : t('Arrange, rename, hide')}
         >
             {editing ? (
-                'Fertig'
+                t('Done')
             ) : (
                 <Icon
                     name="edit"
@@ -70,17 +71,17 @@ export function EditTip(): React.JSX.Element | null {
             role="note"
         >
             <span>
-                Tipp: Mit{' '}
+                {t('Tip: With')}{' '}
                 <Icon
                     name="edit"
                     size={14}
                 />{' '}
-                oben rechts ordnest du Bereiche an, blendest sie aus und benennst Geräte und Räume um.
+                {t('at the top right you arrange sections, hide them and rename devices and rooms.')}
             </span>
             <button
                 type="button"
                 className="iconbtn edittip__close"
-                aria-label="Tipp ausblenden"
+                aria-label={t('Hide tip')}
                 onClick={dismiss}
             >
                 ✕
@@ -122,7 +123,7 @@ export function MoveButtons({
         <div className="movebtns">
             <button
                 type="button"
-                aria-label={`${label} nach vorne`}
+                aria-label={t('Move {name} forward', { name: label })}
                 disabled={!canBack}
                 onClick={() => onMove(-1)}
             >
@@ -130,7 +131,7 @@ export function MoveButtons({
             </button>
             <button
                 type="button"
-                aria-label={`${label} nach hinten`}
+                aria-label={t('Move {name} back', { name: label })}
                 disabled={!canForward}
                 onClick={() => onMove(1)}
             >

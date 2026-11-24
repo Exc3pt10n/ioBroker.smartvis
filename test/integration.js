@@ -264,7 +264,8 @@ tests.integration(path.join(__dirname, '..'), {
                 ws.send(JSON.stringify({ t: 'history', reqId: 7, id: 'hm-rpc.0.DIM1.4.LEVEL', range: '24h' }));
                 const history = await answer;
                 expect(history.points).to.deep.equal([]);
-                expect(history.error).to.match(/Kein Verlauf/);
+                // Sprache der Testinstanz: Systemsprache (englisch)
+                expect(history.error).to.match(/No history/);
 
                 // Diagnose der Erkennung (Mehr → Erkennung)
                 const diagnosis = new Promise(resolve => {
@@ -383,7 +384,7 @@ tests.integration(path.join(__dirname, '..'), {
                     e => e.message,
                 );
                 ws.send(JSON.stringify({ t: 'edit', edit: { kind: 'createRoom', name: 'Verboten' } }));
-                expect(await answer).to.match(/deaktiviert/);
+                expect(await answer).to.match(/disabled/);
                 ws.close();
             });
         });

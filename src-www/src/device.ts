@@ -1,3 +1,4 @@
+import { locale, t } from '../../src/shared/i18n';
 import type { SvDevice, SvRoom, SvStateRef, SvStateValue } from '../../src/shared/protocol';
 
 /** Rollen-Namen der Schalt-States je nach Gerätetyp (type-detector) */
@@ -6,29 +7,29 @@ const SWITCH_NAMES = ['ON', 'SET', 'ON_SET', 'SWITCH', 'STATE'];
 const VALUE_NAMES = ['ACTUAL', 'ON_ACTUAL', 'SET', 'ON', 'BRIGHTNESS', 'DIMMER', 'LEVEL'];
 
 export const TYPE_LABELS: Record<string, string> = {
-    light: 'Licht',
-    dimmer: 'Dimmer',
-    ct: 'Licht',
-    hue: 'Farblicht',
-    rgb: 'Farblicht',
-    rgbSingle: 'Farblicht',
-    rgbwSingle: 'Farblicht',
-    cie: 'Farblicht',
-    socket: 'Steckdose',
-    fan: 'Lüfter',
-    blind: 'Rollladen',
-    thermostat: 'Thermostat',
-    airCondition: 'Klima',
-    temperature: 'Temperatur',
-    humidity: 'Feuchte',
-    window: 'Fenster',
-    windowTilt: 'Fenster',
-    door: 'Tür',
-    motion: 'Bewegung',
-    lock: 'Schloss',
-    media: 'Media',
-    electricity: 'Energie',
-    info: 'Info',
+    light: t('Light'),
+    dimmer: t('Dimmer'),
+    ct: t('Light'),
+    hue: t('Color light'),
+    rgb: t('Color light'),
+    rgbSingle: t('Color light'),
+    rgbwSingle: t('Color light'),
+    cie: t('Color light'),
+    socket: t('Socket'),
+    fan: t('Fan'),
+    blind: t('Blind'),
+    thermostat: t('Thermostat'),
+    airCondition: t('Climate'),
+    temperature: t('Temperature'),
+    humidity: t('Humidity'),
+    window: t('Window'),
+    windowTilt: t('Window'),
+    door: t('Door'),
+    motion: t('Motion'),
+    lock: t('Lock'),
+    media: t('Media'),
+    electricity: t('Energy'),
+    info: t('Info'),
 };
 
 /** Schaltbarer boolean-State (Hauptaktion bei Tap) */
@@ -112,17 +113,20 @@ export function formatValue(ref: SvStateRef | undefined, value: SvStateValue | n
         return ref.states[String(val)];
     }
     if (typeof val === 'boolean') {
-        if (['window', 'windowTilt', 'door'].some(t => ref.role?.includes(t)) || ref.role?.startsWith('sensor.')) {
-            return val ? 'offen' : 'geschlossen';
+        if (
+            ['window', 'windowTilt', 'door'].some(kind => ref.role?.includes(kind)) ||
+            ref.role?.startsWith('sensor.')
+        ) {
+            return val ? t('open') : t('closed');
         }
-        return val ? 'an' : 'aus';
+        return val ? t('on') : t('off');
     }
     if (typeof val === 'number' && ref.unit === 'Wh' && Math.abs(val) >= 1000) {
-        return `${(Math.round(val / 100) / 10).toLocaleString('de-DE')} kWh`;
+        return `${(Math.round(val / 100) / 10).toLocaleString(locale())} kWh`;
     }
     if (typeof val === 'number') {
         const rounded = Math.round(val * 10) / 10;
-        return `${rounded.toLocaleString('de-DE')}${ref.unit ? ` ${ref.unit}` : ''}`;
+        return `${rounded.toLocaleString(locale())}${ref.unit ? ` ${ref.unit}` : ''}`;
     }
     return String(val);
 }
@@ -134,7 +138,7 @@ export function warnings(device: SvDevice, states: Record<string, SvStateValue |
         // Verbindungs-Indikator: false = nicht erreichbar
         if (s.name === 'CONNECTED') {
             if (states[s.id]?.val === false) {
-                result.push('nicht erreichbar');
+                result.push(t('not reachable'));
             }
             continue;
         }
@@ -142,11 +146,11 @@ export function warnings(device: SvDevice, states: Record<string, SvStateValue |
             continue;
         }
         if (/UNREACH/i.test(s.name)) {
-            result.push('nicht erreichbar');
+            result.push(t('not reachable'));
         } else if (/LOWBAT|BATTERY/i.test(s.name)) {
-            result.push('Batterie schwach');
+            result.push(t('Battery low'));
         } else if (/ERROR|MAINTAIN/i.test(s.name)) {
-            result.push('Störung');
+            result.push(t('Fault'));
         }
     }
     return result;
@@ -156,23 +160,28 @@ export function warnings(device: SvDevice, states: Record<string, SvStateValue |
 export const DEVICE_GROUPS: { key: string; label: string; icon: string; types: string[] }[] = [
     {
         key: 'light',
-        label: 'Licht',
+        label: t('Light'),
         icon: '💡',
         types: ['light', 'dimmer', 'ct', 'hue', 'rgb', 'rgbSingle', 'rgbwSingle', 'cie'],
     },
-    { key: 'shading', label: 'Beschattung', icon: '🪟', types: ['blind', 'blindButtons'] },
+    { key: 'shading', label: t('Shading'), icon: '🪟', types: ['blind', 'blindButtons'] },
     {
         key: 'climate',
-        label: 'Heizung & Klima',
+        label: t('Heating & climate'),
         icon: '🌡️',
         types: ['thermostat', 'airCondition', 'fan', 'airPurifier'],
     },
-    { key: 'openings', label: 'Fenster & Türen', icon: '🚪', types: ['window', 'windowTilt', 'door', 'lock', 'gate'] },
-    { key: 'power', label: 'Steckdosen & Schalter', icon: '🔌', types: ['socket', 'button', 'electricity'] },
-    { key: 'media', label: 'Medien', icon: '🎵', types: ['media', 'mediaPlayer', 'tv', 'volume', 'volumeGroup'] },
+    {
+        key: 'openings',
+        label: t('Windows & doors'),
+        icon: '🚪',
+        types: ['window', 'windowTilt', 'door', 'lock', 'gate'],
+    },
+    { key: 'power', label: t('Sockets & switches'), icon: '🔌', types: ['socket', 'button', 'electricity'] },
+    { key: 'media', label: t('Media'), icon: '🎵', types: ['media', 'mediaPlayer', 'tv', 'volume', 'volumeGroup'] },
     {
         key: 'sensors',
-        label: 'Sensoren',
+        label: t('Sensors'),
         icon: '📟',
         types: [
             'temperature',
@@ -191,7 +200,7 @@ export const DEVICE_GROUPS: { key: string; label: string; icon: string; types: s
     },
 ];
 
-const OTHER_GROUP = { key: 'other', label: 'Sonstiges', icon: '•', types: [] as string[] };
+const OTHER_GROUP = { key: 'other', label: t('Other'), icon: '•', types: [] as string[] };
 
 /** Geräte nach Gruppe aufteilen; Reihenfolge innerhalb der Gruppe bleibt erhalten, leere Gruppen entfallen */
 export function groupByType(devices: SvDevice[]): { group: (typeof DEVICE_GROUPS)[number]; devices: SvDevice[] }[] {
@@ -218,7 +227,7 @@ export function groupByRoom(devices: SvDevice[], rooms: SvRoom[]): RoomGroup[] {
     const known = new Set(rooms.map(r => r.id));
     const without = devices.filter(d => !d.roomId || !known.has(d.roomId));
     if (without.length) {
-        result.push({ roomId: null, name: 'Ohne Raum', devices: without });
+        result.push({ roomId: null, name: t('Without room'), devices: without });
     }
     return result;
 }

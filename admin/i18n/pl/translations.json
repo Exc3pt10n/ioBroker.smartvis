@@ -3,11 +3,15 @@
     "IP address": "Adres IP",
     "Port": "Port",
     "Automatic discovery": "Automatyczne wykrywanie",
-    "Language for device names": "Język nazw urządzeń",
     "Rediscovery after object change (seconds)": "Ponowne wykrywanie po zmianie obiektów (sekundy)",
     "Ignored adapters (comma-separated)": "Ignorowane adaptery (oddzielone przecinkami)",
     "These adapters are skipped during discovery": "Te adaptery są pomijane podczas wykrywania",
     "User interface": "Interfejs",
     "Allow edit mode": "Zezwól na tryb edycji",
-    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "Zmiana nazw, ukrywanie, przenoszenie i ulubione w aplikacji. Dopóki nie ma logowania, każdy w sieci może zapisywać zmiany."
+    "Rename, hide, move and mark favourites in the app. As long as there is no login, anyone on the network can save customisations.": "Zmiana nazw, ukrywanie, przenoszenie i ulubione w aplikacji. Dopóki nie ma logowania, każdy w sieci może zapisywać zmiany.",
+    "Language": "Język",
+    "User interface and generated device names": "Interfejs i generowane nazwy urządzeń",
+    "System language": "Język systemu",
+    "Deutsch": "Deutsch",
+    "English": "English"
 }

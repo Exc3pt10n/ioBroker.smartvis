@@ -1,3 +1,4 @@
+import { t } from '../../../src/shared/i18n';
 import type { SvBattery, SvRoom, SvStateValue } from '../../../src/shared/protocol';
 import { batteryLevel, isBatteryLow } from '../battery';
 import { useOpenDetail } from '../detail';
@@ -33,7 +34,7 @@ export function BatteryList({
                         <span className="battery__name">
                             {b.name}
                             <span className="battery__room">
-                                {room || 'ohne Raum'}
+                                {room || t('without room')}
                                 {b.batteryType && (
                                     <>
                                         {' · '}
@@ -54,12 +55,12 @@ export function BatteryList({
                                             style={{ width: `${Math.min(100, Math.max(0, level))}%` }}
                                         />
                                     </span>
-                                    {Math.round(level)} %{low && <span className="sr-only"> – schwach</span>}
+                                    {Math.round(level)} %{low && <span className="sr-only"> – {t('low')}</span>}
                                 </>
                             ) : low ? (
-                                'schwach'
+                                t('low')
                             ) : (
-                                'in Ordnung'
+                                t('OK')
                             )}
                         </span>
                     </>

@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "smartvis",
-        "version": "0.16.1",
+        "version": "0.17.0",
         "news": {
+            "0.17.0": {
+                "en": "User interface in English and German (follows the ioBroker system language, adjustable in the instance settings); log messages and object names in English; WebSocket only accepts connections from SmartVis itself; documentation for developers in DEVELOPMENT.md",
+                "de": "Oberfläche auf Englisch und Deutsch (folgt der Systemsprache von ioBroker, in den Instanz-Einstellungen änderbar); Log-Meldungen und Objektnamen auf Englisch; WebSocket nimmt nur Verbindungen von SmartVis selbst an; Hinweise für Entwickler in DEVELOPMENT.md",
+                "ru": "Интерфейс на английском и немецком языках (следует языку системы ioBroker, настраивается в экземпляре); сообщения журнала и имена объектов на английском; WebSocket принимает только соединения от самого SmartVis; документация для разработчиков в DEVELOPMENT.md",
+                "pt": "Interface em inglês e alemão (segue o idioma do sistema ioBroker, ajustável nas definições da instância); mensagens de registo e nomes de objetos em inglês; o WebSocket só aceita ligações do próprio SmartVis; documentação para programadores em DEVELOPMENT.md",
+                "nl": "Gebruikersinterface in het Engels en Duits (volgt de systeemtaal van ioBroker, instelbaar in de instantie); logberichten en objectnamen in het Engels; WebSocket accepteert alleen verbindingen van SmartVis zelf; documentatie voor ontwikkelaars in DEVELOPMENT.md",
+                "fr": "Interface en anglais et en allemand (suit la langue du système ioBroker, réglable dans l'instance) ; messages du journal et noms d'objets en anglais ; le WebSocket n'accepte que les connexions de SmartVis lui-même ; documentation pour les développeurs dans DEVELOPMENT.md",
+                "it": "Interfaccia in inglese e tedesco (segue la lingua di sistema di ioBroker, modificabile nell'istanza); messaggi di log e nomi degli oggetti in inglese; il WebSocket accetta solo connessioni da SmartVis stesso; documentazione per sviluppatori in DEVELOPMENT.md",
+                "es": "Interfaz en inglés y alemán (sigue el idioma del sistema de ioBroker, ajustable en la instancia); mensajes de registro y nombres de objetos en inglés; el WebSocket solo acepta conexiones del propio SmartVis; documentación para desarrolladores en DEVELOPMENT.md",
+                "pl": "Interfejs w języku angielskim i niemieckim (zgodnie z językiem systemu ioBroker, do zmiany w instancji); komunikaty dziennika i nazwy obiektów po angielsku; WebSocket przyjmuje tylko połączenia z samego SmartVis; dokumentacja dla programistów w DEVELOPMENT.md",
+                "uk": "Інтерфейс англійською та німецькою (відповідає мові системи ioBroker, змінюється в екземплярі); повідомлення журналу та назви об'єктів англійською; WebSocket приймає лише з'єднання від самого SmartVis; документація для розробників у DEVELOPMENT.md",
+                "zh-cn": "界面支持英语和德语（跟随 ioBroker 系统语言，可在实例设置中更改）；日志消息和对象名称为英语；WebSocket 仅接受来自 SmartVis 本身的连接；开发者文档见 DEVELOPMENT.md"
+            },
             "0.16.1": {
                 "en": "Release notes only list versions available on npm; versions are now tagged by a separate workflow run as required by the ioBroker repository",
                 "de": "Versionshinweise nur noch für Versionen, die es auf npm gibt; Versions-Tags lösen jetzt einen eigenen Prüflauf aus, wie vom ioBroker-Repository verlangt",
@@ -119,7 +132,7 @@
     "native": {
         "port": 8099,
         "bind": "0.0.0.0",
-        "language": "de",
+        "language": "",
         "ignoreAdapters": "system,admin,discovery,backitup,history,influxdb,sql,web,vis,vis-2,material,iot",
         "rediscoverDelay": 10,
         "allowEdit": true
@@ -130,7 +143,19 @@
             "_id": "info",
             "type": "channel",
             "common": {
-                "name": "Information"
+                "name": {
+                    "en": "Information",
+                    "de": "Information",
+                    "ru": "Информация",
+                    "pt": "Informação",
+                    "nl": "Informatie",
+                    "fr": "Information",
+                    "it": "Informazioni",
+                    "es": "Información",
+                    "pl": "Informacje",
+                    "uk": "Інформація",
+                    "zh-cn": "信息"
+                }
             },
             "native": {}
         },
@@ -139,7 +164,19 @@
             "type": "state",
             "common": {
                 "role": "value",
-                "name": "Erkannte Geräte",
+                "name": {
+                    "en": "Detected devices",
+                    "de": "Erkannte Geräte",
+                    "ru": "Обнаруженные устройства",
+                    "pt": "Dispositivos detetados",
+                    "nl": "Gedetecteerde apparaten",
+                    "fr": "Appareils détectés",
+                    "it": "Dispositivi rilevati",
+                    "es": "Dispositivos detectados",
+                    "pl": "Wykryte urządzenia",
+                    "uk": "Виявлені пристрої",
+                    "zh-cn": "检测到的设备"
+                },
                 "type": "number",
                 "read": true,
                 "write": false,
@@ -152,7 +189,19 @@
             "type": "state",
             "common": {
                 "role": "value",
-                "name": "Verbundene Clients",
+                "name": {
+                    "en": "Connected clients",
+                    "de": "Verbundene Clients",
+                    "ru": "Подключённые клиенты",
+                    "pt": "Clientes ligados",
+                    "nl": "Verbonden clients",
+                    "fr": "Clients connectés",
+                    "it": "Client connessi",
+                    "es": "Clientes conectados",
+                    "pl": "Połączeni klienci",
+                    "uk": "Підключені клієнти",
+                    "zh-cn": "已连接的客户端"
+                },
                 "type": "number",
                 "read": true,
                 "write": false,

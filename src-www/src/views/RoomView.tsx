@@ -1,3 +1,4 @@
+import { locale, t } from '../../../src/shared/i18n';
 import { DeviceTile } from '../components/DeviceTile';
 import { SortableGrid } from '../components/SortableGrid';
 import { CustomSections, type SectionDef } from '../components/CustomSections';
@@ -16,7 +17,7 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
     const { model, states } = useConnection();
     const { editing } = useEditing();
     if (!model) {
-        return <p className="empty">Lade …</p>;
+        return <p className="empty">{t('Loading …')}</p>;
     }
     const isNone = roomId === '_none';
     const room = model.rooms.find(r => r.id === roomId);
@@ -29,7 +30,7 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
     const shownIds = new Set(devices.filter(d => !d.hidden).map(d => d.id));
     const lamps = devices.filter(d => !d.hidden && isLight(d) && !isCoveredGroup(d, shownIds));
     const anyOn = lamps.some(d => isActive(d, states));
-    const roomLabel = isNone ? 'Ohne Raum' : room?.name || 'Unbekannter Raum';
+    const roomLabel = isNone ? t('Without room') : room?.name || t('Unknown room');
     // Szenen: Lampen des Raums unabhängig von ausgeblendeten Kacheln
     const sceneGroups = isNone ? [] : room ? scenesForRoom(model, roomDevices(room, model.devices)) : [];
     // Zone: aus welchen Räumen ihre Lampen stammen
@@ -69,14 +70,14 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
                             <button
                                 type="button"
                                 className="pillbtn"
-                                aria-label={`${roomLabel}: alle Lichter ${anyOn ? 'ausschalten' : 'einschalten'}`}
+                                aria-label={`${roomLabel}: ${anyOn ? t('switch all lights off') : t('switch all lights on')}`}
                                 onClick={() => switchLights(lamps, !anyOn, states, roomLabel)}
                             >
                                 <Icon
                                     name="light"
                                     size={14}
                                 />{' '}
-                                {anyOn ? 'Alle aus' : 'Alle an'}
+                                {anyOn ? t('All off') : t('All on')}
                             </button>
                         )}
                     </div>
@@ -100,7 +101,7 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
             ? [
                   {
                       key: 'scenes',
-                      label: 'Szenen',
+                      label: t('Scenes'),
                       node:
                           sceneGroups.length > 0 ? (
                               <ScenePanel
@@ -116,7 +117,7 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
         ...deviceSections,
         {
             key: 'cameras',
-            label: 'Kameras',
+            label: t('Cameras'),
             node: cameras.length ? (
                 <section
                     className="group"
@@ -127,7 +128,7 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
                             id="group-cameras"
                             className="subtitle"
                         >
-                            <span aria-hidden="true">📷</span> Kameras
+                            <span aria-hidden="true">📷</span> {t('Cameras')}
                             <span className="group__count">{cameras.length}</span>
                         </h2>
                     </div>
@@ -144,7 +145,7 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
                     type="button"
                     className="iconbtn"
                     onClick={onBack}
-                    aria-label="Zurück"
+                    aria-label={t('Back')}
                 >
                     <Icon name="back" />
                 </button>
@@ -152,10 +153,14 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
                     <h1 className="title">{roomLabel}</h1>
                     {(zoneRooms.length > 0 || status.temperature !== undefined || status.humidity !== undefined) && (
                         <p className="titlebar__status">
-                            {zoneRooms.length > 0 && <span>🔆 Zone · {zoneRooms.join(', ')}</span>}
+                            {zoneRooms.length > 0 && (
+                                <span>
+                                    🔆 {t('Zone')} · {zoneRooms.join(', ')}
+                                </span>
+                            )}
                             {status.temperature !== undefined && (
                                 <span>
-                                    🌡️ {status.temperature.toLocaleString('de-DE', { maximumFractionDigits: 1 })}°
+                                    🌡️ {status.temperature.toLocaleString(locale(), { maximumFractionDigits: 1 })}°
                                 </span>
                             )}
                             {status.humidity !== undefined && <span>💧 {Math.round(status.humidity)} %</span>}
@@ -165,9 +170,13 @@ export function RoomView({ roomId, onBack }: { roomId: string; onBack: () => voi
                 <span className="titlebar__spacer" />
                 <EditButton />
             </div>
-            <EditBanner text="Kachel antippen zum Umbenennen, Verschieben oder Ausblenden · Kacheln und Bereiche am Griff ⠿ ziehen · Bereichs-Anordnung gilt für alle Räume" />
+            <EditBanner
+                text={t(
+                    'Tap a tile to rename, move or hide it · drag tiles and sections by the handle ⠿ · the order of sections applies to all rooms',
+                )}
+            />
             {devices.length === 0 && cameras.length === 0 ? (
-                <p className="empty">Keine Geräte in diesem Raum.</p>
+                <p className="empty">{t('No devices in this room.')}</p>
             ) : (
                 <CustomSections
                     view="room"

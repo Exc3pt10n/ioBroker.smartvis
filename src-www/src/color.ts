@@ -1,3 +1,4 @@
+import { t } from '../../src/shared/i18n';
 /** Farbumrechnung für die Lichtfarbe (Farbton 0–360°, Sättigung/Helligkeit 0–1) */
 
 export function hsvToHex(h: number, s: number, v = 1): string {
@@ -39,12 +40,12 @@ export function rgbToHs(r: number, g: number, b: number): { h: number; s: number
 
 /** Farbfelder für die schnelle Auswahl (Farbton in Grad) */
 export const COLOR_SWATCHES: { name: string; h: number }[] = [
-    { name: 'Rot', h: 0 },
-    { name: 'Orange', h: 28 },
-    { name: 'Gelb', h: 52 },
-    { name: 'Grün', h: 120 },
-    { name: 'Türkis', h: 175 },
-    { name: 'Blau', h: 225 },
-    { name: 'Lila', h: 275 },
-    { name: 'Pink', h: 320 },
+    { name: t('Red'), h: 0 },
+    { name: t('Orange'), h: 28 },
+    { name: t('Yellow'), h: 52 },
+    { name: t('Green'), h: 120 },
+    { name: t('Turquoise'), h: 175 },
+    { name: t('Blue'), h: 225 },
+    { name: t('Purple'), h: 275 },
+    { name: t('Pink'), h: 320 },
 ];
