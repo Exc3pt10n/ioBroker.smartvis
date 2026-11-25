@@ -243,3 +243,14 @@ export function isPlaying(states: Record<string, SvStateValue | null>, ref: SvSt
     }
     return typeof v === 'string' && /^(play|playing|1)$/i.test(v);
 }
+
+/** Kennung eines Werts (z. B. Betriebsart "HEAT"), auch wenn der Adapter eine Zahl liefert (toshiba-ac ab 0.2.0) */
+export function stateCode(ref: SvStateRef | undefined, value: string | number | boolean | null | undefined): string {
+    const raw = value === null || value === undefined ? '' : String(value);
+    return ref?.codes?.[raw] ?? raw;
+}
+
+/** Wert aus einer Werteliste (Schlüssel als Text) im Datentyp des States senden */
+export function listValue(ref: SvStateRef, key: string): string | number {
+    return ref.type === 'number' && key.trim() !== '' && Number.isFinite(Number(key)) ? Number(key) : key;
+}

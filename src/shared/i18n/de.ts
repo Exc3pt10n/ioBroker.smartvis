@@ -281,6 +281,7 @@ export const DE: Record<string, string> = {
     'Frost alarm': 'Frostalarm',
     'full in about {time}': 'voll in ca. {time}',
     'full width': 'volle Breite',
+    Functions: 'Funktionen',
     Generated: 'Erzeugt',
     'Generated compared to the forecast': 'Erzeugt im Vergleich zur Prognose',
     'Generated: {value} of {expected} expected ({percent} %)': 'Erzeugt: {value} von {expected} erwartet ({percent} %)',

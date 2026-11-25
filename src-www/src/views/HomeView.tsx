@@ -8,6 +8,7 @@ import {
     isActive,
     isCoveredGroup,
     isPlaying,
+    stateCode,
     switchState,
     valueState,
     warnings,
@@ -111,7 +112,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
     const climateModes = new Set(
         climateOn.map(d => {
             const mode = d.states.find(st => st.name === 'MODE');
-            return mode ? String(states[mode.id]?.val ?? '') : '';
+            return mode ? stateCode(mode, states[mode.id]?.val) : '';
         }),
     );
     const climateIcon =

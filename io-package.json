@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "smartvis",
-        "version": "0.17.0",
+        "version": "0.17.1",
         "news": {
+            "0.17.1": {
+                "en": "Toshiba air conditioners: operating mode also works with toshiba-ac 0.2.0 and later (mode as number); missing translation in the climate functions",
+                "de": "Toshiba-Klimageräte: Betriebsart funktioniert auch mit toshiba-ac ab 0.2.0 (Betriebsart als Zahl); fehlende Übersetzung bei den Klima-Funktionen",
+                "ru": "Кондиционеры Toshiba: режим работы работает и с toshiba-ac 0.2.0 и новее (режим в виде числа); недостающий перевод в функциях климата",
+                "pt": "Ar condicionado Toshiba: o modo de funcionamento também funciona com toshiba-ac 0.2.0 ou superior (modo como número); tradução em falta nas funções de climatização",
+                "nl": "Toshiba-airco's: bedrijfsmodus werkt ook met toshiba-ac 0.2.0 en later (modus als getal); ontbrekende vertaling bij de klimaatfuncties",
+                "fr": "Climatiseurs Toshiba : le mode de fonctionnement marche aussi avec toshiba-ac 0.2.0 et plus (mode numérique) ; traduction manquante dans les fonctions de climatisation",
+                "it": "Climatizzatori Toshiba: la modalità di funzionamento funziona anche con toshiba-ac 0.2.0 e successivi (modalità numerica); traduzione mancante nelle funzioni del clima",
+                "es": "Aires acondicionados Toshiba: el modo de funcionamiento también funciona con toshiba-ac 0.2.0 o posterior (modo como número); traducción que faltaba en las funciones de climatización",
+                "pl": "Klimatyzatory Toshiba: tryb pracy działa także z toshiba-ac 0.2.0 i nowszym (tryb jako liczba); brakujące tłumaczenie w funkcjach klimatyzacji",
+                "uk": "Кондиціонери Toshiba: режим роботи працює і з toshiba-ac 0.2.0 та новіше (режим як число); відсутній переклад у функціях клімату",
+                "zh-cn": "东芝空调：运行模式也适用于 toshiba-ac 0.2.0 及更高版本（模式为数字）；补充了空调功能中缺失的翻译"
+            },
             "0.17.0": {
                 "en": "User interface in English and German (follows the ioBroker system language, adjustable in the instance settings); log messages and object names in English; WebSocket only accepts connections from SmartVis itself; documentation for developers in DEVELOPMENT.md",
                 "de": "Oberfläche auf Englisch und Deutsch (folgt der Systemsprache von ioBroker, in den Instanz-Einstellungen änderbar); Log-Meldungen und Objektnamen auf Englisch; WebSocket nimmt nur Verbindungen von SmartVis selbst an; Hinweise für Entwickler in DEVELOPMENT.md",

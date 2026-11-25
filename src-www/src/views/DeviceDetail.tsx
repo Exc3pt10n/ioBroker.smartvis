@@ -9,7 +9,7 @@ import { Sheet } from '../components/Sheet';
 import { Slider } from '../components/Slider';
 import { Toggle } from '../components/Toggle';
 import { connection, useConnection } from '../connection';
-import { TYPE_LABELS, formatValue, isPlaying, valueState, warnings } from '../device';
+import { TYPE_LABELS, formatValue, isPlaying, listValue, stateCode, valueState, warnings } from '../device';
 import { scenesForDevice } from '../scenes';
 import { autoStateInfo, shutterForDevice } from '../shutters';
 
@@ -954,7 +954,7 @@ function AcFunctions({ refs, mode, states }: { refs: AcRefs; mode: string; state
 
     return (
         <div className="detail__controls ac__functions">
-            <h3 className="ac__functions-title">Funktionen</h3>
+            <h3 className="ac__functions-title">{t('Functions')}</h3>
             {specialOptions.length > 0 && special && (
                 <>
                     <div
@@ -1087,6 +1087,8 @@ function AcControls({ refs, states }: { refs: AcRefs; states: States }): React.J
     const { power, mode, set, actual, speed, swing } = refs;
     const on = power ? states[power.id]?.val === true : true;
     const current = mode ? String(states[mode.id]?.val ?? '') : '';
+    // Kennung der Betriebsart (HEAT, COOL …) – auch bei toshiba-ac ab 0.2.0, das Zahlen liefert
+    const currentCode = mode ? stateCode(mode, states[mode.id]?.val) : '';
     return (
         <>
             <div className="detail__controls">
@@ -1109,14 +1111,14 @@ function AcControls({ refs, states }: { refs: AcRefs; states: States }): React.J
                                 role="radio"
                                 aria-checked={current === value}
                                 className={current === value ? 'segmented--active' : ''}
-                                onClick={() => connection.setState(mode.id, value)}
+                                onClick={() => connection.setState(mode.id, listValue(mode, value))}
                             >
-                                {AC_MODE_ICONS[value] && (
+                                {AC_MODE_ICONS[stateCode(mode, value)] && (
                                     <span
                                         className="ac__mode-icon"
                                         aria-hidden="true"
                                     >
-                                        {AC_MODE_ICONS[value]}
+                                        {AC_MODE_ICONS[stateCode(mode, value)]}
                                     </span>
                                 )}
                                 <span>{label}</span>
@@ -1148,7 +1150,7 @@ function AcControls({ refs, states }: { refs: AcRefs; states: States }): React.J
             )}
             <AcFunctions
                 refs={refs}
-                mode={current}
+                mode={currentCode}
                 states={states}
             />
         </>
