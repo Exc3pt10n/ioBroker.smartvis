@@ -63,6 +63,11 @@ See [DEVELOPMENT.md](DEVELOPMENT.md).
     ### **WORK IN PROGRESS**
 -->
 
+### 0.17.1 (2026-11-25)
+
+- (Exc3pt10n) Toshiba air conditioners: operating mode, its icons, the fireplace mode and the climate icons on the home page and room cards also work with toshiba-ac 0.2.0 and later, which reports the mode as a number (`1`–`5`, `FAN_ONLY`); older versions keep working
+- (Exc3pt10n) Missing translation of the heading "Functions" in the climate view
+
 ### 0.17.0 (2026-11-24)
 
 - (Exc3pt10n) User interface in English and German: texts in the app, generated device names, camera, wallbox and climate settings follow the ioBroker system language (setting "Language" in the instance, German or otherwise English); numbers and dates are formatted accordingly

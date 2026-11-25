@@ -55,6 +55,11 @@ export interface SvStateRef {
     step?: number;
     /** Werteliste: Wert → Beschriftung (z. B. Betriebsart) */
     states?: Record<string, string>;
+    /**
+     * Wert → feste Kennung, wenn der Adapter Zahlen statt Namen liefert (z. B. toshiba-ac ab 0.2.0: Betriebsart
+     * 3 → "HEAT"); ohne Eintrag ist der Wert selbst die Kennung
+     */
+    codes?: Record<string, string>;
     write: boolean;
     /** Nur Anzeige-Indikator (Batterie, Erreichbarkeit …) */
     indicator?: boolean;

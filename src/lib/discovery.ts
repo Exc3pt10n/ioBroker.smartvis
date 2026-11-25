@@ -561,6 +561,7 @@ function toDevice(
             max: common.max,
             ...(typeof common.step === 'number' && common.step > 0 && { step: common.step }),
             ...(labels && { states: labels }),
+            ...('codes' in s && s.codes && { codes: s.codes }),
             write: common.write === true,
             indicator: s.indicator || undefined,
         });

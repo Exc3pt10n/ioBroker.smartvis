@@ -1,6 +1,6 @@
 import { t } from '../../src/shared/i18n';
 import type { SvDevice, SvRoom, SvStateValue } from '../../src/shared/protocol';
-import { isActive, isCoveredGroup, isPlaying, tapAction, valueState, warnings } from './device';
+import { isActive, isCoveredGroup, isPlaying, stateCode, tapAction, valueState, warnings } from './device';
 
 type States = Record<string, SvStateValue | null>;
 
@@ -145,7 +145,7 @@ export function roomStatus(devices: SvDevice[], states: States, shownIds?: Set<s
         } else if (d.type === 'airCondition') {
             if (isActive(d, states)) {
                 const mode = d.states.find(s => s.name === 'MODE');
-                climateModes.add(mode ? String(states[mode.id]?.val ?? '') : '');
+                climateModes.add(mode ? stateCode(mode, states[mode.id]?.val) : '');
             }
         } else if (d.type === 'media' || d.type === 'mediaPlayer') {
             if (

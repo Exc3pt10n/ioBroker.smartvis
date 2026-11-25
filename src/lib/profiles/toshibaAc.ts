@@ -4,7 +4,13 @@ import type { ObjectMap } from './types';
 /** Zustand einer Geräte-Erkennung (wie ein type-detector-Treffer, mit optionalen Beschriftungen) */
 export interface DeviceControl {
     type: string;
-    states: { name: string; id: string; indicator?: boolean; labels?: Record<string, string> }[];
+    states: {
+        name: string;
+        id: string;
+        indicator?: boolean;
+        labels?: Record<string, string>;
+        codes?: Record<string, string>;
+    }[];
 }
 
 /** Beschriftungen der Wertelisten (Schlüssel wie im Adapter; englisch, übersetzt beim Erzeugen) */
@@ -45,6 +51,18 @@ const LABELS: Record<string, Record<string, string>> = {
     powerSelection: { POWER_50: '50 %', POWER_75: '75 %', POWER_100: '100 %' },
 };
 
+/** Andere Namen derselben Werte (toshiba-ac ab 0.2.0: "FAN_ONLY" statt "FAN") */
+const ALIASES: Record<string, string> = { FAN_ONLY: 'FAN' };
+
+/**
+ * Kennung eines Listen-Eintrags: bisher der Wert selbst ("HEAT"); ab toshiba-ac 0.2.0 ist die Betriebsart eine
+ * Zahl (3) und der Name steht in der Beschriftung ("HEAT")
+ */
+function codeOf(value: string, label: unknown): string {
+    const code = /^-?\d+$/.test(value) && typeof label === 'string' && label ? label.toUpperCase() : value;
+    return ALIASES[code] ?? code;
+}
+
 /** State-Name im Adapter → Rollen-Name in SmartVis (wie type-detector, plus eigene) */
 const STATES: [string, string, boolean?][] = [
     ['power', 'POWER'],
@@ -81,10 +99,21 @@ export function toshibaAcControl(id: string, obj: ioBroker.Object, objects: Obje
             common.states && typeof common.states === 'object' && !Array.isArray(common.states)
                 ? common.states
                 : undefined;
+        const entries = own ? Object.entries(own).map(([k, v]) => [k, v, codeOf(k, v)] as const) : [];
         const labels = own
-            ? Object.fromEntries(Object.entries(own).map(([k, v]) => [k, t(LABELS[key]?.[k] || String(v))]))
+            ? Object.fromEntries(entries.map(([k, v, code]) => [k, t(LABELS[key]?.[code] || String(v))]))
             : undefined;
-        states.push({ name, id: sid, ...(indicator && { indicator }), ...(labels && { labels }) });
+        // Nur nötig, wenn Werte und Kennungen auseinanderfallen (Zahlen)
+        const codes = entries.some(([k, , code]) => k !== code)
+            ? Object.fromEntries(entries.map(([k, , code]) => [k, code]))
+            : undefined;
+        states.push({
+            name,
+            id: sid,
+            ...(indicator && { indicator }),
+            ...(labels && { labels }),
+            ...(codes && { codes }),
+        });
     }
     // Verbindung zur Toshiba-Cloud (gilt für alle Geräte der Instanz)
     const instance = id.split('.', 2).join('.');

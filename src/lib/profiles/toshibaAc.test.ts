@@ -55,3 +55,34 @@ describe('profile: toshiba-ac', () => {
         expect(result.writableIds.has('toshiba-ac.0.info.connection')).to.equal(false);
     });
 });
+
+describe('profile: toshiba-ac ab 0.2.0 (Betriebsart als Zahl)', () => {
+    // Gleicher Objektbaum, nur "mode" wie in toshiba-ac 0.2.0: Zahl mit Werteliste, FAN_ONLY statt FAN
+    const numeric = structuredClone(objects);
+    for (const id of Object.keys(numeric).filter(k => k.endsWith('.mode'))) {
+        const common = numeric[id].common as ioBroker.StateCommon;
+        common.type = 'number';
+        common.role = 'level.mode.airconditioner';
+        common.states = { 1: 'AUTO', 2: 'COOL', 3: 'HEAT', 4: 'DRY', 5: 'FAN_ONLY' };
+    }
+    const devices = discover(numeric, { language: 'de', ignoreAdapters: [] }).model.devices;
+    const mode = devices.find(d => d.id === 'toshiba-ac.0.Wohnzimmer')!.states.find(s => s.name === 'MODE')!;
+
+    it('beschriftet die Zahlen auf Deutsch und kennt ihre Namen', () => {
+        expect(mode.type).to.equal('number');
+        expect(mode.states).to.deep.equal({
+            1: 'Automatik',
+            2: 'Kühlen',
+            3: 'Heizen',
+            4: 'Entfeuchten',
+            5: 'Lüften',
+        });
+        expect(mode.codes).to.deep.equal({ 1: 'AUTO', 2: 'COOL', 3: 'HEAT', 4: 'DRY', 5: 'FAN' });
+    });
+
+    it('braucht bei Namen als Werte (vor 0.2.0) keine Zuordnung', () => {
+        const old = discover(objects, { language: 'de', ignoreAdapters: [] }).model.devices;
+        const oldMode = old.find(d => d.id === 'toshiba-ac.0.Wohnzimmer')!.states.find(s => s.name === 'MODE')!;
+        expect(oldMode.codes).to.equal(undefined);
+    });
+});
