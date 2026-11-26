@@ -8,7 +8,7 @@ Self-configuring, **mobile-first** visualization for ioBroker.
 SmartVis detects devices and rooms automatically and shows them as an installable web app (PWA) – on the phone as well as in the browser – without building widgets by hand.
 
 > **Status:** version 0.x – in daily use and fully usable. Until 1.0, settings and the storage format may still change; such changes are marked **Breaking** in the [changelog](#changelog) and are migrated automatically where possible.
-> Detection is tuned on an installation with Homematic (IP), Philips Hue (`hue` and `hue-v2`), QCells Q.HOME, KEBA, Toshiba air conditioners and Echo. Shelly, Sonoff (Tasmota), Tuya, FRITZ!DECT, Zigbee, zigbee2mqtt and deCONZ have their own rules, developed and tested against the object structures from the source code of these adapters (no feedback from real installations yet). On other systems devices may be missing or superfluous – they can be hidden in edit mode. **More → Detection** shows which channels got no tile and saves an anonymous report (adapter, data point keys and roles only); attached to an issue it helps to improve detection.
+> Detection is tuned on an installation with Homematic (IP), Philips Hue (`hue`, `hue-v2` and `philips-hue`), QCells Q.HOME, KEBA, Toshiba air conditioners and Echo. Shelly, Sonoff (Tasmota), Tuya, FRITZ!DECT, Zigbee, zigbee2mqtt and deCONZ have their own rules, developed and tested against the object structures from the source code of these adapters (no feedback from real installations yet). On other systems devices may be missing or superfluous – they can be hidden in edit mode. **More → Detection** shows which channels got no tile and saves an anonymous report (adapter, data point keys and roles only); attached to an issue it helps to improve detection.
 >
 > The user interface is available in **English and German** and follows the ioBroker system language (can be changed in the instance settings). A detailed German description is in [docs/de/README.md](docs/de/README.md).
 
@@ -17,7 +17,7 @@ SmartVis detects devices and rooms automatically and shows them as an installabl
 ## Features
 
 - **Automatic device detection** via [`@iobroker/type-detector`](https://github.com/ioBroker/ioBroker.type-detector), plus adapter-specific rules against tile noise (maintenance channels, buttons, helper data points …)
-- **Rooms** from several sources, rooms with the same name are merged: `enum.rooms` (e.g. synchronized from the Homematic CCU), Hue rooms (`hue` / `hue-v2`) and device names ("Wohnzimmer Deckenlicht" → room *Wohnzimmer*, device *Deckenlicht*); rediscovery after object changes
+- **Rooms** from several sources, rooms with the same name are merged: `enum.rooms` (e.g. synchronized from the Homematic CCU), Hue rooms (`hue` / `hue-v2` / `philips-hue`) and device names ("Wohnzimmer Deckenlicht" → room *Wohnzimmer*, device *Deckenlicht*); rediscovery after object changes
 - **Home page**: key figures (PV, battery, consumption, lights on, open windows, security mode …, warnings first), weather with forecast and official DWD warnings, favourites, and status cards per topic (lights on per room with "off", climate, open windows & doors, playing media, faults, weak batteries); on the desktop a dashboard with columns
 - **Rooms** with live status (temperature, lights, open windows …) and devices grouped by type; Hue zones
 - **Detail view** per device: light (on/off, brightness, colour temperature, colour with "white | colour", swatches, hue and saturation), blind (position, up/stop/down, shuttercontrol automation), thermostat, air conditioner, media, sensors with their current value, all other values; Hue scenes and smart scenes; undo restores an active Hue scene
@@ -28,7 +28,7 @@ SmartVis detects devices and rooms automatically and shows them as an installabl
 - **Weather**: local weather station (HmIP-SWO-*, HM-WDS100, HmIP-SLO light sensors) or `openweathermap`, `weatherunderground`, `daswetter`; official warnings from `dwd`
 - **Security**: security mode of all stations, alarm, smoke/water/CO detectors, windows & doors, motion sensors; eufy cameras via [`eufy-next`](https://github.com/Exc3pt10n/ioBroker.eufy-next) (recommended) or `eusec` with event picture, detection (person, motion, pet, sound, crying, vehicle, doorbell), **livestream with sound** (go2rtc), light, pan/tilt and camera settings
 - **More**: ioBroker status (hosts with CPU, memory, disk; adapter instances with problems first), battery overview with battery type from the device model (e.g. "2× AAA", "CR2450"; table from the [Battery Notes](https://github.com/andrew-codechimp/HA-Battery-Notes) library, MIT), detection diagnosis with anonymous report
-- **Further device adapters** with corrected roles and readable names: `shelly`, `sonoff` (Tasmota), `tuya`, `fritzdect`, `zigbee`, `zigbee2mqtt`, `deconz`, `alexa2`, `hue`, `hue-v2`
+- **Further device adapters** with corrected roles and readable names: `shelly`, `sonoff` (Tasmota), `tuya`, `fritzdect`, `zigbee`, `zigbee2mqtt`, `deconz`, `alexa2`, `hue`, `hue-v2`, `philips-hue` (lights, rooms, zones, scenes, smart scenes and motion sensors)
 - **Edit mode** (✎): rename, move to another or a new room, hide, mark as favourite, arrange tiles, rooms and sections by drag & drop; customisations **per end device** (phone and tablet can look different), stored in the ioBroker file storage (`smartvis.0/overrides.json`, part of backups); can be disabled in the instance settings
 - Own web server with WebSocket API; the app only receives detected states and may only write to released states
 - Responsive: bottom navigation on phones, sidebar from tablet size, light/dark mode automatically
@@ -62,6 +62,10 @@ See [DEVELOPMENT.md](DEVELOPMENT.md).
     Placeholder for the next version (at the beginning of the line):
     ### **WORK IN PROGRESS**
 -->
+
+### 0.18.0 (2026-11-26)
+
+- (Exc3pt10n) Support for the `philips-hue` adapter (Hue Bridge API v2): lights, rooms and zones from the bridge, "All lights" per room, scenes and smart scenes with the active scene, and motion sensors as one device with brightness and battery; dimmer switches, automations and the group "all" are hidden
 
 ### 0.17.1 (2026-11-25)
 

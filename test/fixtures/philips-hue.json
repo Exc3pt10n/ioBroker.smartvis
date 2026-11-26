@@ -1,0 +1,2481 @@
+{
+  "philips-hue.0": {
+    "type": "device",
+    "common": {
+      "name": "Hue Bridge"
+    },
+    "native": {
+      "id": "9ada8f99-637b-494a-931e-51b3f1c757a7",
+      "type": "bridge",
+      "bridgeId": "0017880000000000",
+      "modelId": "BSB002",
+      "softwareVersion": "6.5.1978688000"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843224,
+    "_id": "philips-hue.0",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.all": {
+    "type": "channel",
+    "common": {
+      "name": "All lights"
+    },
+    "native": {
+      "id": "9a451b2f-2d1e-41a4-9452-c42d00a3ccd1",
+      "type": "bridge_home",
+      "groupedLightId": "fd296ed8-472e-4b7f-9964-e0401a4422c3"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844168,
+    "_id": "philips-hue.0.all",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.all.alert": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Alert (breathe)",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844177,
+    "_id": "philips-hue.0.all.alert",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.all.allOn": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "All lights on",
+      "type": "boolean",
+      "role": "indicator"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844180,
+    "_id": "philips-hue.0.all.allOn",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.all.brightness": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Brightness",
+      "type": "number",
+      "role": "level.dimmer",
+      "unit": "%",
+      "min": 0,
+      "max": 100
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844171,
+    "_id": "philips-hue.0.all.brightness",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 0,
+    "ack": true
+  },
+  "philips-hue.0.all.colorTemperature": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color temperature",
+      "type": "number",
+      "role": "level.color.temperature",
+      "unit": "K",
+      "min": 2000,
+      "max": 6536
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844173,
+    "_id": "philips-hue.0.all.colorTemperature",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.all.command": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Command (JSON)",
+      "type": "string",
+      "role": "json"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844179,
+    "_id": "philips-hue.0.all.command",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.all.on": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Any light on",
+      "type": "boolean",
+      "role": "switch.light"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844170,
+    "_id": "philips-hue.0.all.on",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.all.rgb": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color (hex)",
+      "type": "string",
+      "role": "level.color.rgb"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844176,
+    "_id": "philips-hue.0.all.rgb",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.all.xy": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color (CIE xy)",
+      "type": "string",
+      "role": "level.color.cie"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844175,
+    "_id": "philips-hue.0.all.xy",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.automations": {
+    "type": "folder",
+    "common": {
+      "name": "Automations"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843229,
+    "_id": "philips-hue.0.automations",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.automations.Bewegungsmelder_Gäste_WC": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Bewegungsmelder Gäste WC enabled",
+      "type": "boolean",
+      "role": "switch.enable"
+    },
+    "native": {
+      "id": "f7f04a14-ce67-48cd-bf65-fbd3095aa48a",
+      "type": "behavior_instance"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844195,
+    "_id": "philips-hue.0.automations.Bewegungsmelder_Gäste_WC",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": true,
+    "ack": true
+  },
+  "philips-hue.0.info": {
+    "_id": "philips-hue.0.info",
+    "type": "channel",
+    "common": {
+      "name": {
+        "en": "Information",
+        "de": "Information",
+        "ru": "Информация",
+        "pt": "Informação",
+        "nl": "Informatie",
+        "fr": "Information",
+        "it": "Informazioni",
+        "es": "Información",
+        "pl": "Informacje",
+        "uk": "Інформація",
+        "zh-cn": "信息"
+      }
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "ts": 1795692842507,
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "user": "system.user.admin"
+  },
+  "philips-hue.0.info.connection": {
+    "_id": "philips-hue.0.info.connection",
+    "type": "state",
+    "common": {
+      "role": "indicator.connected",
+      "name": "Connected to the bridge",
+      "type": "boolean",
+      "read": true,
+      "write": false,
+      "def": false
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "ts": 1795692842509,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "user": "system.user.admin",
+    "val": true,
+    "ack": true
+  },
+  "philips-hue.0.lights": {
+    "type": "folder",
+    "common": {
+      "name": "Lights"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843238,
+    "_id": "philips-hue.0.lights",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Eingangstüre": {
+    "type": "channel",
+    "common": {
+      "name": "Leuchte Eingangstüre"
+    },
+    "native": {
+      "id": "8c180280-a258-4fab-8c63-be4a5d5a38d3",
+      "type": "light",
+      "deviceId": "d5a2b2b7-5c9f-4db1-898c-a67992612f8e",
+      "modelId": "1743030P7",
+      "productName": "Hue outdoor wall",
+      "manufacturer": "Signify Netherlands B.V.",
+      "softwareVersion": "1.116.12",
+      "gamutType": "C"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843528,
+    "_id": "philips-hue.0.lights.Leuchte_Eingangstüre",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Eingangstüre.alert": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Alert (breathe)",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843544,
+    "_id": "philips-hue.0.lights.Leuchte_Eingangstüre.alert",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Eingangstüre.brightness": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Brightness",
+      "type": "number",
+      "role": "level.dimmer",
+      "unit": "%",
+      "min": 0,
+      "max": 100
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843533,
+    "_id": "philips-hue.0.lights.Leuchte_Eingangstüre.brightness",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 50,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Eingangstüre.colorMode": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Color mode",
+      "type": "string",
+      "role": "text",
+      "states": {
+        "xy": "xy",
+        "ct": "ct"
+      }
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843541,
+    "_id": "philips-hue.0.lights.Leuchte_Eingangstüre.colorMode",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": "ct",
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Eingangstüre.colorTemperature": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color temperature",
+      "type": "number",
+      "role": "level.color.temperature",
+      "unit": "K",
+      "min": 2000,
+      "max": 6536
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843535,
+    "_id": "philips-hue.0.lights.Leuchte_Eingangstüre.colorTemperature",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 2732,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Eingangstüre.command": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Command (JSON)",
+      "type": "string",
+      "role": "json"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843546,
+    "_id": "philips-hue.0.lights.Leuchte_Eingangstüre.command",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Eingangstüre.on": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "On",
+      "type": "boolean",
+      "role": "switch.light"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843530,
+    "_id": "philips-hue.0.lights.Leuchte_Eingangstüre.on",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Eingangstüre.reachable": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Reachable",
+      "type": "boolean",
+      "role": "indicator.reachable"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843549,
+    "_id": "philips-hue.0.lights.Leuchte_Eingangstüre.reachable",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": true,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Eingangstüre.rgb": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color (hex)",
+      "type": "string",
+      "role": "level.color.rgb"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843539,
+    "_id": "philips-hue.0.lights.Leuchte_Eingangstüre.rgb",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": "#FFCF78",
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Eingangstüre.xy": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color (CIE xy)",
+      "type": "string",
+      "role": "level.color.cie"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843537,
+    "_id": "philips-hue.0.lights.Leuchte_Eingangstüre.xy",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": "[0.4572, 0.4099]",
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Gäste_WC": {
+    "type": "channel",
+    "common": {
+      "name": "Leuchte Gäste WC"
+    },
+    "native": {
+      "id": "28ca908e-54bb-4fb2-9f8c-120a3f4b178c",
+      "type": "light",
+      "deviceId": "0ab2e935-af41-4043-859d-653fcb1ad09c",
+      "modelId": "LTC001",
+      "productName": "Hue ambiance ceiling",
+      "manufacturer": "Signify Netherlands B.V.",
+      "softwareVersion": "1.116.12"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843333,
+    "_id": "philips-hue.0.lights.Leuchte_Gäste_WC",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Gäste_WC.alert": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Alert (breathe)",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843341,
+    "_id": "philips-hue.0.lights.Leuchte_Gäste_WC.alert",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Gäste_WC.brightness": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Brightness",
+      "type": "number",
+      "role": "level.dimmer",
+      "unit": "%",
+      "min": 0,
+      "max": 100
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843337,
+    "_id": "philips-hue.0.lights.Leuchte_Gäste_WC.brightness",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 50,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Gäste_WC.colorTemperature": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color temperature",
+      "type": "number",
+      "role": "level.color.temperature",
+      "unit": "K",
+      "min": 2203,
+      "max": 6536
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843339,
+    "_id": "philips-hue.0.lights.Leuchte_Gäste_WC.colorTemperature",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 6410,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Gäste_WC.command": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Command (JSON)",
+      "type": "string",
+      "role": "json"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843343,
+    "_id": "philips-hue.0.lights.Leuchte_Gäste_WC.command",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Gäste_WC.on": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "On",
+      "type": "boolean",
+      "role": "switch.light"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843335,
+    "_id": "philips-hue.0.lights.Leuchte_Gäste_WC.on",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Gäste_WC.reachable": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Reachable",
+      "type": "boolean",
+      "role": "indicator.reachable"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843345,
+    "_id": "philips-hue.0.lights.Leuchte_Gäste_WC.reachable",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": true,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Küche": {
+    "type": "channel",
+    "common": {
+      "name": "Leuchte Küche"
+    },
+    "native": {
+      "id": "7179c9ea-3b19-4971-9aac-63dfea8c8a68",
+      "type": "light",
+      "deviceId": "bb7b7f90-04bf-4199-83fc-212cdc424b7d",
+      "modelId": "LTC015",
+      "productName": "Hue ambiance panel",
+      "manufacturer": "Signify Netherlands B.V.",
+      "softwareVersion": "1.116.12"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843445,
+    "_id": "philips-hue.0.lights.Leuchte_Küche",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Küche.alert": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Alert (breathe)",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843451,
+    "_id": "philips-hue.0.lights.Leuchte_Küche.alert",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Küche.brightness": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Brightness",
+      "type": "number",
+      "role": "level.dimmer",
+      "unit": "%",
+      "min": 0,
+      "max": 100
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843447,
+    "_id": "philips-hue.0.lights.Leuchte_Küche.brightness",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 100,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Küche.colorTemperature": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color temperature",
+      "type": "number",
+      "role": "level.color.temperature",
+      "unit": "K",
+      "min": 2203,
+      "max": 6536
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843449,
+    "_id": "philips-hue.0.lights.Leuchte_Küche.colorTemperature",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 6410,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Küche.command": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Command (JSON)",
+      "type": "string",
+      "role": "json"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843453,
+    "_id": "philips-hue.0.lights.Leuchte_Küche.command",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Küche.on": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "On",
+      "type": "boolean",
+      "role": "switch.light"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843446,
+    "_id": "philips-hue.0.lights.Leuchte_Küche.on",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Küche.reachable": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Reachable",
+      "type": "boolean",
+      "role": "indicator.reachable"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843454,
+    "_id": "philips-hue.0.lights.Leuchte_Küche.reachable",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": true,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Theke": {
+    "type": "channel",
+    "common": {
+      "name": "Leuchte Theke"
+    },
+    "native": {
+      "id": "2de0e0f8-1126-431b-9871-24177d510971",
+      "type": "light",
+      "deviceId": "45b5effa-ee49-4f38-95f1-a0fe22f21268",
+      "modelId": "LTP008",
+      "productName": "Hue ambiance pendant",
+      "manufacturer": "Signify Netherlands B.V.",
+      "softwareVersion": "1.116.12"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843347,
+    "_id": "philips-hue.0.lights.Leuchte_Theke",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Theke.alert": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Alert (breathe)",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843354,
+    "_id": "philips-hue.0.lights.Leuchte_Theke.alert",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Theke.brightness": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Brightness",
+      "type": "number",
+      "role": "level.dimmer",
+      "unit": "%",
+      "min": 0,
+      "max": 100
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843350,
+    "_id": "philips-hue.0.lights.Leuchte_Theke.brightness",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 100,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Theke.colorTemperature": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color temperature",
+      "type": "number",
+      "role": "level.color.temperature",
+      "unit": "K",
+      "min": 2203,
+      "max": 6536
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843352,
+    "_id": "philips-hue.0.lights.Leuchte_Theke.colorTemperature",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 6410,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Theke.command": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Command (JSON)",
+      "type": "string",
+      "role": "json"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843356,
+    "_id": "philips-hue.0.lights.Leuchte_Theke.command",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.lights.Leuchte_Theke.on": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "On",
+      "type": "boolean",
+      "role": "switch.light"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843349,
+    "_id": "philips-hue.0.lights.Leuchte_Theke.on",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.lights.Leuchte_Theke.reachable": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Reachable",
+      "type": "boolean",
+      "role": "indicator.reachable"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843358,
+    "_id": "philips-hue.0.lights.Leuchte_Theke.reachable",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": true,
+    "ack": true
+  },
+  "philips-hue.0.rooms": {
+    "type": "folder",
+    "common": {
+      "name": "Rooms"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843232,
+    "_id": "philips-hue.0.rooms",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre": {
+    "type": "channel",
+    "common": {
+      "name": "Licht Eingangstüre"
+    },
+    "native": {
+      "id": "e8c2737b-217c-497f-a33a-cf4b80bafedb",
+      "type": "room",
+      "groupedLightId": "66ec772e-c6ee-41ba-a091-447c4bccd9a1",
+      "lights": [
+        "8c180280-a258-4fab-8c63-be4a5d5a38d3"
+      ]
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844104,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.activeScene": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Active scene",
+      "type": "string",
+      "role": "text"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844118,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.activeScene",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": "",
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.alert": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Alert (breathe)",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844113,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.alert",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.allOn": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "All lights on",
+      "type": "boolean",
+      "role": "indicator"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844116,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.allOn",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.brightness": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Brightness",
+      "type": "number",
+      "role": "level.dimmer",
+      "unit": "%",
+      "min": 0,
+      "max": 100
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844107,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.brightness",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 0,
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.colorTemperature": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color temperature",
+      "type": "number",
+      "role": "level.color.temperature",
+      "unit": "K",
+      "min": 2000,
+      "max": 6536
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844109,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.colorTemperature",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.command": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Command (JSON)",
+      "type": "string",
+      "role": "json"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844115,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.command",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.on": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Any light on",
+      "type": "boolean",
+      "role": "switch.light"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844106,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.on",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.rgb": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color (hex)",
+      "type": "string",
+      "role": "level.color.rgb"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844112,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.rgb",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.scenes": {
+    "type": "folder",
+    "common": {
+      "name": "Scenes"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844119,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.scenes",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.scenes.Energie_tanken": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Energie tanken",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {
+      "id": "4b175272-b521-49d3-a36a-00885e700b49",
+      "type": "scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844124,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.scenes.Energie_tanken",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.scenes.Entspannen": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Entspannen",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {
+      "id": "c4ef5e59-0184-4de3-bc90-6f02c24cfe03",
+      "type": "scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844131,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.scenes.Entspannen",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.scenes.Frühlingsblüten": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Frühlingsblüten",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {
+      "id": "fc49368d-8896-45f8-a173-3bcd59e803cb",
+      "type": "scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844135,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.scenes.Frühlingsblüten",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.smartScenes": {
+    "type": "folder",
+    "common": {
+      "name": "Smart scenes"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844136,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.smartScenes",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.smartScenes.Natürliches_Licht": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Natürliches Licht",
+      "type": "boolean",
+      "role": "switch"
+    },
+    "native": {
+      "id": "ac8d9be5-4d15-49cc-879a-9444b2aaa75e",
+      "type": "smart_scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844137,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.smartScenes.Natürliches_Licht",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Eingangstüre.xy": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color (CIE xy)",
+      "type": "string",
+      "role": "level.color.cie"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844110,
+    "_id": "philips-hue.0.rooms.Licht_Eingangstüre.xy",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC": {
+    "type": "channel",
+    "common": {
+      "name": "Licht Gäste WC"
+    },
+    "native": {
+      "id": "effaecfb-3951-47ff-84bc-0599e11a45a1",
+      "type": "room",
+      "groupedLightId": "9e87c14f-440b-4957-8d5a-9de77ee9a498",
+      "lights": [
+        "28ca908e-54bb-4fb2-9f8c-120a3f4b178c"
+      ]
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844138,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.activeScene": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Active scene",
+      "type": "string",
+      "role": "text"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844145,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.activeScene",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": "",
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.alert": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Alert (breathe)",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844142,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.alert",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.allOn": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "All lights on",
+      "type": "boolean",
+      "role": "indicator"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844144,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.allOn",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.brightness": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Brightness",
+      "type": "number",
+      "role": "level.dimmer",
+      "unit": "%",
+      "min": 0,
+      "max": 100
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844140,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.brightness",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 0,
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.colorTemperature": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color temperature",
+      "type": "number",
+      "role": "level.color.temperature",
+      "unit": "K",
+      "min": 2203,
+      "max": 6536
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844141,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.colorTemperature",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.command": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Command (JSON)",
+      "type": "string",
+      "role": "json"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844143,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.command",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.on": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Any light on",
+      "type": "boolean",
+      "role": "switch.light"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844139,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.on",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.scenes": {
+    "type": "folder",
+    "common": {
+      "name": "Scenes"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844146,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.scenes",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.scenes.Energie_tanken": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Energie tanken",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {
+      "id": "fc68350c-f857-4c1a-a1cf-8d15bd2eb375",
+      "type": "scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844162,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.scenes.Energie_tanken",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.scenes.Entspannen": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Entspannen",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {
+      "id": "33fea7dc-e70a-4db8-b87c-181c460423db",
+      "type": "scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844149,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.scenes.Entspannen",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.scenes.Frühlingsblüten": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Frühlingsblüten",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {
+      "id": "3a9171a7-5970-4d5b-99db-2853e783a218",
+      "type": "scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844150,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.scenes.Frühlingsblüten",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.smartScenes": {
+    "type": "folder",
+    "common": {
+      "name": "Smart scenes"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844165,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.smartScenes",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Gäste_WC.smartScenes.Natürliches_Licht": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Natürliches Licht",
+      "type": "boolean",
+      "role": "switch"
+    },
+    "native": {
+      "id": "b5c3f0d8-3243-4258-ad4c-86a8c5e10968",
+      "type": "smart_scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844167,
+    "_id": "philips-hue.0.rooms.Licht_Gäste_WC.smartScenes.Natürliches_Licht",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Küche": {
+    "type": "channel",
+    "common": {
+      "name": "Licht Küche"
+    },
+    "native": {
+      "id": "71fd24c2-da00-4563-9634-85b1c7bc4157",
+      "type": "room",
+      "groupedLightId": "c75d9157-05d5-450f-81e4-2363912ae49f",
+      "lights": [
+        "2de0e0f8-1126-431b-9871-24177d510971",
+        "7179c9ea-3b19-4971-9aac-63dfea8c8a68"
+      ]
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843944,
+    "_id": "philips-hue.0.rooms.Licht_Küche",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Küche.activeScene": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Active scene",
+      "type": "string",
+      "role": "text"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843955,
+    "_id": "philips-hue.0.rooms.Licht_Küche.activeScene",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": "",
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Küche.alert": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Alert (breathe)",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843950,
+    "_id": "philips-hue.0.rooms.Licht_Küche.alert",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Küche.allOn": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "All lights on",
+      "type": "boolean",
+      "role": "indicator"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843954,
+    "_id": "philips-hue.0.rooms.Licht_Küche.allOn",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Küche.brightness": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Brightness",
+      "type": "number",
+      "role": "level.dimmer",
+      "unit": "%",
+      "min": 0,
+      "max": 100
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843947,
+    "_id": "philips-hue.0.rooms.Licht_Küche.brightness",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 0,
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Küche.colorTemperature": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Color temperature",
+      "type": "number",
+      "role": "level.color.temperature",
+      "unit": "K",
+      "min": 2203,
+      "max": 6536
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843949,
+    "_id": "philips-hue.0.rooms.Licht_Küche.colorTemperature",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Küche.command": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Command (JSON)",
+      "type": "string",
+      "role": "json"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843952,
+    "_id": "philips-hue.0.rooms.Licht_Küche.command",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Küche.on": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Any light on",
+      "type": "boolean",
+      "role": "switch.light"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843946,
+    "_id": "philips-hue.0.rooms.Licht_Küche.on",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.rooms.Licht_Küche.scenes": {
+    "type": "folder",
+    "common": {
+      "name": "Scenes"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843957,
+    "_id": "philips-hue.0.rooms.Licht_Küche.scenes",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Küche.scenes.Energie_tanken": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Energie tanken",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {
+      "id": "7065482d-d4bf-4260-9da8-c73659ba5c22",
+      "type": "scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843967,
+    "_id": "philips-hue.0.rooms.Licht_Küche.scenes.Energie_tanken",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Küche.scenes.Entspannen": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Entspannen",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {
+      "id": "55ccd881-d001-4444-924e-bc5198507477",
+      "type": "scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843965,
+    "_id": "philips-hue.0.rooms.Licht_Küche.scenes.Entspannen",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Küche.scenes.Frühlingsblüten": {
+    "type": "state",
+    "common": {
+      "read": false,
+      "write": true,
+      "name": "Frühlingsblüten",
+      "type": "boolean",
+      "role": "button"
+    },
+    "native": {
+      "id": "d5fa28f3-07b7-4bcb-bf0d-6546b668779d",
+      "type": "scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843997,
+    "_id": "philips-hue.0.rooms.Licht_Küche.scenes.Frühlingsblüten",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Küche.smartScenes": {
+    "type": "folder",
+    "common": {
+      "name": "Smart scenes"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843999,
+    "_id": "philips-hue.0.rooms.Licht_Küche.smartScenes",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.rooms.Licht_Küche.smartScenes.Natürliches_Licht": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Natürliches Licht",
+      "type": "boolean",
+      "role": "switch"
+    },
+    "native": {
+      "id": "a110dae7-3666-4223-a442-8fb619a82d08",
+      "type": "smart_scene"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692844004,
+    "_id": "philips-hue.0.rooms.Licht_Küche.smartScenes.Natürliches_Licht",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.sensors": {
+    "type": "folder",
+    "common": {
+      "name": "Sensors"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843235,
+    "_id": "philips-hue.0.sensors",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC": {
+    "type": "channel",
+    "common": {
+      "name": "Bewegungsmelder Gäste WC"
+    },
+    "native": {
+      "id": "a2f2bc71-34c7-449f-bb7a-e2ca38310da4",
+      "type": "device",
+      "modelId": "SML001",
+      "productName": "Hue motion sensor",
+      "manufacturer": "Signify Netherlands B.V.",
+      "softwareVersion": "67.116.1"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843731,
+    "_id": "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.battery": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Battery",
+      "type": "number",
+      "role": "value.battery",
+      "unit": "%",
+      "min": 0,
+      "max": 100
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843737,
+    "_id": "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.battery",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 100,
+    "ack": true
+  },
+  "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.illuminance": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Illuminance",
+      "type": "number",
+      "role": "value.brightness",
+      "unit": "lx"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843736,
+    "_id": "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.illuminance",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 40,
+    "ack": true
+  },
+  "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.lowBattery": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Low battery",
+      "type": "boolean",
+      "role": "indicator.lowbat"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843738,
+    "_id": "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.lowBattery",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.motion": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Motion",
+      "type": "boolean",
+      "role": "sensor.motion"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843732,
+    "_id": "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.motion",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.motionEnabled": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": true,
+      "name": "Motion detection enabled",
+      "type": "boolean",
+      "role": "switch.enable"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843734,
+    "_id": "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.motionEnabled",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": true,
+    "ack": true
+  },
+  "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.reachable": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Reachable",
+      "type": "boolean",
+      "role": "indicator.reachable"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843739,
+    "_id": "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.reachable",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": true,
+    "ack": true
+  },
+  "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.temperature": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Temperature",
+      "type": "number",
+      "role": "value.temperature",
+      "unit": "°C"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843735,
+    "_id": "philips-hue.0.sensors.Bewegungsmelder_Gäste_WC.temperature",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 21.47,
+    "ack": true
+  },
+  "philips-hue.0.sensors.Schalter_Küche": {
+    "type": "channel",
+    "common": {
+      "name": "Schalter Küche"
+    },
+    "native": {
+      "id": "1424dc1c-54da-4861-b228-719f42bd0318",
+      "type": "device",
+      "modelId": "RWL021",
+      "productName": "Hue dimmer switch",
+      "manufacturer": "Signify Netherlands B.V.",
+      "softwareVersion": "67.116.1"
+    },
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843666,
+    "_id": "philips-hue.0.sensors.Schalter_Küche",
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.sensors.Schalter_Küche.battery": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Battery",
+      "type": "number",
+      "role": "value.battery",
+      "unit": "%",
+      "min": 0,
+      "max": 100
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843669,
+    "_id": "philips-hue.0.sensors.Schalter_Küche.battery",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": 31,
+    "ack": true
+  },
+  "philips-hue.0.sensors.Schalter_Küche.button1": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Button 1",
+      "type": "string",
+      "role": "text",
+      "states": {
+        "initial_press": "initial_press",
+        "repeat": "repeat",
+        "short_release": "short_release",
+        "long_release": "long_release",
+        "double_short_release": "double_short_release",
+        "long_press": "long_press"
+      }
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843676,
+    "_id": "philips-hue.0.sensors.Schalter_Küche.button1",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.sensors.Schalter_Küche.button2": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Button 2",
+      "type": "string",
+      "role": "text",
+      "states": {
+        "initial_press": "initial_press",
+        "repeat": "repeat",
+        "short_release": "short_release",
+        "long_release": "long_release",
+        "double_short_release": "double_short_release",
+        "long_press": "long_press"
+      }
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843679,
+    "_id": "philips-hue.0.sensors.Schalter_Küche.button2",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.sensors.Schalter_Küche.button3": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Button 3",
+      "type": "string",
+      "role": "text",
+      "states": {
+        "initial_press": "initial_press",
+        "repeat": "repeat",
+        "short_release": "short_release",
+        "long_release": "long_release",
+        "double_short_release": "double_short_release",
+        "long_press": "long_press"
+      }
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843681,
+    "_id": "philips-hue.0.sensors.Schalter_Küche.button3",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.sensors.Schalter_Küche.button4": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Button 4",
+      "type": "string",
+      "role": "text",
+      "states": {
+        "initial_press": "initial_press",
+        "repeat": "repeat",
+        "short_release": "short_release",
+        "long_release": "long_release",
+        "double_short_release": "double_short_release",
+        "long_press": "long_press"
+      }
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843684,
+    "_id": "philips-hue.0.sensors.Schalter_Küche.button4",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "philips-hue.0.sensors.Schalter_Küche.lowBattery": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Low battery",
+      "type": "boolean",
+      "role": "indicator.lowbat"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843672,
+    "_id": "philips-hue.0.sensors.Schalter_Küche.lowBattery",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": false,
+    "ack": true
+  },
+  "philips-hue.0.sensors.Schalter_Küche.reachable": {
+    "type": "state",
+    "common": {
+      "read": true,
+      "write": false,
+      "name": "Reachable",
+      "type": "boolean",
+      "role": "indicator.reachable"
+    },
+    "native": {},
+    "from": "system.adapter.philips-hue.0",
+    "user": "system.user.admin",
+    "ts": 1795692843674,
+    "_id": "philips-hue.0.sensors.Schalter_Küche.reachable",
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "val": true,
+    "ack": true
+  }
+}

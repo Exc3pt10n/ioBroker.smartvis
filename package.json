@@ -1,6 +1,6 @@
 {
   "name": "iobroker.smartvis",
-  "version": "0.17.1",
+  "version": "0.18.0",
   "description": "Self-configuring, mobile-first visualization for ioBroker",
   "author": {
     "name": "Exc3pt10n",

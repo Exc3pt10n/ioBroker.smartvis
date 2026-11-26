@@ -1,4 +1,4 @@
-import { hueChannelRole, hueGroupLights } from './hueRooms';
+import { hueChannelRole, hueGroupLights, hueNativeType } from './hueRooms';
 import type { ObjectMap } from './types';
 
 /**
@@ -56,10 +56,11 @@ function hmCandidate(id: string, obj: ioBroker.Object, objects: ObjectMap): bool
 }
 
 /**
- * Hue (ioBroker.hue und hue-v2): nur Lampen, Steckdosen und Raum/Zonen-Gruppen mit mehreren Lampen.
+ * Hue (ioBroker.hue, hue-v2, philips-hue): nur Lampen, Steckdosen und Raum/Zonen-Gruppen mit mehreren Lampen.
  * hue-v2-Gruppen ohne Lampenliste bleiben drin (dann ist die Gruppe der einzige Schalter des Raums).
+ * philips-hue: zusätzlich die Bewegungsmelder (Kanal unter sensors.* mit native.type "device" und State "motion").
  */
-function hueCandidate(id: string, obj: ioBroker.Object, staleHue: Set<string>): boolean {
+function hueCandidate(id: string, obj: ioBroker.Object, objects: ObjectMap, staleHue: Set<string>): boolean {
     if (staleHue.has(id)) {
         return false;
     }
@@ -71,7 +72,10 @@ function hueCandidate(id: string, obj: ioBroker.Object, staleHue: Set<string>): 
         const lights = hueGroupLights(obj);
         return !!lights && (lights.length > 1 || (lights.length === 0 && !obj.common?.role));
     }
-    // LightGroup "All" bzw. "all" (bridge_home), Entertainment, Sensoren, Smart Scenes
+    if (id.startsWith('philips-hue.') && hueNativeType(obj) === 'device' && objects[`${id}.motion`]?.type === 'state') {
+        return true;
+    }
+    // LightGroup "All" bzw. "all" (bridge_home), Entertainment, sonstige Sensoren (Schalter), Smart Scenes
     return false;
 }
 
@@ -79,6 +83,8 @@ function hueCandidate(id: string, obj: ioBroker.Object, staleHue: Set<string>): 
 export const ADAPTER_ALLOWED_TYPES: Record<string, string[]> = {
     // Echo-Geräte: nur die Player sind sinnvoll, nicht Wecker/Erinnerungen/Lautstärke-Kanäle
     alexa2: ['media'],
+    // philips-hue: Bewegungsmelder nur als Bewegung (nicht zusätzlich als eigenes Thermometer)
+    'philips-hue': ['light', 'dimmer', 'ct', 'hue', 'rgb', 'rgbSingle', 'rgbwSingle', 'cie', 'socket', 'motion'],
 };
 
 /** Prüft, ob ein Kanal/Gerät als Kachel-Kandidat infrage kommt */
@@ -87,8 +93,8 @@ export function isCandidate(id: string, obj: ioBroker.Object, objects: ObjectMap
     if (adapter === 'hm-rpc') {
         return hmCandidate(id, obj, objects);
     }
-    if (adapter === 'hue' || adapter === 'hue-v2') {
-        return hueCandidate(id, obj, staleHue);
+    if (adapter === 'hue' || adapter === 'hue-v2' || adapter === 'philips-hue') {
+        return hueCandidate(id, obj, objects, staleHue);
     }
     return true;
 }
