@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "smartvis",
-        "version": "0.17.1",
+        "version": "0.18.0",
         "news": {
+            "0.18.0": {
+                "en": "Support for the philips-hue adapter: lights, rooms, zones, scenes, smart scenes and motion sensors",
+                "de": "Unterstützung für den Adapter philips-hue: Lampen, Räume, Zonen, Szenen, Smart Scenes und Bewegungsmelder",
+                "ru": "Поддержка адаптера philips-hue: лампы, комнаты, зоны, сцены, умные сцены и датчики движения",
+                "pt": "Suporte para o adaptador philips-hue: luzes, divisões, zonas, cenas, cenas inteligentes e sensores de movimento",
+                "nl": "Ondersteuning voor de adapter philips-hue: lampen, ruimtes, zones, scènes, smart scenes en bewegingsmelders",
+                "fr": "Prise en charge de l'adaptateur philips-hue : lampes, pièces, zones, scènes, scènes intelligentes et détecteurs de mouvement",
+                "it": "Supporto per l'adattatore philips-hue: luci, stanze, zone, scene, scene intelligenti e sensori di movimento",
+                "es": "Compatibilidad con el adaptador philips-hue: luces, habitaciones, zonas, escenas, escenas inteligentes y sensores de movimiento",
+                "pl": "Obsługa adaptera philips-hue: lampy, pomieszczenia, strefy, sceny, inteligentne sceny i czujniki ruchu",
+                "uk": "Підтримка адаптера philips-hue: лампи, кімнати, зони, сцени, розумні сцени та датчики руху",
+                "zh-cn": "支持 philips-hue 适配器：灯具、房间、区域、场景、智能场景和运动传感器"
+            },
             "0.17.1": {
                 "en": "Toshiba air conditioners: operating mode also works with toshiba-ac 0.2.0 and later (mode as number); missing translation in the climate functions",
                 "de": "Toshiba-Klimageräte: Betriebsart funktioniert auch mit toshiba-ac ab 0.2.0 (Betriebsart als Zahl); fehlende Übersetzung bei den Klima-Funktionen",

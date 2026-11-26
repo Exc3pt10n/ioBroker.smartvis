@@ -12,6 +12,7 @@ const SUPPORTED = new Set([
     'hm-rega',
     'hue',
     'hue-v2',
+    'philips-hue',
     'alexa2',
     'qhome-ess-hyb-g2',
     'kecontact',

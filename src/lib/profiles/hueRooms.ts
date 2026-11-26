@@ -2,7 +2,7 @@ import { getName } from '../names';
 import { guessRoom } from '../rooms';
 import type { ObjectMap } from './types';
 
-/** Objekte der Hue-Adapter: ioBroker.hue (Bridge-API v1) und hue-v2 (Bridge-API v2) */
+/** Objekte der Hue-Adapter: ioBroker.hue (Bridge-API v1), hue-v2 und philips-hue (Bridge-API v2, gleicher Aufbau) */
 /** native.type eines Hue-Objekts (hue-v2: "room", "zone", "light", "scene", "smart_scene" …) */
 export function hueNativeType(obj: ioBroker.Object): string {
     const type = (obj.native as { type?: unknown } | undefined)?.type;
@@ -10,7 +10,7 @@ export function hueNativeType(obj: ioBroker.Object): string {
 }
 
 export function isHueId(id: string): boolean {
-    return id.startsWith('hue.') || id.startsWith('hue-v2.');
+    return id.startsWith('hue.') || id.startsWith('hue-v2.') || id.startsWith('philips-hue.');
 }
 
 /**
