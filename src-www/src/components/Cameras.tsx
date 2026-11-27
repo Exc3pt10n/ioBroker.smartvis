@@ -508,22 +508,24 @@ function CameraSettings({ settings }: { settings: SvCameraSetting[] }): React.JS
 /**
  * Startseite: Kameras mit laufender oder frischer Erkennung (Ereignisbild jünger als 10 Minuten).
  * Ohne aktuelles Ereignis erscheint nichts – die Kameras stehen im Bereich Sicherheit.
+ * Die Detailansicht öffnet die Startseite selbst (onOpen): Die Karte verschwindet, sobald die Erkennung endet –
+ * eine darin geöffnete Ansicht würde dann geschlossen und ein gerade startender Livestream beendet.
  */
 export function RecentDetectionsCard({
     detections,
     cameras,
+    onOpen,
 }: {
     detections: { cameraId: string; ts: number; events: string[] }[];
     cameras: SvCamera[];
+    onOpen: (cameraId: string) => void;
 }): React.JSX.Element | null {
-    const [open, setOpen] = useState<string | undefined>();
     const list = detections
         .map(d => ({ ...d, camera: cameras.find(c => c.id === d.cameraId) }))
         .filter((d): d is typeof d & { camera: SvCamera } => !!d.camera);
     if (!list.length) {
         return null;
     }
-    const camera = cameras.find(c => c.id === open);
     return (
         <section
             className="card"
@@ -535,16 +537,10 @@ export function RecentDetectionsCard({
                     <CameraTile
                         key={d.cameraId}
                         camera={d.camera}
-                        onOpen={() => setOpen(d.cameraId)}
+                        onOpen={() => onOpen(d.cameraId)}
                     />
                 ))}
             </div>
-            {camera && (
-                <CameraSheet
-                    camera={camera}
-                    onClose={() => setOpen(undefined)}
-                />
-            )}
         </section>
     );
 }
