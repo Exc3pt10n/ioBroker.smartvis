@@ -220,6 +220,8 @@ export const eufyNextProfile: AdapterProfile = {
                 liveStart: s('livestream.start', 'Start stream'),
                 liveStop: s('livestream.stop', 'Stop stream'),
                 liveUrl: s('livestream.url', 'Livestream'),
+                liveActive: s('livestream.active', 'Livestream active'),
+                liveError: s('livestream.error', 'Livestream error'),
                 panLeft: s('ptz.left', 'Pan left'),
                 panRight: s('ptz.right', 'Pan right'),
                 tiltUp: s('ptz.up', 'Tilt up'),

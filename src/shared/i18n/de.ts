@@ -1,5 +1,11 @@
 /** Deutsche Übersetzungen: englischer Text (wie im Code) → deutscher Text */
 export const DE: Record<string, string> = {
+    'Livestream active': 'Livestream aktiv',
+    'Livestream error': 'Livestream-Fehler',
+    'The livestream did not start': 'Der Livestream ist nicht gestartet',
+    'The camera did not deliver a stream. Battery cameras sometimes do not wake up, or the stream is already running in the eufy app. Details are in the log of the camera adapter.':
+        'Die Kamera hat keinen Stream geliefert. Akku-Kameras wachen manchmal nicht auf, oder der Stream läuft schon in der eufy-App. Einzelheiten stehen im Log des Kamera-Adapters.',
+    'Try again': 'Erneut versuchen',
     '1-phase only': 'Nur 1-phasig',
     '24 h': '24 Std.',
     '3-phase only': 'Nur 3-phasig',

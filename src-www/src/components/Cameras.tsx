@@ -133,6 +133,9 @@ export function StationRow({ station }: { station: SvSecurityStation }): React.J
  * Detailansicht einer Kamera: großes Ereignisbild, Status, Livestream (go2rtc-Seite des eusec-Adapters),
  * Kamera an/aus, Licht und Schwenken. Ein gestarteter Stream wird beim Schließen beendet (Akku schonen).
  */
+/** So lange darf der Start eines Livestreams dauern (Akku-Kameras wecken, Verbindung über die HomeBase) */
+const LIVE_START_TIMEOUT_MS = 45_000;
+
 export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: () => void }): React.JSX.Element {
     const { states, model } = useConnection();
     const info = cameraInfo(camera, states);
@@ -154,17 +157,33 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
         [stopId],
     );
 
+    // Stream bereit: Adresse vorhanden und – wenn der Adapter das meldet (eufy-next) – Stream wirklich aktiv. Sonst
+    // lädt der Player zu früh (Akku-Kameras brauchen zum Aufwachen einige Sekunden) und zeigt nur "Error".
+    const ready = !!info.liveUrl && info.liveActive !== false;
     // eusec beendet den Stream nach der eingestellten Höchstdauer (Standard 120 s) und löscht die Adresse
-    const [sawUrl, setSawUrl] = useState(false);
-    if (live && info.liveUrl && !sawUrl) {
-        setSawUrl(true);
+    const [sawReady, setSawReady] = useState(false);
+    if (live && ready && !sawReady) {
+        setSawReady(true);
     }
-    const ended = live && sawUrl && !info.liveUrl;
+    const ended = live && sawReady && !ready;
+    // Start ohne Erfolg: Fehlermeldung des Adapters oder nach einer Wartezeit kein aktiver Stream
+    const [timedOut, setTimedOut] = useState(false);
+    const [attempt, setAttempt] = useState(0);
+    useEffect(() => {
+        if (!live || sawReady) {
+            return;
+        }
+        const timer = window.setTimeout(() => setTimedOut(true), LIVE_START_TIMEOUT_MS);
+        return () => window.clearTimeout(timer);
+    }, [live, sawReady, attempt]);
+    const failed = live && !sawReady && (timedOut || (!!info.liveError && info.liveActive === false));
 
     const startLive = (): void => {
         if (camera.liveStart) {
             connection.setState(camera.liveStart.id, true);
-            setSawUrl(false);
+            setSawReady(false);
+            setTimedOut(false);
+            setAttempt(n => n + 1);
             setLive(true);
         }
     };
@@ -191,7 +210,7 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
         >
             <div className="camera__detail">
                 {live ? (
-                    info.liveUrl ? (
+                    ready && info.liveUrl ? (
                         <div className="camera__live">
                             <iframe
                                 className="camera__frame"
@@ -213,7 +232,24 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                         </div>
                     ) : (
                         <div className="camera__big camera__placeholder camera__waiting">
-                            {ended ? (
+                            {failed ? (
+                                <span>
+                                    {t('The livestream did not start')}
+                                    <small>
+                                        {info.liveError ||
+                                            t(
+                                                'The camera did not deliver a stream. Battery cameras sometimes do not wake up, or the stream is already running in the eufy app. Details are in the log of the camera adapter.',
+                                            )}
+                                    </small>
+                                    <button
+                                        type="button"
+                                        className="action action--small camera__retry"
+                                        onClick={startLive}
+                                    >
+                                        {t('Try again')}
+                                    </button>
+                                </span>
+                            ) : ended ? (
                                 <span>
                                     {t('Livestream ended')}
                                     <small>

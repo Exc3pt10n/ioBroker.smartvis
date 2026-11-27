@@ -27,6 +27,9 @@ describe('profile: eufy-next (eufy v6 cloud)', () => {
         expect(garden.liveStart?.id).to.equal(`${garden.id}.livestream.start`);
         expect(garden.liveStop?.id).to.equal(`${garden.id}.livestream.stop`);
         expect(garden.liveUrl?.id).to.equal(`${garden.id}.livestream.url`);
+        // Stream erst anzeigen, wenn er wirklich läuft; eine Fehlermeldung gibt es (noch) nicht
+        expect(garden.liveActive?.id).to.equal(`${garden.id}.livestream.active`);
+        expect(garden.liveError).to.equal(undefined);
         expect(r.writableIds.has(garden.liveStart!.id)).to.equal(true);
         expect(r.writableIds.has(`${garden.id}.livestream.rtsp`)).to.equal(false);
         expect(garden.model).to.equal('T8142');

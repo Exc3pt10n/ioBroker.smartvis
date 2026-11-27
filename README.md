@@ -63,6 +63,10 @@ See [DEVELOPMENT.md](DEVELOPMENT.md).
     ### **WORK IN PROGRESS**
 -->
 
+### 0.18.1 (2026-11-27)
+
+- (Exc3pt10n) eufy-next livestream: the player page opens only when `livestream.active` reports a running stream (battery cameras need some seconds to wake up); if no stream arrives within 45 s, a clear hint with "Try again" is shown instead of the player's bare "Error" (an error text in `livestream.error` is shown if the adapter provides one)
+
 ### 0.18.0 (2026-11-26)
 
 - (Exc3pt10n) Support for the `philips-hue` adapter (Hue Bridge API v2): lights, rooms and zones from the bridge, "All lights" per room, scenes and smart scenes with the active scene, and motion sensors as one device with brightness and battery; dimmer switches, automations and the group "all" are hidden

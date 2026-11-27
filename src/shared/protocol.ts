@@ -331,6 +331,10 @@ export interface SvCamera {
     liveStop?: SvStateRef;
     /** Adresse der Livestream-Seite (nur gefüllt, solange der Stream läuft) */
     liveUrl?: SvStateRef;
+    /** Stream läuft wirklich (eufy-next: livestream.active) – erst dann wird die Seite geladen */
+    liveActive?: SvStateRef;
+    /** Fehlermeldung beim Start des Streams, falls der Adapter eine liefert (eufy-next: livestream.error) */
+    liveError?: SvStateRef;
     panLeft?: SvStateRef;
     panRight?: SvStateRef;
     tiltUp?: SvStateRef;

@@ -4391,6 +4391,10 @@ button.battery__row {
     font-size: 12px;
 }
 
+.camera__retry {
+    margin-top: 12px;
+}
+
 .camera__alarm {
     margin: 0 0 12px;
     padding: 10px 12px;
