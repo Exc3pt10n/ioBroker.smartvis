@@ -63,6 +63,10 @@ See [DEVELOPMENT.md](DEVELOPMENT.md).
     ### **WORK IN PROGRESS**
 -->
 
+### 0.18.3 (2026-11-27)
+
+- (Exc3pt10n) eufy-next livestream stayed black since 0.18.1: SmartVis waits for `livestream.active` but did not subscribe to it (nor to `livestream.error`), so the app never learned that the stream was running and did not open the player
+
 ### 0.18.2 (2026-11-27)
 
 - (Exc3pt10n) Camera view opened from "Just detected" on the home page stays open when the card disappears (event picture older than 10 minutes); before, the view closed with the card and stopped a running livestream

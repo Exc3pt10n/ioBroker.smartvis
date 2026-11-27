@@ -31,6 +31,8 @@ describe('profile: eufy-next (eufy v6 cloud)', () => {
         expect(garden.liveActive?.id).to.equal(`${garden.id}.livestream.active`);
         expect(garden.liveError).to.equal(undefined);
         expect(r.writableIds.has(garden.liveStart!.id)).to.equal(true);
+        // Werte, die die App für den Livestream braucht, müssen abonniert sein
+        expect(r.stateIds).to.include.members([garden.liveUrl!.id, garden.liveActive!.id]);
         expect(r.writableIds.has(`${garden.id}.livestream.rtsp`)).to.equal(false);
         expect(garden.model).to.equal('T8142');
         const living = cam('Wohnzimmer');
