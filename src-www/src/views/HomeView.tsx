@@ -25,7 +25,7 @@ import { EditBanner, EditButton, EditTip } from '../components/EditButton';
 import { favorites, useEditing, visibleDevices } from '../editing';
 import { WarningsCard, WeatherCard } from '../components/WeatherCard';
 import { Icon, iconForType } from '../components/Icon';
-import { RecentDetectionsCard } from '../components/Cameras';
+import { CameraSheet, RecentDetectionsCard } from '../components/Cameras';
 import { eventLabel } from '../cameras';
 import { activeAlarms, primaryStation, recentDetections, securityMode, useNow } from '../security';
 import { activeWarnings } from '../weather';
@@ -84,6 +84,8 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
     const phone = useMediaQuery('(max-width: 899px)');
     const now = useNow(30_000);
     const [showAllKpis, setShowAllKpis] = useState(kpisExpanded);
+    // Kamera-Ansicht aus "Gerade erkannt": hier statt in der Karte, damit sie offen bleibt, wenn die Karte verschwindet
+    const [openCamera, setOpenCamera] = useState<string | undefined>();
     if (!model) {
         return <p className="empty">{t('Loading devices …')}</p>;
     }
@@ -517,6 +519,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                 <RecentDetectionsCard
                     detections={detections}
                     cameras={model.cameras || []}
+                    onOpen={setOpenCamera}
                 />
             ) : (
                 placeholder(t('Appears when a camera detects something (event picture up to 10 minutes old).'))
@@ -621,6 +624,14 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
         </>
     );
 
+    const openedCamera = model.cameras?.find(c => c.id === openCamera);
+    const cameraSheet = openedCamera && (
+        <CameraSheet
+            camera={openedCamera}
+            onClose={() => setOpenCamera(undefined)}
+        />
+    );
+
     return (
         <>
             <div className="titlebar titlebar--split">
@@ -669,6 +680,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
                     <div className="home__hint">{hint}</div>
                 </div>
             )}
+            {cameraSheet}
         </>
     );
 }

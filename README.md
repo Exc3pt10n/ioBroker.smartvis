@@ -63,6 +63,10 @@ See [DEVELOPMENT.md](DEVELOPMENT.md).
     ### **WORK IN PROGRESS**
 -->
 
+### 0.18.2 (2026-11-27)
+
+- (Exc3pt10n) Camera view opened from "Just detected" on the home page stays open when the card disappears (event picture older than 10 minutes); before, the view closed with the card and stopped a running livestream
+
 ### 0.18.1 (2026-11-27)
 
 - (Exc3pt10n) eufy-next livestream: the player page opens only when `livestream.active` reports a running stream (battery cameras need some seconds to wake up); if no stream arrives within 45 s, a clear hint with "Try again" is shown instead of the player's bare "Error" (an error text in `livestream.error` is shown if the adapter provides one)
