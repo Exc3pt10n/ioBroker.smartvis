@@ -305,6 +305,9 @@ export function cameraRefs(c: SvCamera): { read: SvStateRef[]; write: SvStateRef
         c.status,
         c.battery,
         c.liveUrl,
+        // Ohne Abo kämen "Stream läuft" und die Fehlermeldung nie in der App an (Player bliebe ungeladen)
+        c.liveActive,
+        c.liveError,
         c.enabled,
         c.light,
     ].filter((r): r is SvStateRef => !!r);

@@ -1,8 +1,21 @@
 {
     "common": {
         "name": "smartvis",
-        "version": "0.18.2",
+        "version": "0.18.3",
         "news": {
+            "0.18.3": {
+                "en": "eufy-next livestream stayed black: SmartVis did not subscribe to livestream.active, so the player never opened",
+                "de": "eufy-next-Livestream blieb schwarz: SmartVis hat livestream.active nicht abonniert, deshalb öffnete der Player nie",
+                "ru": "Трансляция eufy-next оставалась чёрной: SmartVis не подписывался на livestream.active, поэтому плеер не открывался",
+                "pt": "A transmissão eufy-next ficava preta: o SmartVis não subscrevia livestream.active, pelo que o leitor nunca abria",
+                "nl": "eufy-next-livestream bleef zwart: SmartVis was niet geabonneerd op livestream.active, dus de speler opende nooit",
+                "fr": "Le flux eufy-next restait noir : SmartVis ne s'abonnait pas à livestream.active, le lecteur ne s'ouvrait donc jamais",
+                "it": "Il livestream eufy-next restava nero: SmartVis non era iscritto a livestream.active, quindi il lettore non si apriva mai",
+                "es": "La transmisión de eufy-next se quedaba en negro: SmartVis no se suscribía a livestream.active, por lo que el reproductor nunca se abría",
+                "pl": "Transmisja eufy-next pozostawała czarna: SmartVis nie subskrybował livestream.active, więc odtwarzacz nigdy się nie otwierał",
+                "uk": "Трансляція eufy-next залишалася чорною: SmartVis не підписувався на livestream.active, тому плеєр не відкривався",
+                "zh-cn": "eufy-next 直播一直黑屏：SmartVis 未订阅 livestream.active，因此播放器从未打开"
+            },
             "0.18.2": {
                 "en": "Camera view opened from \"Just detected\" on the home page stays open when the card disappears, so a running livestream is no longer stopped",
                 "de": "Die Kamera-Ansicht aus „Gerade erkannt“ auf der Startseite bleibt offen, wenn die Karte verschwindet – ein laufender Livestream wird nicht mehr beendet",
@@ -80,19 +93,6 @@
                 "pl": "Informacje o wydaniu tylko dla wersji dostępnych w npm; tagi wersji uruchamiają teraz własny przebieg sprawdzający, zgodnie z wymaganiami repozytorium ioBroker",
                 "uk": "Примітки до випуску лише для версій, доступних у npm; теги версій тепер запускають окрему перевірку, як вимагає репозиторій ioBroker",
                 "zh-cn": "版本说明仅列出 npm 上已有的版本；版本标签现在会按 ioBroker 仓库要求触发单独的检查运行"
-            },
-            "0.16.0": {
-                "en": "Prepared for npm and the ioBroker repository: shipped pre-built (Breaking: installing from GitHub source no longer possible, use the .tgz of the GitHub release); instance settings translated; README in English",
-                "de": "Vorbereitet für npm und das ioBroker-Repository: wird fertig gebaut ausgeliefert (Breaking: Installation aus dem GitHub-Quellcode nicht mehr möglich, stattdessen das .tgz am GitHub-Release); Instanz-Einstellungen übersetzt; README auf Englisch",
-                "ru": "Подготовка к npm и репозиторию ioBroker: поставляется в собранном виде (Breaking: установка из исходного кода GitHub больше невозможна, используйте .tgz из релиза GitHub); настройки экземпляра переведены; README на английском",
-                "pt": "Preparado para npm e o repositório ioBroker: distribuído já compilado (Breaking: instalação a partir do código-fonte no GitHub deixou de ser possível, use o .tgz do release no GitHub); definições da instância traduzidas; README em inglês",
-                "nl": "Voorbereid op npm en de ioBroker-repository: wordt kant-en-klaar gebouwd geleverd (Breaking: installatie vanuit de GitHub-broncode niet meer mogelijk, gebruik de .tgz van de GitHub-release); instantie-instellingen vertaald; README in het Engels",
-                "fr": "Préparé pour npm et le dépôt ioBroker : livré déjà compilé (Breaking : l'installation depuis le code source GitHub n'est plus possible, utiliser le .tgz de la release GitHub) ; réglages de l'instance traduits ; README en anglais",
-                "it": "Preparato per npm e il repository di ioBroker: distribuito già compilato (Breaking: l'installazione dal codice sorgente su GitHub non è più possibile, usare il .tgz della release GitHub); impostazioni dell'istanza tradotte; README in inglese",
-                "es": "Preparado para npm y el repositorio de ioBroker: se distribuye ya compilado (Breaking: ya no es posible instalar desde el código fuente de GitHub, use el .tgz de la release de GitHub); ajustes de la instancia traducidos; README en inglés",
-                "pl": "Przygotowano do npm i repozytorium ioBroker: dostarczany w wersji zbudowanej (Breaking: instalacja z kodu źródłowego GitHub nie jest już możliwa, użyj pliku .tgz z wydania GitHub); ustawienia instancji przetłumaczone; README po angielsku",
-                "uk": "Підготовлено до npm і репозиторію ioBroker: постачається у зібраному вигляді (Breaking: встановлення з вихідного коду GitHub більше неможливе, використовуйте .tgz із релізу GitHub); налаштування екземпляра перекладено; README англійською",
-                "zh-cn": "为 npm 和 ioBroker 仓库做好准备：以预构建形式发布（Breaking：不再支持从 GitHub 源码安装，请使用 GitHub 发布页上的 .tgz）；实例设置已翻译；README 改为英文"
             }
         },
         "titleLang": {
