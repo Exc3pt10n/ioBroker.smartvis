@@ -22,6 +22,12 @@ export interface CameraInfo {
     battery?: number;
     /** Livestream-Seite (nur während der Stream läuft) */
     liveUrl?: string;
+    /** Stream läuft laut Adapter (undefined: der Adapter meldet das nicht) */
+    liveActive?: boolean;
+    /** Fehlermeldung des Adapters zum Livestream */
+    liveError?: string;
+    /** Zeitpunkt der Fehlermeldung (eine Meldung vom vorigen Versuch zählt nicht) */
+    liveErrorTs?: number;
 }
 
 export function cameraInfo(camera: SvCamera, states: States): CameraInfo {
@@ -51,6 +57,7 @@ export function cameraInfo(camera: SvCamera, states: States): CameraInfo {
     ].filter((e): e is string => !!e);
     const battery = camera.battery ? Number(states[camera.battery.id]?.val) : NaN;
     const live = camera.liveUrl ? states[camera.liveUrl.id]?.val : undefined;
+    const liveError = camera.liveError ? states[camera.liveError.id]?.val : undefined;
     return {
         // Die Ereignisbilder von eufy kommen seit 2026 falsch entschlüsselt (Streifen) – nur deren Zeitpunkt zählt
         image: camera.snapshot
@@ -72,6 +79,12 @@ export function cameraInfo(camera: SvCamera, states: States): CameraInfo {
         events,
         battery: Number.isFinite(battery) ? battery : undefined,
         liveUrl: typeof live === 'string' && /^https?:\/\//.test(live) ? live : undefined,
+        ...(camera.liveActive && { liveActive: states[camera.liveActive.id]?.val === true }),
+        ...(typeof liveError === 'string' &&
+            liveError.trim() && {
+                liveError: liveError.trim(),
+                liveErrorTs: camera.liveError ? states[camera.liveError.id]?.ts : undefined,
+            }),
     };
 }
 
