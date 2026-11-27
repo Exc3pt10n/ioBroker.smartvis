@@ -1091,7 +1091,7 @@ function AcControls({ refs, states }: { refs: AcRefs; states: States }): React.J
     const currentCode = mode ? stateCode(mode, states[mode.id]?.val) : '';
     return (
         <>
-            <div className="detail__controls">
+            <div className="detail__controls ac__main">
                 {power && (
                     <Toggle
                         state={power}

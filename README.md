@@ -66,6 +66,7 @@ See [DEVELOPMENT.md](DEVELOPMENT.md).
 ### 0.18.1 (2026-11-27)
 
 - (Exc3pt10n) eufy-next livestream: the player page opens only when `livestream.active` reports a running stream (battery cameras need some seconds to wake up); if no stream arrives within 45 s, a clear hint with "Try again" is shown instead of the player's bare "Error" (an error text in `livestream.error` is shown if the adapter provides one)
+- (Exc3pt10n) Air conditioner view: missing space between the first card (on/off, operating mode) and the temperature card
 
 ### 0.18.0 (2026-11-26)
 

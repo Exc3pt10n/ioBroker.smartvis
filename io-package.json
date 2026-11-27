@@ -4,17 +4,17 @@
         "version": "0.18.1",
         "news": {
             "0.18.1": {
-                "en": "eufy-next livestream: the player opens only once the stream is really running; if it does not start, a clear hint with a retry button is shown instead of \"Error\"",
-                "de": "eufy-next-Livestream: Der Player öffnet erst, wenn der Stream wirklich läuft; startet er nicht, erscheint ein verständlicher Hinweis mit „Erneut versuchen“ statt „Error“",
-                "ru": "Прямая трансляция eufy-next: плеер открывается только когда поток действительно запущен; если он не запускается, вместо «Error» показывается понятная подсказка с кнопкой повтора",
-                "pt": "Transmissão em direto eufy-next: o leitor só abre quando a transmissão está realmente ativa; se não iniciar, é mostrada uma indicação clara com botão para tentar novamente em vez de \"Error\"",
-                "nl": "eufy-next-livestream: de speler opent pas als de stream echt loopt; start hij niet, dan verschijnt een duidelijke melding met 'Opnieuw proberen' in plaats van \"Error\"",
-                "fr": "Flux en direct eufy-next : le lecteur ne s'ouvre que lorsque le flux fonctionne vraiment ; s'il ne démarre pas, un message clair avec un bouton pour réessayer remplace « Error »",
-                "it": "Livestream eufy-next: il lettore si apre solo quando lo stream è davvero attivo; se non parte, al posto di \"Error\" compare un avviso chiaro con il pulsante per riprovare",
-                "es": "Transmisión en directo de eufy-next: el reproductor solo se abre cuando la transmisión está realmente activa; si no arranca, se muestra un aviso claro con un botón para reintentar en lugar de \"Error\"",
-                "pl": "Transmisja na żywo eufy-next: odtwarzacz otwiera się dopiero, gdy strumień naprawdę działa; jeśli się nie uruchomi, zamiast „Error” pojawia się zrozumiały komunikat z przyciskiem ponowienia",
-                "uk": "Пряма трансляція eufy-next: плеєр відкривається лише тоді, коли потік справді працює; якщо він не запускається, замість «Error» показується зрозуміла підказка з кнопкою повтору",
-                "zh-cn": "eufy-next 直播：仅在视频流真正运行后才打开播放器；如果未能启动，将显示清晰的提示和重试按钮，而不是“Error”"
+                "en": "eufy-next livestream: the player opens only once the stream is really running; if it does not start, a clear hint with a retry button is shown instead of \"Error\"; missing space in the air conditioner view",
+                "de": "eufy-next-Livestream: Der Player öffnet erst, wenn der Stream wirklich läuft; startet er nicht, erscheint ein verständlicher Hinweis mit „Erneut versuchen“ statt „Error“; fehlender Abstand in der Klima-Ansicht",
+                "ru": "Прямая трансляция eufy-next: плеер открывается только когда поток действительно запущен; если он не запускается, вместо «Error» показывается понятная подсказка с кнопкой повтора; недостающий отступ в окне кондиционера",
+                "pt": "Transmissão em direto eufy-next: o leitor só abre quando a transmissão está realmente ativa; se não iniciar, é mostrada uma indicação clara com botão para tentar novamente em vez de \"Error\"; espaço em falta na vista do ar condicionado",
+                "nl": "eufy-next-livestream: de speler opent pas als de stream echt loopt; start hij niet, dan verschijnt een duidelijke melding met 'Opnieuw proberen' in plaats van \"Error\"; ontbrekende ruimte in de airco-weergave",
+                "fr": "Flux en direct eufy-next : le lecteur ne s'ouvre que lorsque le flux fonctionne vraiment ; s'il ne démarre pas, un message clair avec un bouton pour réessayer remplace « Error » ; espacement manquant dans la vue du climatiseur",
+                "it": "Livestream eufy-next: il lettore si apre solo quando lo stream è davvero attivo; se non parte, al posto di \"Error\" compare un avviso chiaro con il pulsante per riprovare; spazio mancante nella vista del climatizzatore",
+                "es": "Transmisión en directo de eufy-next: el reproductor solo se abre cuando la transmisión está realmente activa; si no arranca, se muestra un aviso claro con un botón para reintentar en lugar de \"Error\"; espacio que faltaba en la vista del aire acondicionado",
+                "pl": "Transmisja na żywo eufy-next: odtwarzacz otwiera się dopiero, gdy strumień naprawdę działa; jeśli się nie uruchomi, zamiast „Error” pojawia się zrozumiały komunikat z przyciskiem ponowienia; brakujący odstęp w widoku klimatyzatora",
+                "uk": "Пряма трансляція eufy-next: плеєр відкривається лише тоді, коли потік справді працює; якщо він не запускається, замість «Error» показується зрозуміла підказка з кнопкою повтору; відсутній відступ у вікні кондиціонера",
+                "zh-cn": "eufy-next 直播：仅在视频流真正运行后才打开播放器；如果未能启动，将显示清晰的提示和重试按钮，而不是“Error”；修复空调视图中缺少的间距"
             },
             "0.18.0": {
                 "en": "Support for the philips-hue adapter: lights, rooms, zones, scenes, smart scenes and motion sensors",

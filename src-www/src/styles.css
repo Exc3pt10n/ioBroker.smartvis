@@ -3606,6 +3606,11 @@ button.kpi:hover {
     cursor: default;
 }
 
+/* Klimagerät: Karte mit Raum-/Solltemperatur (wie beim Thermostat) direkt nach Ein/Aus und Betriebsart */
+.ac__main + .detail__controls {
+    margin-top: 12px;
+}
+
 .ac__selects {
     margin-top: 12px;
     padding-top: 4px;
