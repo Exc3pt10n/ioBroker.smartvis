@@ -65,7 +65,7 @@ See [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ### 0.18.2 (2026-11-27)
 
-- (Exc3pt10n) Camera view opened from "Just detected" on the home page: it closed as soon as the detection ended (the card disappears), which also stopped a livestream that was just starting – often only seconds after the start, before the camera delivered a picture. The view now stays open
+- (Exc3pt10n) Camera view opened from "Just detected" on the home page stays open when the card disappears (event picture older than 10 minutes); before, the view closed with the card and stopped a running livestream
 
 ### 0.18.1 (2026-11-27)
 

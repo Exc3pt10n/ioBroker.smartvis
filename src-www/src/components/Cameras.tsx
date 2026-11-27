@@ -508,8 +508,8 @@ function CameraSettings({ settings }: { settings: SvCameraSetting[] }): React.JS
 /**
  * Startseite: Kameras mit laufender oder frischer Erkennung (Ereignisbild jünger als 10 Minuten).
  * Ohne aktuelles Ereignis erscheint nichts – die Kameras stehen im Bereich Sicherheit.
- * Die Detailansicht öffnet die Startseite selbst (onOpen): Die Karte verschwindet, sobald die Erkennung endet –
- * eine darin geöffnete Ansicht würde dann geschlossen und ein gerade startender Livestream beendet.
+ * Die Detailansicht öffnet die Startseite selbst (onOpen): Die Karte verschwindet, wenn das Ereignisbild älter als
+ * 10 Minuten wird – eine darin geöffnete Ansicht würde dann geschlossen und ein laufender Livestream beendet.
  */
 export function RecentDetectionsCard({
     detections,

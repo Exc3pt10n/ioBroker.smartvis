@@ -84,7 +84,7 @@ export function HomeView({ onNavigate }: { onNavigate: (path: string) => void })
     const phone = useMediaQuery('(max-width: 899px)');
     const now = useNow(30_000);
     const [showAllKpis, setShowAllKpis] = useState(kpisExpanded);
-    // Kamera-Ansicht aus "Gerade erkannt": hier statt in der Karte, damit sie offen bleibt, wenn die Erkennung endet
+    // Kamera-Ansicht aus "Gerade erkannt": hier statt in der Karte, damit sie offen bleibt, wenn die Karte verschwindet
     const [openCamera, setOpenCamera] = useState<string | undefined>();
     if (!model) {
         return <p className="empty">{t('Loading devices …')}</p>;

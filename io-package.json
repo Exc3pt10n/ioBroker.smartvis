@@ -4,17 +4,17 @@
         "version": "0.18.2",
         "news": {
             "0.18.2": {
-                "en": "Camera view opened from \"Just detected\" on the home page stays open when the detection ends, so a starting livestream is no longer stopped",
-                "de": "Die Kamera-Ansicht aus „Gerade erkannt“ auf der Startseite bleibt offen, wenn die Erkennung endet – ein startender Livestream wird nicht mehr abgebrochen",
-                "ru": "Окно камеры, открытое из «Только что обнаружено» на главной странице, остаётся открытым после окончания обнаружения, поэтому запускаемая трансляция больше не прерывается",
-                "pt": "A vista da câmara aberta a partir de \"Acabado de detetar\" na página inicial permanece aberta quando a deteção termina, pelo que uma transmissão a iniciar já não é interrompida",
-                "nl": "De cameraweergave die vanuit 'Net gedetecteerd' op de startpagina is geopend, blijft open als de detectie eindigt, zodat een startende livestream niet meer wordt afgebroken",
-                "fr": "La vue caméra ouverte depuis « Détecté à l'instant » sur la page d'accueil reste ouverte à la fin de la détection ; un flux en cours de démarrage n'est plus interrompu",
-                "it": "La vista della telecamera aperta da \"Appena rilevato\" nella pagina iniziale resta aperta quando il rilevamento termina, quindi un livestream in avvio non viene più interrotto",
-                "es": "La vista de cámara abierta desde \"Detectado ahora\" en la página de inicio permanece abierta cuando termina la detección, por lo que una transmisión que se está iniciando ya no se interrumpe",
-                "pl": "Widok kamery otwarty z „Właśnie wykryto” na stronie głównej pozostaje otwarty po zakończeniu wykrywania, więc uruchamiana transmisja nie jest już przerywana",
-                "uk": "Вікно камери, відкрите з «Щойно виявлено» на головній сторінці, залишається відкритим після завершення виявлення, тому трансляція, що запускається, більше не переривається",
-                "zh-cn": "从首页“刚刚检测到”打开的摄像头视图在检测结束后保持打开，正在启动的直播不再被中断"
+                "en": "Camera view opened from \"Just detected\" on the home page stays open when the card disappears, so a running livestream is no longer stopped",
+                "de": "Die Kamera-Ansicht aus „Gerade erkannt“ auf der Startseite bleibt offen, wenn die Karte verschwindet – ein laufender Livestream wird nicht mehr beendet",
+                "ru": "Окно камеры, открытое из «Только что обнаружено» на главной странице, остаётся открытым, когда карточка исчезает, поэтому идущая трансляция больше не прерывается",
+                "pt": "A vista da câmara aberta a partir de \"Acabado de detetar\" na página inicial permanece aberta quando o cartão desaparece, pelo que uma transmissão em curso já não é terminada",
+                "nl": "De cameraweergave die vanuit 'Net gedetecteerd' op de startpagina is geopend, blijft open als de kaart verdwijnt, zodat een lopende livestream niet meer wordt beëindigd",
+                "fr": "La vue caméra ouverte depuis « Détecté à l'instant » sur la page d'accueil reste ouverte lorsque la carte disparaît ; un flux en cours n'est plus arrêté",
+                "it": "La vista della telecamera aperta da \"Appena rilevato\" nella pagina iniziale resta aperta quando la scheda scompare, quindi un livestream in corso non viene più interrotto",
+                "es": "La vista de cámara abierta desde \"Detectado ahora\" en la página de inicio permanece abierta cuando desaparece la tarjeta, por lo que una transmisión en curso ya no se detiene",
+                "pl": "Widok kamery otwarty z „Właśnie wykryto” na stronie głównej pozostaje otwarty, gdy karta znika, więc trwająca transmisja nie jest już przerywana",
+                "uk": "Вікно камери, відкрите з «Щойно виявлено» на головній сторінці, залишається відкритим, коли картка зникає, тому трансляція, що триває, більше не переривається",
+                "zh-cn": "从首页“刚刚检测到”打开的摄像头视图在卡片消失时保持打开，正在进行的直播不再被停止"
             },
             "0.18.1": {
                 "en": "eufy-next livestream: the player opens only once the stream is really running; if it does not start, a clear hint with a retry button is shown instead of \"Error\"; missing space in the air conditioner view",
