@@ -135,6 +135,8 @@ export function StationRow({ station }: { station: SvSecurityStation }): React.J
  */
 /** So lange darf der Start eines Livestreams dauern (Akku-Kameras wecken, Verbindung über die HomeBase) */
 const LIVE_START_TIMEOUT_MS = 45_000;
+/** Uhren von Browser und ioBroker-Host gehen selten genau gleich */
+const CLOCK_TOLERANCE_MS = 2000;
 
 export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: () => void }): React.JSX.Element {
     const { states, model } = useConnection();
@@ -169,6 +171,7 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
     // Start ohne Erfolg: Fehlermeldung des Adapters oder nach einer Wartezeit kein aktiver Stream
     const [timedOut, setTimedOut] = useState(false);
     const [attempt, setAttempt] = useState(0);
+    const [startedAt, setStartedAt] = useState(0);
     useEffect(() => {
         if (!live || sawReady) {
             return;
@@ -176,7 +179,10 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
         const timer = window.setTimeout(() => setTimedOut(true), LIVE_START_TIMEOUT_MS);
         return () => window.clearTimeout(timer);
     }, [live, sawReady, attempt]);
-    const failed = live && !sawReady && (timedOut || (!!info.liveError && info.liveActive === false));
+    // Fehlermeldung nur, wenn sie zu diesem Versuch gehört (eufy-next leert sie erst kurz nach dem neuen Start)
+    const startError =
+        info.liveError && (info.liveErrorTs ?? 0) >= startedAt - CLOCK_TOLERANCE_MS ? info.liveError : undefined;
+    const failed = live && !sawReady && (timedOut || (!!startError && info.liveActive === false));
 
     const startLive = (): void => {
         if (camera.liveStart) {
@@ -184,6 +190,7 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
             setSawReady(false);
             setTimedOut(false);
             setAttempt(n => n + 1);
+            setStartedAt(Date.now());
             setLive(true);
         }
     };
@@ -236,7 +243,7 @@ export function CameraSheet({ camera, onClose }: { camera: SvCamera; onClose: ()
                                 <span>
                                     {t('The livestream did not start')}
                                     <small>
-                                        {info.liveError ||
+                                        {startError ||
                                             t(
                                                 'The camera did not deliver a stream. Battery cameras sometimes do not wake up, or the stream is already running in the eufy app. Details are in the log of the camera adapter.',
                                             )}
